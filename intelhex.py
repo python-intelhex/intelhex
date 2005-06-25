@@ -1,19 +1,23 @@
 #!/usr/bin/python
-# @file     intelhex.py
-# @brief    Work with Intel HEX file format
-# @author   Alexander Belchenko, 2005
+# Intel HEX file format reader and converter.
 
-'''
+'''\
 Intel HEX file format reader and converter.
+@author     Alexander Belchenko, 2005
+@version    0.1
+@date       2005/06/25
 '''
 
+__docformat__ = "javadoc"
+
+import array
 
 class IntelHex:
     ''' Intel HEX file reader. '''
 
     def __init__(self, fname):
         ''' Constructor.
-        @param  fname   file name of HEX file or file-like object.
+        @param  fname   file name of HEX file or file object.
         '''
         self._fname = fname
         self._buf = {}
@@ -55,7 +59,7 @@ class IntelHex:
         ''' Decode one record of HEX file.
         @param  s       line with HEX record.
         @return True    if line decode OK, or this is not HEX line.
-        @return False   if this is invalid HEX line or checksum error.
+                False   if this is invalid HEX line or checksum error.
         '''
         s = s.rstrip('\r\n')
         l = len(s)
@@ -111,16 +115,17 @@ class IntelHex:
 
         return True
 
-    def tobin(self, start=None, end=None, fill=0xFF):
+    def tobinarray(self, start=None, end=None, fill=0xFF):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
         @param  fill    fill empty spaces with this value.
-        @return string with binary data.
+        @return         array of unsigned char data.
         '''
+        bin = array.array('B')
         aa = self._buf.keys()
         aa.sort()
-        if aa == []:    return ''
+        if aa == []:    return bin
         amin = aa[0]
         amax = aa[-1]
         if start is None:
@@ -128,23 +133,35 @@ class IntelHex:
         if end is None:
             end = amax
 
-        s = ''
         for i in xrange(start, end+1, 1):
-            s += chr(self._buf.get(i, fill))
+            bin.append(self._buf.get(i, fill))
 
-        return s
+        return bin
 
-    def tobinfile(self, fname, start=None, end=None, fill=0xFF):
-        ''' Convert to binary and write to fname file.
-        @param  fname   file name for write output bytes.
+    def tobinstr(self, start=None, end=None, fill=0xFF):
+        ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
         @param  fill    fill empty spaces with this value.
-        @return string with binary data.
+        @return         string of binary data.
         '''
-        f = file(fname, "wb")
-        f.write(self.tobin(start, end, fill))
-        f.close()
+        bin = self.tobinarray(start, end, fill)
+        return bin.tostring()
+
+    def tobinfile(self, fname, start=None, end=None, fill=0xFF):
+        ''' Convert to binary and write to fname file.
+        @param  fname   file name or file object for write output bytes.
+        @param  start   start address of output bytes.
+        @param  end     end address of output bytes.
+        @param  fill    fill empty spaces with this value.
+        @return         Nothing.
+        '''
+        bin = self.tobinarray(start, end, fill)
+        if not hasattr(fname, "write"):
+            fname = file(fname, "wb")
+        bin.tofile(fname)
+
+#/IntelHex
 
 
 if __name__ == '__main__':
@@ -153,4 +170,9 @@ if __name__ == '__main__':
     print len(h._buf)
 
     h.tobinfile("1.bin")
+
+    f = file("2.bin", "wb")
+    h.tobinfile(f)
+
+    print h.tobinarray()
 
