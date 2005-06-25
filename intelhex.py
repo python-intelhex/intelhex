@@ -5,8 +5,8 @@
 Intel HEX file format reader and converter.
 This script also may be used as hex2bin convertor utility.
 
-@author     Alexander Belchenko, 2005
-@version    0.2
+@author     Alexander Belchenko (bialix@ukr.net)
+@version    0.4
 @date       2005/06/25
 '''
 
