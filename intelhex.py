@@ -135,6 +135,11 @@ class IntelHex:
         if end is None:
             end = amax
 
+        if start > end:
+            x = start
+            start = end
+            end = x
+
         for i in xrange(start, end+1, 1):
             bin.append(self._buf.get(i, pad))
 
