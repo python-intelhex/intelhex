@@ -1,0 +1,82 @@
+Intel HEX format
+================
+
+Record
+------
+
+012345678 90    90
+:llaaaatt[dd...]cc
+
+:	is the colon that starts every Intel HEX record.
+
+ll	is the record-length field that represents the number of data
+	bytes (dd) in the record.
+
+aaaa	is the address field that represents the starting address for
+	subsequent data in the record.
+
+tt	is the field that represents the HEX record type, which may
+	be one of the following:
+	
+		00 data record
+		01 end-of-file record
+		02 extended 8086 segment address record.
+		04 extended linear address record.
+
+dd	is a data field that represents one byte of data. A record may
+	have multiple data bytes. The number of data bytes in the
+	record must match the number specified by the ll field.
+
+cc	is the checksum field that represents the checksum of the
+	record. The checksum is calculated by summing the values
+	of all hexadecimal digit pairs in the record modulo 256 and
+	taking the two’s complement.
+
+End-of-file record
+------------------
+:00000001FF
+
+
+Extended 8086 Segment Record
+----------------------------
+The Intel HEX contains extended 8086 segment records when the H86 directive
+is used. This record is used to specify an address offset (in 8086 paragraph
+form) for the following data records. Extended 8086 segment records appear as
+follows:
+
+012345678901234
+:02000002F0000C
+
+where:
+02 	is the number of data bytes in the record.
+
+0000 	is always 0 in a extended 8086 segment record.
+
+02 	is the record type 02 (a extended 8086 segment record).
+
+F000 	is the offset in 8086 paragraph notation (= 0x0F0000).
+
+0C 	is the checksum of the record.
+
+
+Extended Linear Address Record
+------------------------------
+The Intel HEX contains extended linear address records when the H386 directive
+is used. This record is used to specify the two most significant bytes (bits 16 -
+31) of the absolute address. This address offset is used for all following data
+records. Extended linear address records appear as follows:
+
+012345678901234
+:0200000400FFFB
+
+where:
+
+02 	is the number of data bytes in the record.
+
+0000	is always 0 in a extended 8086 segment record.
+
+04 	is the record type 04 (a extended linear address record).
+
+00FF 	is the high word of the address offset (= 0xFF0000).
+
+FB 	is the checksum of the record.
