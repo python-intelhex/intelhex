@@ -250,3 +250,6 @@ if __name__ == '__main__':
     else:
         print "Fail"
         sys.exit(1)
+
+    print "Overlay:", ih.Overlay
+    print "Error:", ih.Error

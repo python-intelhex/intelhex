@@ -21,13 +21,17 @@ class IntelHex:
         ''' Constructor.
         @param  fname   file name of HEX file or file object.
         '''
+        #public members
+        self.Error = None
+        self.Overlay = None
+        self.padding = 0x0FF
+        # private members
         self._fname = fname
         self._buf = {}
         self._readed = False
-        self.Error = None
-        self.Intersection = None
         self._eof = False
         self._offset = 0
+        self._keys = []
 
     def readfile(self):
         ''' Read file into internal buffer.
@@ -92,7 +96,7 @@ class IntelHex:
             aaaa = self._offset + aaaa
             for i in bb[4:4+ll]:
                 if self._buf.get(aaaa, None) is not None:
-                    self.Intersection = aaaa
+                    self.Overlay = aaaa
                 self._buf[aaaa] = i
                 aaaa += 1
         elif tt == 1:
@@ -115,19 +119,27 @@ class IntelHex:
             self.Error = "Invalid type of record"
             return False
 
+        self._keys = self._buf.keys()
+        self._keys.sort()
+
         return True
 
-    def tobinarray(self, start=None, end=None, pad=0xFF):
+    def tobinarray(self, start=None, end=None, pad=None):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  pad     fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value
+                        (if None used self.padding).
         @return         array of unsigned char data.
         '''
+        if pad is None:
+            pad = self.padding
+
         bin = array.array('B')
-        aa = self._buf.keys()
-        aa.sort()
+
+        aa = self._keys
         if aa == []:    return bin
+
         amin = aa[0]
         amax = aa[-1]
         if start is None:
@@ -136,9 +148,7 @@ class IntelHex:
             end = amax
 
         if start > end:
-            x = start
-            start = end
-            end = x
+            start, end = end, start
 
         for i in xrange(start, end+1, 1):
             bin.append(self._buf.get(i, pad))
@@ -149,7 +159,8 @@ class IntelHex:
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  pad     fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value
+                        (if None used self.padding).
         @return         string of binary data.
         '''
         bin = self.tobinarray(start, end, pad)
@@ -160,7 +171,8 @@ class IntelHex:
         @param  fname   file name or file object for write output bytes.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  pad     fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value
+                        (if None used self.padding).
         @return         Nothing.
         '''
         bin = self.tobinarray(start, end, pad)
