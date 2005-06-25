@@ -2,3 +2,5 @@
 *.hex
 html
 HEX2BIN.EXE
+*.tws
+__x.py
