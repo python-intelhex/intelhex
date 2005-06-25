@@ -3,8 +3,10 @@
 
 '''\
 Intel HEX file format reader and converter.
+This script also may be used as hex2bin convertor utility.
+
 @author     Alexander Belchenko, 2005
-@version    0.1
+@version    0.2
 @date       2005/06/25
 '''
 
@@ -115,11 +117,11 @@ class IntelHex:
 
         return True
 
-    def tobinarray(self, start=None, end=None, fill=0xFF):
+    def tobinarray(self, start=None, end=None, pad=0xFF):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  fill    fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value.
         @return         array of unsigned char data.
         '''
         bin = array.array('B')
@@ -134,29 +136,29 @@ class IntelHex:
             end = amax
 
         for i in xrange(start, end+1, 1):
-            bin.append(self._buf.get(i, fill))
+            bin.append(self._buf.get(i, pad))
 
         return bin
 
-    def tobinstr(self, start=None, end=None, fill=0xFF):
+    def tobinstr(self, start=None, end=None, pad=0xFF):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  fill    fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value.
         @return         string of binary data.
         '''
-        bin = self.tobinarray(start, end, fill)
+        bin = self.tobinarray(start, end, pad)
         return bin.tostring()
 
-    def tobinfile(self, fname, start=None, end=None, fill=0xFF):
+    def tobinfile(self, fname, start=None, end=None, pad=0xFF):
         ''' Convert to binary and write to fname file.
         @param  fname   file name or file object for write output bytes.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
-        @param  fill    fill empty spaces with this value.
+        @param  pad     fill empty spaces with this value.
         @return         Nothing.
         '''
-        bin = self.tobinarray(start, end, fill)
+        bin = self.tobinarray(start, end, pad)
         if not hasattr(fname, "write"):
             fname = file(fname, "wb")
         bin.tofile(fname)
@@ -165,14 +167,81 @@ class IntelHex:
 
 
 if __name__ == '__main__':
-    h = IntelHex('hello.hex')
-    print h.readfile()
-    print len(h._buf)
+    import sys, getopt
 
-    h.tobinfile("1.bin")
+    usage = '''
+Hex2Bin python converting utility.
+Usage:
+    python intelhex.py [options] file.hex [out.bin]
 
-    f = file("2.bin", "wb")
-    h.tobinfile(f)
+Arguments:
+    file.hex                name of hex file to processing.
+    out.bin                 name of output file.
+                            If ommited then output write to file.bin.
 
-    print h.tobinarray()
+Options:
+    -h, --help              this help message.
+    -p, --pad=FF            pad byte for empty spaces (ascii hex value).
+    -r, --range=START:END   specify address range for writing output
+                            (ascii hex value).
+                            Range can be in form 'START:' or ':END'.
+'''
 
+    pad = 0xFF
+    start = None
+    end = None
+
+    try:
+        opts, args = getopt.getopt(sys.argv[1:], "hp:r:",
+                                  ["help", "pad=", "range="])
+
+        for o, a in opts:
+            if o in ("-h", "--help"):
+                print usage
+                sys.exit(0)
+            elif o in ("-p", "--pad"):
+                try:
+                    pad = int(a, 16) & 0x0FF
+                except:
+                    raise getopt.GetoptError, 'Bad pad value'
+            elif o in ("-r", "--range"):
+                try:
+                    l = a.split(":")
+                    if l[0] != '':
+                        start = int(l[0], 16)
+                    if l[1] != '':
+                        end = int(l[1], 16)
+                except:
+                    raise getopt.GetoptError, 'Bad range value(s)'
+
+        if not args:
+            raise getopt.GetoptError, 'Hex file is not specified'
+
+        if len(args) > 2:
+            raise getopt.GetoptError, 'Too many arguments'
+
+    except getopt.GetoptError, msg:
+        print >>sys.stderr, msg
+        print >>sys.stderr, usage
+        sys.exit(3)
+
+    fin = args[0]
+    if len(args) == 1:
+        import os.path
+        name, ext = os.path.splitext(fin)
+        fout = name + ".bin"
+    else:
+        fout = args[1]
+
+    h = IntelHex(fin)
+    if not h.readfile():
+        print >>sys.stderr, "Bad HEX file"
+        sys.exit(1)
+
+    try:
+        h.tobinfile(fout, start, end, pad)
+    except IOError:
+        print >>sys.stderr, "Could not write to file: %s" % fout
+        sys.exit(2)
+
+    sys.exit(0)
