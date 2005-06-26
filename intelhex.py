@@ -26,13 +26,13 @@ class IntelHex:
         self.Error = None
         self.Overlay = None
         self.padding = 0x0FF
+
         # private members
         self._fname = fname
         self._buf = {}
         self._readed = False
         self._eof = False
         self._offset = 0
-        self._keys = []
 
     def readfile(self):
         ''' Read file into internal buffer.
@@ -122,9 +122,6 @@ class IntelHex:
             self.Error = "Invalid type of record"
             return False
 
-        self._keys = self._buf.keys()
-        self._keys.sort()
-
         return True
 
     def tobinarray(self, start=None, end=None, pad=None):
@@ -140,15 +137,13 @@ class IntelHex:
 
         bin = array.array('B')
 
-        aa = self._keys
+        aa = self._buf.keys()
         if aa == []:    return bin
 
-        amin = aa[0]
-        amax = aa[-1]
         if start is None:
-            start = amin
+            start = min(aa)
         if end is None:
-            end = amax
+            end = max(aa)
 
         if start > end:
             start, end = end, start
@@ -191,6 +186,23 @@ class IntelHex:
         '''
         return self._buf.get(addr, self.padding)
 
+    def minaddr(self):
+        ''' Get minimal address of HEX content. '''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return min(aa)
+
+    def maxaddr(self):
+        ''' Get maximal address of HEX content. '''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return max(aa)
+
+
 #/IntelHex
 
 
@@ -213,15 +225,19 @@ Options:
     -r, --range=START:END   specify address range for writing output
                             (ascii hex value).
                             Range can be in form 'START:' or ':END'.
+    -l, --length=NNNN,
+    -s, --size=NNNN         size of output (decimal value).
 '''
 
     pad = 0xFF
     start = None
     end = None
+    size = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hp:r:",
-                                  ["help", "pad=", "range="])
+        opts, args = getopt.getopt(sys.argv[1:], "hp:r:l:s:",
+                                  ["help", "pad=", "range=",
+                                   "length=", "size="])
 
         for o, a in opts:
             if o in ("-h", "--help"):
@@ -241,6 +257,14 @@ Options:
                         end = int(l[1], 16)
                 except:
                     raise getopt.GetoptError, 'Bad range value(s)'
+            elif o in ("-l", "--lenght", "-s", "--size"):
+                try:
+                    size = int(a, 10)
+                except:
+                    raise getopt.GetoptError, 'Bad size value'
+
+        if start != None and end != None and size != None:
+            raise getopt.GetoptError, 'Cannot specify START:END and SIZE simultaneously'
 
         if not args:
             raise getopt.GetoptError, 'Hex file is not specified'
@@ -267,6 +291,18 @@ Options:
         print >>sys.stderr, "Bad HEX file"
         sys.exit(1)
     print "readfile, sec:", time.time() - t
+
+    # start, end, size
+    if size != None and size != 0:
+        if end == None:
+            if start == None:
+                start = h.minaddr()
+            end = start + size - 1
+        else:
+            if (end+1) >= size:
+                start = end + 1 - size
+            else:
+                start = 0
 
     try:
         t = time.time()
