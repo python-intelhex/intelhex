@@ -47,6 +47,7 @@ class IntelHex:
             f = self._fname
 
         self._offset = 0
+        self._eof = False
 
         while True:
             s = f.readline()
@@ -54,10 +55,10 @@ class IntelHex:
                 break
 
             if not self.decode_record(s):
-                if self._eof:
-                    break
-                else:
-                    return False
+                return False
+
+            if self._eof:
+                break
 
         self._readed = True
         return True
@@ -66,8 +67,7 @@ class IntelHex:
         ''' Decode one record of HEX file.
         @param  s       line with HEX record.
         @return True    if line decode OK, or this is not HEX line.
-                False   if this is invalid HEX line or checksum error,
-                        or End-of-File record found (also set self._eof flag).
+                False   if this is invalid HEX line or checksum error.
         '''
         s = s.rstrip('\r\n')
         l = len(s)
@@ -103,8 +103,10 @@ class IntelHex:
                 aaaa += 1
         elif tt == 1:
             # end of file record
+            if ll != 0:
+                self.Error = "Bad End-of-File Record"
+                return False
             self._eof = True
-            return False
         elif tt == 2:
             # Extended 8086 Segment Record
             if ll != 2 or aaaa != 0:
@@ -178,14 +180,6 @@ class IntelHex:
             fname = file(fname, "wb")
         bin.tofile(fname)
 
-    def __getitem__(self, addr):
-        ''' Get byte from address.
-        @param  addr    address of byte.
-        @return         byte if address exists in HEX file, or self.padding
-                        if no data found.
-        '''
-        return self._buf.get(addr, self.padding)
-
     def minaddr(self):
         ''' Get minimal address of HEX content. '''
         aa = self._buf.keys()
@@ -201,6 +195,14 @@ class IntelHex:
             return 0
         else:
             return max(aa)
+
+    def __getitem__(self, addr):
+        ''' Get byte from address.
+        @param  addr    address of byte.
+        @return         byte if address exists in HEX file, or self.padding
+                        if no data found.
+        '''
+        return self._buf.get(addr, self.padding)
 
 
 #/IntelHex
@@ -290,7 +292,7 @@ Options:
     if not h.readfile():
         print >>sys.stderr, "Bad HEX file"
         sys.exit(1)
-    print "readfile, sec:", time.time() - t
+    #print "readfile, sec:", time.time() - t
 
     # start, end, size
     if size != None and size != 0:
@@ -307,7 +309,7 @@ Options:
     try:
         t = time.time()
         h.tobinfile(fout, start, end, pad)
-        print "tobinfile, sec:", time.time() - t
+        #print "tobinfile, sec:", time.time() - t
     except IOError:
         print >>sys.stderr, "Could not write to file: %s" % fout
         sys.exit(2)
