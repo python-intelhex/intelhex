@@ -7,13 +7,16 @@ Intel HEX file format reader and converter.
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.5
-@date       2005/06/26
+@version    0.5.1
+@date       2005/12/22
 '''
+
 
 __docformat__ = "javadoc"
 
+
 import array
+
 
 class IntelHex:
     ''' Intel HEX file reader. '''
@@ -70,57 +73,66 @@ class IntelHex:
                 False   if this is invalid HEX line or checksum error.
         '''
         s = s.rstrip('\r\n')
-        l = len(s)
-        if l == 0:  return True         # empty line
+        len_ = len(s)
+        if len_ == 0: return True       # empty line
         if s[0] != ':': return True     # first char must be ':'
-        if l < 11:
+
+        if len_ < 11:
             self.Error = "Too short line"
             return False
-        ll = int(s[1:3], 16)
-        if l != (11 + ll*2):
+
+        record_length = int(s[1:3], 16)
+
+        if len_ != (11 + record_length*2):
             self.Error = "Invalid line length"
             return False
-        aaaa = int(s[3:7], 16)
-        tt = int(s[7:9], 16)
-        if not tt in (0, 1, 2, 4):
+
+        addr = int(s[3:7], 16)
+
+        record_type = int(s[7:9], 16)
+        if not record_type in (0, 1, 2, 4):
             self.Error = "Invalid type of record"
             return False
 
-        bb = [int(s[i:i+2], 16) for i in xrange(1,l,2)]
-        crc = reduce(lambda x, y: x+y, bb, 0)
+        data_bytes = [int(s[i:i+2], 16) for i in xrange(1,len_,2)]
+
+        crc = reduce(lambda x, y: x+y, data_bytes, 0)
         crc &= 0x0FF
         if crc != 0:
             self.Error = "Invalid crc"
             return False
 
-        if tt == 0:
+        if record_type == 0:
             # data record
-            aaaa = self._offset + aaaa
-            for i in bb[4:4+ll]:
-                if self._buf.get(aaaa, None) is not None:
-                    self.AddrOverlap = aaaa
-                self._buf[aaaa] = i
-                aaaa += 1
-        elif tt == 1:
+            addr += self._offset
+            for i in data_bytes[4:4+record_length]:
+                if self._buf.get(addr, None) is not None:
+                    self.AddrOverlap = addr
+                self._buf[addr] = i
+                addr += 1
+
+        elif record_type == 1:
             # end of file record
-            if ll != 0:
+            if record_length != 0:
                 self.Error = "Bad End-of-File Record"
                 return False
             self._eof = True
-        elif tt == 2:
+
+        elif record_type == 2:
             # Extended 8086 Segment Record
-            if ll != 2 or aaaa != 0:
+            if record_length != 2 or addr != 0:
                 self.Error = "Bad Extended 8086 Segment Record"
                 return False
             self._offset = int(s[9:13], 16) << 4
-        elif tt == 4:
+
+        elif record_type == 4:
             # Extended Linear Address Record
-            if ll != 2 or aaaa != 0:
+            if record_length != 2 or addr != 0:
                 self.Error = "Bad Extended Linear Address Record"
                 return False
             self._offset = int(s[9:13], 16) << 16
+
         else:
-            # this is impossible
             self.Error = "Invalid type of record"
             return False
 
@@ -139,18 +151,19 @@ class IntelHex:
 
         bin = array.array('B')
 
-        aa = self._buf.keys()
-        if aa == []:    return bin
+        addresses = self._buf.keys()
+        if addresses == []:
+            return bin
 
         if start is None:
-            start = min(aa)
+            start = min(addresses)
         if end is None:
-            end = max(aa)
+            end = max(addresses)
 
         if start > end:
             start, end = end, start
 
-        for i in xrange(start, end+1, 1):
+        for i in xrange(start, end+1):
             bin.append(self._buf.get(i, pad))
 
         return bin
@@ -208,9 +221,10 @@ class IntelHex:
 
 
 if __name__ == '__main__':
-    import sys, getopt, time
+    import sys
+    import getopt
 
-    usage = '''
+    usage = '''\
 Hex2Bin python converting utility.
 Usage:
     python intelhex.py [options] file.hex [out.bin]
