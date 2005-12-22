@@ -7,8 +7,8 @@ Intel HEX file format reader and converter.
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.4
-@date       2005/06/25
+@version    0.5
+@date       2005/06/26
 '''
 
 __docformat__ = "javadoc"
@@ -24,7 +24,7 @@ class IntelHex:
         '''
         #public members
         self.Error = None
-        self.Overlay = None
+        self.AddrOverlap = None
         self.padding = 0x0FF
 
         # private members
@@ -98,7 +98,7 @@ class IntelHex:
             aaaa = self._offset + aaaa
             for i in bb[4:4+ll]:
                 if self._buf.get(aaaa, None) is not None:
-                    self.Overlay = aaaa
+                    self.AddrOverlap = aaaa
                 self._buf[aaaa] = i
                 aaaa += 1
         elif tt == 1:
@@ -219,7 +219,7 @@ Usage:
 Arguments:
     file.hex                name of hex file to processing.
     out.bin                 name of output file.
-                            If ommited then output write to file.bin.
+                            If omitted then output write to file.bin.
 
 Options:
     -h, --help              this help message.
@@ -287,12 +287,10 @@ Options:
     else:
         fout = args[1]
 
-    t = time.time()
     h = IntelHex(fin)
     if not h.readfile():
         print >>sys.stderr, "Bad HEX file"
         sys.exit(1)
-    #print "readfile, sec:", time.time() - t
 
     # start, end, size
     if size != None and size != 0:
@@ -307,9 +305,7 @@ Options:
                 start = 0
 
     try:
-        t = time.time()
         h.tobinfile(fout, start, end, pad)
-        #print "tobinfile, sec:", time.time() - t
     except IOError:
         print >>sys.stderr, "Could not write to file: %s" % fout
         sys.exit(2)

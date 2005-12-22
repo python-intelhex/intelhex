@@ -4,7 +4,6 @@ Intel HEX format
 Record
 ------
 
-012345678 90    90
 :llaaaatt[dd...]cc
 
 :	is the colon that starts every Intel HEX record.
@@ -44,7 +43,6 @@ is used. This record is used to specify an address offset (in 8086 paragraph
 form) for the following data records. Extended 8086 segment records appear as
 follows:
 
-012345678901234
 :02000002F0000C
 
 where:
@@ -66,7 +64,6 @@ is used. This record is used to specify the two most significant bytes (bits 16 
 31) of the absolute address. This address offset is used for all following data
 records. Extended linear address records appear as follows:
 
-012345678901234
 :0200000400FFFB
 
 where:

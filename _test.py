@@ -251,5 +251,5 @@ if __name__ == '__main__':
         print "Fail"
         sys.exit(1)
 
-    print "Overlay:", ih.Overlay
+    print "Address Overlap:", ih.AddrOverlap
     print "Error:", ih.Error
