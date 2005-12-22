@@ -204,7 +204,6 @@ class IntelHex:
         '''
         return self._buf.get(addr, self.padding)
 
-
 #/IntelHex
 
 
