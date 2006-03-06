@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # Intel HEX file format reader and converter.
 
-'''\
-Intel HEX file format reader and converter.
+'''Intel HEX file format reader and converter.
 
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.5.1
-@date       2005/12/22
+@version    0.6
+@date       2006/03/06
 '''
 
 
@@ -220,12 +219,50 @@ class IntelHex:
 #/IntelHex
 
 
-if __name__ == '__main__':
-    import sys
-    import getopt
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
+    """Hex-to-Bin convertor engine.
+    @return     0   if all OK
 
-    usage = '''\
-Hex2Bin python converting utility.
+    @param  fin     input hex file (filename or file-like object)
+    @param  fout    output bin file (filename or file-like object)
+    @param  start   start of address range (optional)
+    @param  end     end of address range (optional)
+    @param  size    size of resulting file (in bytes) (optional)
+    @param  pad     padding byte (optional)
+    """
+    h = IntelHex(fin)
+    if not h.readfile():
+        print "Bad HEX file"
+        return 1
+
+    # start, end, size
+    if size != None and size != 0:
+        if end == None:
+            if start == None:
+                start = h.minaddr()
+            end = start + size - 1
+        else:
+            if (end+1) >= size:
+                start = end + 1 - size
+            else:
+                start = 0
+
+    try:
+        h.tobinfile(fout, start, end, pad)
+    except IOError:
+        print "Could not write to file: %s" % fout
+        return 1
+
+    return 0
+#/def hex2bin
+
+
+if __name__ == '__main__':
+    import getopt
+    import os
+    import sys
+
+    usage = '''Hex2Bin python converting utility.
 Usage:
     python intelhex.py [options] file.hex [out.bin]
 
@@ -288,9 +325,9 @@ Options:
             raise getopt.GetoptError, 'Too many arguments'
 
     except getopt.GetoptError, msg:
-        print >>sys.stderr, msg
-        print >>sys.stderr, usage
-        sys.exit(3)
+        print msg
+        print usage
+        sys.exit(2)
 
     fin = args[0]
     if len(args) == 1:
@@ -300,27 +337,8 @@ Options:
     else:
         fout = args[1]
 
-    h = IntelHex(fin)
-    if not h.readfile():
-        print >>sys.stderr, "Bad HEX file"
+    if not os.path.isfile(fin):
+        print "File not found"
         sys.exit(1)
 
-    # start, end, size
-    if size != None and size != 0:
-        if end == None:
-            if start == None:
-                start = h.minaddr()
-            end = start + size - 1
-        else:
-            if (end+1) >= size:
-                start = end + 1 - size
-            else:
-                start = 0
-
-    try:
-        h.tobinfile(fout, start, end, pad)
-    except IOError:
-        print >>sys.stderr, "Could not write to file: %s" % fout
-        sys.exit(2)
-
-    sys.exit(0)
+    sys.exit(hex2bin(fin, fout))
