@@ -305,3 +305,9 @@ if __name__ == '__main__':
             sys.exit(1)
 
     print 'Data match. All OK'
+
+    print "Test hex out"
+    fin = StringIO(hex16)
+    ihex = intelhex.IntelHex(fin)
+    ihex.readfile()
+    ihex.writefile('out1.hex')

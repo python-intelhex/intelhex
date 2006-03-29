@@ -6,8 +6,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.7
-@date       2006/03/23
+@version    0.8
+@date       2006/03/29
 '''
 
 
@@ -215,6 +215,91 @@ class IntelHex:
                         if no data found.
         '''
         return self._buf.get(addr, self.padding)
+
+    def writefile(self, f):
+        """Write data to file f in HEX format.
+        @return True    if successful.
+        """
+        if hasattr(f, "write"):
+            fobj = f
+        else:
+            fobj = file(f, 'w')
+
+        maxaddr = self.maxaddr()
+        if maxaddr > 65535:
+            offset = 0
+        else:
+            offset = None
+
+        while True:
+            if offset != None:
+                # emit 32-bit offset record
+                high_ofs = offset / 65536
+                fobj.write(":02000004%04X" % high_ofs)
+                bytes = divmod(high_ofs, 256)
+                csum = 2 + 4 + bytes[0] + bytes[1]
+                csum = (-csum) & 0x0FF
+                fobj.write("%02X\n" % csum)
+
+                ofs = offset
+                if (ofs + 65536) > maxaddr:
+                    rng = xrange(maxaddr - ofs + 1)
+                else:
+                    rng = xrange(65536)
+            else:
+                ofs = 0
+                rng = xrange(maxaddr + 1)
+
+            csum = 0
+            k = 0
+            record = ""
+            for addr in rng:
+                byte = self._buf.get(ofs+addr, None)
+                if byte != None:
+                    if k == 0:
+                        # start data record
+                        record += "%04X00" % addr
+                        bytes = divmod(addr, 256)
+                        csum = bytes[0] + bytes[1]
+
+                    k += 1
+                    # continue data in record
+                    record += "%02X" % byte
+                    csum += byte
+
+                    # check for length of record
+                    if k < 16:
+                        continue
+
+                if k != 0:
+                    # close record
+                    csum += k
+                    csum = (-csum) & 0x0FF
+                    record += "%02X" % csum
+                    fobj.write(":%02X%s\n" % (k, record))
+                    # cleanup
+                    csum = 0
+                    k = 0
+                    record = ""
+            else:
+                if k != 0:
+                    # close record
+                    csum += k
+                    csum = (-csum) & 0x0FF
+                    record += "%02X" % csum
+                    fobj.write(":%02X%s\n" % (k, record))
+
+            # advance offset
+            if offset is None:
+                break
+
+            offset += 65536
+            if offset > maxaddr:
+                break
+
+        # end-of-file record
+        fobj.write(":00000001FF\n")
+        fobj.close()
 
 #/IntelHex
 
