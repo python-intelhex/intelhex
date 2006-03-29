@@ -7,12 +7,13 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix@ukr.net
-:Date: 2005-06-26
-:Version: 0.5
+:Date: 2006-03-07
+:Version: 0.6
 
+.. Contents::
 
 Introduction
-============
+------------
 Intel HEX file format widely used in microprocessors and microcontrollers
 area as de-facto standard for representation of code for programming into
 microelectronic devices.
@@ -20,8 +21,6 @@ microelectronic devices.
 This work implements HEX file format reader and convertor to binary form 
 as python script.
 
-Script intelhex.py
-==================
 Script intelhex.py contain implementation of HEX file reader and convertor
 as IntelHex class. You also may use this script as standalone hex-to-bin
 convertor.
@@ -57,6 +56,31 @@ You can use epydoc_ for creating documentation for IntelHex class. Run epydoc::
 
 Hex-to-Bin convertor
 --------------------
+You can use hex-to-bin convertor in two way: as function ``hex2bin`` (useful
+for using in other scripts) or as stand-alone script.
+
+Function ``hex2bin``
+********************
+Hex-to-Bin convertor engine.
+
+``hex2bin(fin, fout, start=None, end=None, size=None, pad=255)``
+
+**Parameters**: 
+
+* ``fin`` -- input hex file (filename or file-like object) 
+* ``fout`` -- output bin file (filename or file-like object) 
+* ``start`` -- start of address range (optional) 
+* ``end`` -- end of address range (optional) 
+* ``size`` -- size of resulting file (in bytes) (optional) 
+* ``pad`` -- padding byte (optional) 
+
+**Returns**: 
+
+	0 if all OK 
+
+
+Stand-alone script ``intelhex.py``
+**********************************
 You can use intelhex.py as stand-alone hex-to-bin convertor.
 ::
 

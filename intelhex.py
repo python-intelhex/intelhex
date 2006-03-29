@@ -1,14 +1,13 @@
 #!/usr/bin/python
 # Intel HEX file format reader and converter.
 
-'''\
-Intel HEX file format reader and converter.
+'''Intel HEX file format reader and converter.
 
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.5.1
-@date       2005/12/22
+@version    0.7
+@date       2006/03/23
 '''
 
 
@@ -106,10 +105,10 @@ class IntelHex:
             # data record
             addr += self._offset
             for i in data_bytes[4:4+record_length]:
-                if self._buf.get(addr, None) is not None:
+                if self._buf.get(addr, None) != None:
                     self.AddrOverlap = addr
                 self._buf[addr] = i
-                addr += 1
+                addr += 1       # FIXME: addr should be wrapped on 64K boundary
 
         elif record_type == 1:
             # end of file record
@@ -220,12 +219,118 @@ class IntelHex:
 #/IntelHex
 
 
-if __name__ == '__main__':
-    import sys
-    import getopt
+class IntelHex16bit(IntelHex):
+    """Access to data as 16-bit words."""
 
-    usage = '''\
-Hex2Bin python converting utility.
+    def __init__(self, source):
+        """Construct class from HEX file
+        or from instance of ordinary IntelHex class.
+
+        @param  source  file name of HEX file or file object
+                        or instance of ordinary IntelHex class
+        """
+        if isinstance(source, IntelHex):
+            # from ihex8
+            self.Error = source.Error
+            self.AddrOverlap = source.AddrOverlap
+            self.padding = source.padding
+    
+            # private members
+            self._fname = source._fname
+            self._buf = source._buf
+            self._readed = source._readed
+            self._eof = source._eof
+            self._offset = source._offset
+        else:
+            IntelHex.__init__(self, source)
+
+        if self.padding == 0x0FF:
+            self.padding = 0x0FFFF
+
+    def __getitem__(self, addr16):
+        """Get 16-bit word from address.
+        Raise error if found only one byte from pair.
+
+        @param  addr16  address of word (addr8 = 2 * addr16).
+        @return         word if bytes exists in HEX file, or self.padding
+                        if no data found.
+        """
+        addr1 = addr16 * 2
+        addr2 = addr1 + 1
+        byte1 = self._buf.get(addr1, None)
+        byte2 = self._buf.get(addr2, None)
+
+        if byte1 != None and byte2 != None:
+            return byte1 | (byte2 << 8)     # low endian
+
+        if byte1 == None and byte2 == None:
+            return self.padding
+
+        raise Exception, 'Bad access in 16-bit mode (not enough data)'
+
+    def minaddr(self):
+        '''Get minimal address of HEX content in 16-bit mode.'''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return min(aa)/2
+
+    def maxaddr(self):
+        '''Get maximal address of HEX content in 16-bit mode.'''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return max(aa)/2
+
+#/class IntelHex16bit
+
+
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
+    """Hex-to-Bin convertor engine.
+    @return     0   if all OK
+
+    @param  fin     input hex file (filename or file-like object)
+    @param  fout    output bin file (filename or file-like object)
+    @param  start   start of address range (optional)
+    @param  end     end of address range (optional)
+    @param  size    size of resulting file (in bytes) (optional)
+    @param  pad     padding byte (optional)
+    """
+    h = IntelHex(fin)
+    if not h.readfile():
+        print "Bad HEX file"
+        return 1
+
+    # start, end, size
+    if size != None and size != 0:
+        if end == None:
+            if start == None:
+                start = h.minaddr()
+            end = start + size - 1
+        else:
+            if (end+1) >= size:
+                start = end + 1 - size
+            else:
+                start = 0
+
+    try:
+        h.tobinfile(fout, start, end, pad)
+    except IOError:
+        print "Could not write to file: %s" % fout
+        return 1
+
+    return 0
+#/def hex2bin
+
+
+if __name__ == '__main__':
+    import getopt
+    import os
+    import sys
+
+    usage = '''Hex2Bin python converting utility.
 Usage:
     python intelhex.py [options] file.hex [out.bin]
 
@@ -288,9 +393,9 @@ Options:
             raise getopt.GetoptError, 'Too many arguments'
 
     except getopt.GetoptError, msg:
-        print >>sys.stderr, msg
-        print >>sys.stderr, usage
-        sys.exit(3)
+        print msg
+        print usage
+        sys.exit(2)
 
     fin = args[0]
     if len(args) == 1:
@@ -300,27 +405,8 @@ Options:
     else:
         fout = args[1]
 
-    h = IntelHex(fin)
-    if not h.readfile():
-        print >>sys.stderr, "Bad HEX file"
+    if not os.path.isfile(fin):
+        print "File not found"
         sys.exit(1)
 
-    # start, end, size
-    if size != None and size != 0:
-        if end == None:
-            if start == None:
-                start = h.minaddr()
-            end = start + size - 1
-        else:
-            if (end+1) >= size:
-                start = end + 1 - size
-            else:
-                start = 0
-
-    try:
-        h.tobinfile(fout, start, end, pad)
-    except IOError:
-        print >>sys.stderr, "Could not write to file: %s" % fout
-        sys.exit(2)
-
-    sys.exit(0)
+    sys.exit(hex2bin(fin, fout))
