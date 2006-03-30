@@ -216,6 +216,9 @@ class IntelHex:
         '''
         return self._buf.get(addr, self.padding)
 
+    def __setitem__(self, addr, byte):
+        self._buf[addr] = byte
+
     def writefile(self, f):
         """Write data to file f in HEX format.
         @return True    if successful.
@@ -225,7 +228,7 @@ class IntelHex:
         else:
             fobj = file(f, 'w')
 
-        maxaddr = self.maxaddr()
+        maxaddr = IntelHex.maxaddr(self)
         if maxaddr > 65535:
             offset = 0
         else:
@@ -235,7 +238,7 @@ class IntelHex:
             if offset != None:
                 # emit 32-bit offset record
                 high_ofs = offset / 65536
-                fobj.write(":02000004%04X" % high_ofs)
+                offset_record = ":02000004%04X\n" % high_ofs
                 bytes = divmod(high_ofs, 256)
                 csum = 2 + 4 + bytes[0] + bytes[1]
                 csum = (-csum) & 0x0FF
@@ -248,6 +251,7 @@ class IntelHex:
                     rng = xrange(65536)
             else:
                 ofs = 0
+                offset_record = ''
                 rng = xrange(maxaddr + 1)
 
             csum = 0
@@ -257,6 +261,9 @@ class IntelHex:
                 byte = self._buf.get(ofs+addr, None)
                 if byte != None:
                     if k == 0:
+                        # optionally offset record
+                        fobj.write(offset_record)
+                        offset_record = ''
                         # start data record
                         record += "%04X00" % addr
                         bytes = divmod(addr, 256)
@@ -352,6 +359,12 @@ class IntelHex16bit(IntelHex):
             return self.padding
 
         raise Exception, 'Bad access in 16-bit mode (not enough data)'
+
+    def __setitem__(self, addr16, word):
+        addr_byte = addr16 * 2
+        bytes = divmod(word, 256)
+        self._buf[addr_byte] = bytes[1]
+        self._buf[addr_byte+1] = bytes[0]
 
     def minaddr(self):
         '''Get minimal address of HEX content in 16-bit mode.'''
