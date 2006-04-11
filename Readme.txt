@@ -6,7 +6,7 @@ Python implementation
 ---------------------
 
 :Author: Alexander Belchenko
-:Contact: bialix@ukr.net
+:Contact: bialix AT ukr net
 :Date: 2006-04-11
 :Version: 0.8
 
@@ -24,6 +24,11 @@ and convertor to binary form as python script.
 Script intelhex.py contain implementation of HEX file reader and convertor
 as IntelHex class. You also may use this script as standalone hex-to-bin
 convertor.
+
+
+Download
+--------
+http://www.onembedding.com/tools/python/code/intelhex.zip
 
 
 IntelHex classes
