@@ -2,7 +2,17 @@
 # Test suite for IntelHex class.
 
 import array
+from cStringIO import StringIO
+import os
+import sys
+import tempfile
+import unittest
 
+import intelhex
+
+
+##
+# Data for tests
 
 hex8 = '''\
 :1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396
@@ -249,65 +259,94 @@ bin16 = array.array('H', [0x0000, 0x1283, 0x1303, 0x2007,
                           0x0099, 0x0008, 0x3FFF, 0x3FFF])
 
 
+##
+# Test cases
+
+class TestIntelHex(unittest.TestCase):
+
+    def setUp(self):
+        self.f = StringIO(hex8)
+
+    def tearDown(self):
+        self.f.close()
+
+    def test_readfile(self):
+        ih = intelhex.IntelHex(self.f)
+        self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
+        self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
+
+    def test_tobinstr(self):
+        ih = intelhex.IntelHex(self.f)
+        ih.readfile()
+        s1 = ih.tobinstr()
+        s2 = bin8.tostring()
+        self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+
+
+class TestIntelHex16bit(unittest.TestCase):
+
+    def setUp(self):
+        self.f = StringIO(hex16)
+
+    def tearDown(self):
+        self.f.close()
+
+    def test_readfile(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
+        self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
+
+    def test_minaddr(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        ih.readfile()
+        addr = ih.minaddr()
+        self.assertEqual(0, addr, 'Error in detection of minaddr (0 != 0x%x)' % addr)
+
+    def test_maxaddr(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        ih.readfile()
+        addr = ih.maxaddr()
+        self.assertEqual(0x001D, addr, 'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
+
+    def test_getitem(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        ih.readfile()
+        ih.padding = 0x3FFF
+        for addr, word in enumerate(bin16):
+            self.assertEqual(word, ih[addr],
+                             'Data mismatch at address 0x%x (0x%x != 0x%x)' % (addr, word, ih[addr]))
+
+    def test_writefile(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        ih.readfile()
+
+        handle, fout = tempfile.mkstemp()
+        os.close(handle)
+
+        ih.writefile(fout)
+
+        fi = file(fout)
+        s = fi.read()
+        fi.close()
+        os.remove(fout)
+
+        fin = StringIO(s)
+        ih2 = intelhex.IntelHex16bit(fin)
+        ih2.readfile()
+
+        self.assertEqual(ih.tobinstr(), ih2.tobinstr(), "Writed hex file does not equal with original")
+
+    def test_setitem(self):
+        ih = intelhex.IntelHex16bit(self.f)
+        ih.readfile()
+
+        old = ih[0]
+        ih[0] = old ^ 0xFFFF
+
+        self.assertNotEqual(old, ih[0], "Setting new value to internal buffer failed")
+
+
+##
+# MAIN
 if __name__ == '__main__':
-    from cStringIO import StringIO
-    import sys
-    import intelhex
-
-    print 'Test 8-bit mode'
-    f = StringIO(hex8)
-
-    ih = intelhex.IntelHex(f)
-    print "readfile ..",
-    if ih.readfile():
-        print "OK"
-    else:
-        print "Fail"
-        sys.exit(1)
-
-    s1 = ih.tobinstr()
-    s2 = bin8.tostring()
-
-    print "convert to string ..",
-    if s1 == s2:
-        print "OK"
-    else:
-        print "Fail"
-        sys.exit(1)
-
-    print "Address Overlap:", ih.AddrOverlap
-    print "Error:", ih.Error
-
-
-    # 16-bit
-    print 'Test 16-bit mode'
-    f = StringIO(hex16)
-    ih = intelhex.IntelHex16bit(f)
-    if not ih.readfile():
-        print 'Read from file failed'
-        sys.exit(1)
-
-    addr = ih.minaddr()
-    if addr != 0:
-        print 'Error in detection of minaddr (0 != 0x%x)' % addr
-        sys.exit(1)
-
-    addr = ih.maxaddr()
-    if addr != 0x01D:
-        print 'Error in detection of maxaddr (0x001D != 0x%x)' % addr
-        sys.exit(1)
-        
-    ih.padding = 0x3FFF
-
-    for addr, word in enumerate(bin16):
-        if word != ih[addr]:
-            print 'Data mismatch at address 0x%x (0x%x != 0x%x)' % (addr, word, ih[addr])
-            sys.exit(1)
-
-    print 'Data match. All OK'
-
-    print "Test hex out"
-    fin = StringIO(hex16)
-    ihex = intelhex.IntelHex(fin)
-    ihex.readfile()
-    ihex.writefile('out1.hex')
+    unittest.main()
