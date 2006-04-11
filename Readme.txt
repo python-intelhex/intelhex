@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix@ukr.net
-:Date: 2006-03-07
-:Version: 0.6
+:Date: 2006-04-11
+:Version: 0.8
 
 .. Contents::
 
@@ -18,16 +18,19 @@ Intel HEX file format widely used in microprocessors and microcontrollers
 area as de-facto standard for representation of code for programming into
 microelectronic devices.
 
-This work implements HEX file format reader and convertor to binary form 
-as python script.
+This work implements 8-bit HEX (also known as Intel HEX8) file format reader
+and convertor to binary form as python script.
 
 Script intelhex.py contain implementation of HEX file reader and convertor
 as IntelHex class. You also may use this script as standalone hex-to-bin
 convertor.
 
-IntelHex class
---------------
-Example of typical usage of IntelHex class::
+
+IntelHex classes
+----------------
+Basic
+*****
+Example of typical usage of ``IntelHex`` class::
 
 	>>> from intelhex import IntelHex	# 1
 	>>> h = IntelHex("foo.hex")		# 2
@@ -44,6 +47,31 @@ into binary form (see line 4 in example above):
 	* ``tobinarray`` (returns array of unsigned char bytes);
 	* ``tobinstr``   (returns string of bytes);
 	* ``tobinfile``  (convert content to binary form and write to file).
+
+Access to data by address
+*************************
+You can get or modify some data by address in usual way: via indexing
+operations::
+
+	>>> print ih[0]			# read data from address 0
+        >>> ih[1] = 0x55		# modify data at address 1
+
+When you try to read from non-existent address you get default data. Default
+data sets via attribute ``.padding`` of class instance.
+
+To obtain adresses limits use methods ``.minaddr()`` and ``.maxaddr()``.
+
+Access to 16-bit data
+*********************
+When you need to work with 16-bit data stored in 8-bit Intel HEX file you need
+to use class ``IntelHex16bit``. This class derived from IntelHex and has all their
+methods. But some of methods modified to implement 16-bit behaviour.
+
+Write data to HEX file
+**********************
+You can store data contained in object by method ``.writefile(f)``. Parameter
+``f`` should be filename or file-like object. After write file will be closed.
+
 
 Documentation
 -------------
