@@ -6,8 +6,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.8.1
-@date       2006/03/29
+@version    0.8.2
+@date       2006/04/11
 '''
 
 
@@ -507,4 +507,4 @@ Options:
         print "File not found"
         sys.exit(1)
 
-    sys.exit(hex2bin(fin, fout))
+    sys.exit(hex2bin(fin, fout, start, end, size, pad))
