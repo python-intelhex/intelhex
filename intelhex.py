@@ -6,8 +6,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.6
-@date       2006/03/06
+@version    0.8
+@date       2006/03/29
 '''
 
 
@@ -105,10 +105,10 @@ class IntelHex:
             # data record
             addr += self._offset
             for i in data_bytes[4:4+record_length]:
-                if self._buf.get(addr, None) is not None:
+                if not self._buf.get(addr, None) is None:
                     self.AddrOverlap = addr
                 self._buf[addr] = i
-                addr += 1
+                addr += 1       # FIXME: addr should be wrapped on 64K boundary
 
         elif record_type == 1:
             # end of file record
@@ -216,7 +216,173 @@ class IntelHex:
         '''
         return self._buf.get(addr, self.padding)
 
+    def __setitem__(self, addr, byte):
+        self._buf[addr] = byte
+
+    def writefile(self, f):
+        """Write data to file f in HEX format.
+        @return True    if successful.
+        """
+        if hasattr(f, "write"):
+            fobj = f
+        else:
+            fobj = file(f, 'w')
+
+        maxaddr = IntelHex.maxaddr(self)
+        if maxaddr > 65535:
+            offset = 0
+        else:
+            offset = None
+
+        while True:
+            if offset != None:
+                # emit 32-bit offset record
+                high_ofs = offset / 65536
+                offset_record = ":02000004%04X\n" % high_ofs
+                bytes = divmod(high_ofs, 256)
+                csum = 2 + 4 + bytes[0] + bytes[1]
+                csum = (-csum) & 0x0FF
+                fobj.write("%02X\n" % csum)
+
+                ofs = offset
+                if (ofs + 65536) > maxaddr:
+                    rng = xrange(maxaddr - ofs + 1)
+                else:
+                    rng = xrange(65536)
+            else:
+                ofs = 0
+                offset_record = ''
+                rng = xrange(maxaddr + 1)
+
+            csum = 0
+            k = 0
+            record = ""
+            for addr in rng:
+                byte = self._buf.get(ofs+addr, None)
+                if byte != None:
+                    if k == 0:
+                        # optionally offset record
+                        fobj.write(offset_record)
+                        offset_record = ''
+                        # start data record
+                        record += "%04X00" % addr
+                        bytes = divmod(addr, 256)
+                        csum = bytes[0] + bytes[1]
+
+                    k += 1
+                    # continue data in record
+                    record += "%02X" % byte
+                    csum += byte
+
+                    # check for length of record
+                    if k < 16:
+                        continue
+
+                if k != 0:
+                    # close record
+                    csum += k
+                    csum = (-csum) & 0x0FF
+                    record += "%02X" % csum
+                    fobj.write(":%02X%s\n" % (k, record))
+                    # cleanup
+                    csum = 0
+                    k = 0
+                    record = ""
+            else:
+                if k != 0:
+                    # close record
+                    csum += k
+                    csum = (-csum) & 0x0FF
+                    record += "%02X" % csum
+                    fobj.write(":%02X%s\n" % (k, record))
+
+            # advance offset
+            if offset is None:
+                break
+
+            offset += 65536
+            if offset > maxaddr:
+                break
+
+        # end-of-file record
+        fobj.write(":00000001FF\n")
+        fobj.close()
+
 #/IntelHex
+
+
+class IntelHex16bit(IntelHex):
+    """Access to data as 16-bit words."""
+
+    def __init__(self, source):
+        """Construct class from HEX file
+        or from instance of ordinary IntelHex class.
+
+        @param  source  file name of HEX file or file object
+                        or instance of ordinary IntelHex class
+        """
+        if isinstance(source, IntelHex):
+            # from ihex8
+            self.Error = source.Error
+            self.AddrOverlap = source.AddrOverlap
+            self.padding = source.padding
+    
+            # private members
+            self._fname = source._fname
+            self._buf = source._buf
+            self._readed = source._readed
+            self._eof = source._eof
+            self._offset = source._offset
+        else:
+            IntelHex.__init__(self, source)
+
+        if self.padding == 0x0FF:
+            self.padding = 0x0FFFF
+
+    def __getitem__(self, addr16):
+        """Get 16-bit word from address.
+        Raise error if found only one byte from pair.
+
+        @param  addr16  address of word (addr8 = 2 * addr16).
+        @return         word if bytes exists in HEX file, or self.padding
+                        if no data found.
+        """
+        addr1 = addr16 * 2
+        addr2 = addr1 + 1
+        byte1 = self._buf.get(addr1, None)
+        byte2 = self._buf.get(addr2, None)
+
+        if byte1 != None and byte2 != None:
+            return byte1 | (byte2 << 8)     # low endian
+
+        if byte1 == None and byte2 == None:
+            return self.padding
+
+        raise Exception, 'Bad access in 16-bit mode (not enough data)'
+
+    def __setitem__(self, addr16, word):
+        addr_byte = addr16 * 2
+        bytes = divmod(word, 256)
+        self._buf[addr_byte] = bytes[1]
+        self._buf[addr_byte+1] = bytes[0]
+
+    def minaddr(self):
+        '''Get minimal address of HEX content in 16-bit mode.'''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return min(aa)/2
+
+    def maxaddr(self):
+        '''Get maximal address of HEX content in 16-bit mode.'''
+        aa = self._buf.keys()
+        if aa == []:
+            return 0
+        else:
+            return max(aa)/2
+
+#/class IntelHex16bit
 
 
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
