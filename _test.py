@@ -259,6 +259,16 @@ bin16 = array.array('H', [0x0000, 0x1283, 0x1303, 0x2007,
                           0x0099, 0x0008, 0x3FFF, 0x3FFF])
 
 
+hex64k = """:020000040000FA
+:0100000001FE
+:020000040001F9
+:0100000002FD
+:00000001FF
+"""
+
+data64k = {0: 1, 0x10000: 2}
+
+
 ##
 # Test cases
 
@@ -281,6 +291,46 @@ class TestIntelHex(unittest.TestCase):
         s1 = ih.tobinstr()
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+
+
+class TestIntelHex_big_files(unittest.TestCase):
+    """Test that data bigger than 64K read/write correctly"""
+
+    def setUp(self):
+        self.f = StringIO(hex64k)
+
+    def tearDown(self):
+        self.f.close()
+
+    def test_readfile(self):
+        ih = intelhex.IntelHex(self.f)
+        ih.readfile()
+        for addr, byte in data64k.items():
+            readed = ih[addr]
+            self.assertEquals(byte, readed, "data not equal at addr %X (%X != %X)" % (addr, byte, readed))
+
+    def test_writefile(self):
+        ih = intelhex.IntelHex(self.f)
+        ih.readfile()
+        # prepare for writing
+        handle, fout = tempfile.mkstemp()
+        os.close(handle)
+
+        ih.writefile(fout)
+
+        # check written
+        fi = file(fout)
+        s = fi.read()
+        fi.close()
+        os.remove(fout)
+
+        self.assertEquals(hex64k, s, """Written data is incorrect
+Should be:
+%s
+
+Written:
+%s
+""" % (hex64k, s))
 
 
 class TestIntelHex16bit(unittest.TestCase):
