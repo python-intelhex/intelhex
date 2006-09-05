@@ -238,11 +238,11 @@ class IntelHex:
             if offset != None:
                 # emit 32-bit offset record
                 high_ofs = offset / 65536
-                offset_record = ":02000004%04X\n" % high_ofs
+                offset_record = ":02000004%04X" % high_ofs
                 bytes = divmod(high_ofs, 256)
                 csum = 2 + 4 + bytes[0] + bytes[1]
                 csum = (-csum) & 0x0FF
-                fobj.write("%02X\n" % csum)
+                offset_record += "%02X\n" % csum 
 
                 ofs = offset
                 if (ofs + 65536) > maxaddr:
