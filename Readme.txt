@@ -31,6 +31,20 @@ Download
 http://www.onembedding.com/tools/python/code/intelhex.zip
 
 
+Bzr repository
+--------------
+You can branch development repository to working on your own improvements
+for intelhex::
+
+	$ bzr branch http://bzr.onembedding.com/branches/intelhex/
+
+You can prepare patches with ``bzr bundle`` command and then sending it to me
+via e-mail.
+        
+Bzr (Bazaar version-control system) itself is here: 
+http://bazaar-vcs.org
+
+
 IntelHex classes
 ----------------
 Basic
