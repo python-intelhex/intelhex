@@ -6,8 +6,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.8.2
-@date       2006/04/11
+@version    0.8.3
+@date       2006/09/05
 '''
 
 

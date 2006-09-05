@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2006-04-11
-:Version: 0.8
+:Date: 2006-09-05
+:Version: 0.8.3
 
 .. Contents::
 
@@ -75,7 +75,7 @@ methods. But some of methods modified to implement 16-bit behaviour.
 Write data to HEX file
 **********************
 You can store data contained in object by method ``.writefile(f)``. Parameter
-``f`` should be filename or file-like object. After write file will be closed.
+``f`` should be filename or file-like object. After writing file will be closed.
 
 
 Documentation
