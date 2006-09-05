@@ -1,0 +1,27 @@
+NEWS
+====
+
+* 2006/09/05 v.0.8.3 (BugFix Release)
+
+    Fix writing hex files with extended linear records
+    (when address overlaps 64K boundary).
+    Patch from Henrik Maier.
+    
+* 2006/04/11 v.0.8.2 (Major improvements release)
+
+    - Introduced new class IntelHex16bit for manipulate
+      data as 16-bit values
+    - You can manipulate data using dictionary-like
+      interface (i.e. syntax: ih[addr] = value)
+    - Added new method .writefile(file) for writing
+      data to hex file
+    - Using unittest for testing functionality
+    
+* 2006/03 v.0.6
+
+    Convertor engine hex2bin extracted to stand-alone function
+    for using by external clients of intelhex
+    
+* 2005 v.0.5
+
+    First public release
