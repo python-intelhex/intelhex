@@ -6,8 +6,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.8.3
-@date       2006/09/05
+@version    0.9.devel
+@date       2006/09/06
 '''
 
 
@@ -17,10 +17,10 @@ __docformat__ = "javadoc"
 import array
 
 
-class IntelHex:
+class IntelHex: #FOLD00
     ''' Intel HEX file reader. '''
 
-    def __init__(self, fname):
+    def __init__(self, fname): #FOLD01
         ''' Constructor.
         @param  fname   file name of HEX file or file object.
         '''
@@ -36,7 +36,7 @@ class IntelHex:
         self._eof = False
         self._offset = 0
 
-    def readfile(self):
+    def readfile(self): #FOLD01
         ''' Read file into internal buffer.
         @return True    if successful.
         '''
@@ -65,7 +65,7 @@ class IntelHex:
         self._readed = True
         return True
 
-    def decode_record(self, s):
+    def decode_record(self, s): #FOLD01
         ''' Decode one record of HEX file.
         @param  s       line with HEX record.
         @return True    if line decode OK, or this is not HEX line.
@@ -137,7 +137,7 @@ class IntelHex:
 
         return True
 
-    def tobinarray(self, start=None, end=None, pad=None):
+    def tobinarray(self, start=None, end=None, pad=None): #FOLD01
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
@@ -167,7 +167,7 @@ class IntelHex:
 
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=0xFF):
+    def tobinstr(self, start=None, end=None, pad=0xFF): #FOLD01
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
@@ -178,7 +178,7 @@ class IntelHex:
         bin = self.tobinarray(start, end, pad)
         return bin.tostring()
 
-    def tobinfile(self, fname, start=None, end=None, pad=0xFF):
+    def tobinfile(self, fname, start=None, end=None, pad=0xFF): #FOLD01
         ''' Convert to binary and write to fname file.
         @param  fname   file name or file object for write output bytes.
         @param  start   start address of output bytes.
@@ -192,7 +192,7 @@ class IntelHex:
             fname = file(fname, "wb")
         bin.tofile(fname)
 
-    def minaddr(self):
+    def minaddr(self): #FOLD01
         ''' Get minimal address of HEX content. '''
         aa = self._buf.keys()
         if aa == []:
@@ -200,7 +200,7 @@ class IntelHex:
         else:
             return min(aa)
 
-    def maxaddr(self):
+    def maxaddr(self): #FOLD01
         ''' Get maximal address of HEX content. '''
         aa = self._buf.keys()
         if aa == []:
@@ -208,7 +208,7 @@ class IntelHex:
         else:
             return max(aa)
 
-    def __getitem__(self, addr):
+    def __getitem__(self, addr): #FOLD01
         ''' Get byte from address.
         @param  addr    address of byte.
         @return         byte if address exists in HEX file, or self.padding
@@ -216,10 +216,10 @@ class IntelHex:
         '''
         return self._buf.get(addr, self.padding)
 
-    def __setitem__(self, addr, byte):
+    def __setitem__(self, addr, byte): #FOLD01
         self._buf[addr] = byte
 
-    def writefile(self, f):
+    def writefile(self, f): #FOLD01
         """Write data to file f in HEX format.
         @return True    if successful.
         """
@@ -311,10 +311,10 @@ class IntelHex:
 #/IntelHex
 
 
-class IntelHex16bit(IntelHex):
+class IntelHex16bit(IntelHex): #FOLD00
     """Access to data as 16-bit words."""
 
-    def __init__(self, source):
+    def __init__(self, source): #FOLD01
         """Construct class from HEX file
         or from instance of ordinary IntelHex class.
 
@@ -339,7 +339,7 @@ class IntelHex16bit(IntelHex):
         if self.padding == 0x0FF:
             self.padding = 0x0FFFF
 
-    def __getitem__(self, addr16):
+    def __getitem__(self, addr16): #FOLD01
         """Get 16-bit word from address.
         Raise error if found only one byte from pair.
 
@@ -360,13 +360,13 @@ class IntelHex16bit(IntelHex):
 
         raise Exception, 'Bad access in 16-bit mode (not enough data)'
 
-    def __setitem__(self, addr16, word):
+    def __setitem__(self, addr16, word): #FOLD01
         addr_byte = addr16 * 2
         bytes = divmod(word, 256)
         self._buf[addr_byte] = bytes[1]
         self._buf[addr_byte+1] = bytes[0]
 
-    def minaddr(self):
+    def minaddr(self): #FOLD01
         '''Get minimal address of HEX content in 16-bit mode.'''
         aa = self._buf.keys()
         if aa == []:
@@ -374,7 +374,7 @@ class IntelHex16bit(IntelHex):
         else:
             return min(aa)/2
 
-    def maxaddr(self):
+    def maxaddr(self): #FOLD01
         '''Get maximal address of HEX content in 16-bit mode.'''
         aa = self._buf.keys()
         if aa == []:
@@ -385,7 +385,7 @@ class IntelHex16bit(IntelHex):
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF): #FOLD00
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -423,7 +423,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 #/def hex2bin
 
 
-if __name__ == '__main__':
+if __name__ == '__main__': #FOLD00
     import getopt
     import os
     import sys
