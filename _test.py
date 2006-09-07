@@ -9,10 +9,15 @@ import tempfile
 import unittest
 
 import intelhex
+from intelhex import IntelHexError, HexReaderError, NotAHexFile, \
+                     BadHexRecord, InvalidRecordLength, \
+                     InvalidHexRecordType, InvalidRecordChecksum, \
+                     InvalidEndOfFileRecord, InvalidExtendedSegmentRecord, \
+                     InvalidExtendedLinearAddressRecord
 
 
 ##
-# Data for tests
+# Data for tests #fold00
 
 hex8 = '''\
 :1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396
@@ -272,21 +277,64 @@ data64k = {0: 1, 0x10000: 2}
 ##
 # Test cases
 
-class TestIntelHex(unittest.TestCase):
+class TestIntelHexBase(unittest.TestCase): #fold00
+    """Base class for all tests.
+    Provide additional functionality for testing.
+    """
 
-    def setUp(self):
+    def assertRaisesMsg(self, excClass, msg, callableObj, *args, **kwargs): #FOLD01
+        """Just like unittest.TestCase.assertRaises,
+        but checks that the message is right too.
+
+        Borrowed from Ned Batchelder Blog.
+        See: http://www.nedbatchelder.com/blog/200609.html#e20060905T064418
+
+        Typical usage:
+            self.assertRaisesMsg(MyException, "Exception message", my_function, (arg1, arg2))
+        """
+        try:
+            callableObj(*args, **kwargs)
+        except excClass, exc:
+            excMsg = str(exc)
+            if not msg:
+                # No message provided: any message is fine.
+                return
+            elif excMsg == msg:
+                # Message provided, and we got the right message: it passes.
+                return
+            else:
+                # Message provided, and it didn't match: fail!
+                raise self.failureException(
+                    "Right exception, wrong message: got '%s' expected '%s'" % 
+                    (excMsg, msg)
+                    )
+        else:
+            if hasattr(excClass, '__name__'):
+                excName = excClass.__name__
+            else:
+                excName = str(excClass)
+            raise self.failureException(
+                "Expected to raise %s, didn't get an exception at all" % 
+                excName
+                )
+#/class TestIntelHexBase
+
+
+class TestIntelHex(unittest.TestCase): #fold00
+
+    def setUp(self): #FOLD01
         self.f = StringIO(hex8)
 
-    def tearDown(self):
+    def tearDown(self): #FOLD01
         self.f.close()
         del self.f
 
-    def test_readfile(self):
+    def test_readfile(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
         self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
         self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
 
-    def test_tobinstr(self):
+    def test_tobinstr(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
         ih.readfile()
         s1 = ih.tobinstr()
@@ -294,24 +342,24 @@ class TestIntelHex(unittest.TestCase):
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
 
-class TestIntelHex_big_files(unittest.TestCase):
+class TestIntelHex_big_files(unittest.TestCase): #fold00
     """Test that data bigger than 64K read/write correctly"""
 
-    def setUp(self):
+    def setUp(self): #FOLD01
         self.f = StringIO(hex64k)
 
-    def tearDown(self):
+    def tearDown(self): #FOLD01
         self.f.close()
         del self.f
 
-    def test_readfile(self):
+    def test_readfile(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
         ih.readfile()
         for addr, byte in data64k.items():
             readed = ih[addr]
             self.assertEquals(byte, readed, "data not equal at addr %X (%X != %X)" % (addr, byte, readed))
 
-    def test_writefile(self):
+    def test_writefile(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
         ih.readfile()
         # prepare for writing
@@ -335,34 +383,34 @@ Written:
 """ % (hex64k, s))
 
 
-class TestIntelHex16bit(unittest.TestCase):
+class TestIntelHex16bit(unittest.TestCase): #fold00
 
-    def setUp(self):
+    def setUp(self): #FOLD01
         self.f = StringIO(hex16)
 
-    def tearDown(self):
+    def tearDown(self): #FOLD01
         self.f.close()
         del self.f
 
-    def test_readfile(self):
+    def test_readfile(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
         self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
 
-    def test_minaddr(self):
+    def test_minaddr(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
         addr = ih.minaddr()
         self.assertEqual(0, addr, 'Error in detection of minaddr (0 != 0x%x)' % addr)
 
-    def test_maxaddr(self):
+    def test_maxaddr(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
         addr = ih.maxaddr()
         self.assertEqual(0x001D, addr,
                          'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
 
-    def test_getitem(self):
+    def test_getitem(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
         ih.padding = 0x3FFF
@@ -371,7 +419,7 @@ class TestIntelHex16bit(unittest.TestCase):
                              'Data mismatch at address '
                              '0x%x (0x%x != 0x%x)' % (addr, word, ih[addr]))
 
-    def test_writefile(self):
+    def test_writefile(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
 
@@ -392,7 +440,7 @@ class TestIntelHex16bit(unittest.TestCase):
         self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
                          "Written hex file does not equal with original")
 
-    def test_setitem(self):
+    def test_setitem(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
 
@@ -401,9 +449,86 @@ class TestIntelHex16bit(unittest.TestCase):
 
         self.assertNotEqual(old, ih[0],
                             "Setting new value to internal buffer failed")
+#/class TestIntelHex16bit
+
+
+class TestIntelHexErrors(TestIntelHexBase): #FOLD00
+    """Tests for custom errors classes"""
+
+    def _raise_error(self, ErrorClass, dict={}): #FOLD01
+        """Raise ErrorClass for testing"""
+        raise ErrorClass(**dict)
+
+    def test_IntelHexError(self): #FOLD01
+        self.assertRaisesMsg(IntelHexError,
+                             'Base Exception class for IntelHex module',
+                             self._raise_error,
+                             IntelHexError)
+
+    def test_HexReaderError(self): #FOLD01
+        self.assertRaisesMsg(HexReaderError,
+                             'Generic error of reading HEX file',
+                             self._raise_error,
+                             HexReaderError)
+
+    def test_NotAHexFile(self): #FOLD01
+        self.assertRaisesMsg(NotAHexFile,
+                             'File "foo.hex" is not a valid HEX file',
+                             self._raise_error,
+                             NotAHexFile,
+                             {'filename': 'foo.hex'})
+
+    def test_BadHexRecord(self): #FOLD01
+        self.assertRaisesMsg(BadHexRecord,
+                             'Hex file contains invalid record at line 1',
+                             self._raise_error,
+                             BadHexRecord,
+                             {'line': 1})
+
+    def test_InvalidRecordLength(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordLength,
+                             'Record at line 1 has invalid length',
+                             self._raise_error,
+                             InvalidRecordLength,
+                             {'line': 1})
+
+    def test_InvalidHexRecordType(self): #FOLD01
+        self.assertRaisesMsg(InvalidHexRecordType,
+                             'Record at line 1 has invalid record type',
+                             self._raise_error,
+                             InvalidHexRecordType,
+                             {'line': 1})
+
+    def test_InvalidRecordChecksum(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordChecksum,
+                             'Record at line 1 has invalid checksum',
+                             self._raise_error,
+                             InvalidRecordChecksum,
+                             {'line': 1})
+
+    def test_InvalidEndOfFileRecord(self): #FOLD01
+        self.assertRaisesMsg(InvalidEndOfFileRecord,
+                             'File has invalid End-of-File record',
+                             self._raise_error,
+                             InvalidEndOfFileRecord)
+
+    def test_InvalidExtendedSegmentRecord(self): #FOLD01
+        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
+                             'Invalid Extended 8086 Segment Record at line 1',
+                             self._raise_error,
+                             InvalidExtendedSegmentRecord,
+                             {'line': 1})
+
+    def test_InvalidExtendedLinearAddressRecord(self): #FOLD01
+        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+                             'Invalid Extended Linear Address Record at line 1',
+                             self._raise_error,
+                             InvalidExtendedLinearAddressRecord,
+                             {'line': 1})
+#/class TestIntelHexErrors
 
 
 ##
-# MAIN
+# MAIN #FOLD00
 if __name__ == '__main__':
     unittest.main()
