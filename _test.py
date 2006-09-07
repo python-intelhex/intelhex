@@ -279,6 +279,7 @@ class TestIntelHex(unittest.TestCase):
 
     def tearDown(self):
         self.f.close()
+        del self.f
 
     def test_readfile(self):
         ih = intelhex.IntelHex(self.f)
@@ -301,6 +302,7 @@ class TestIntelHex_big_files(unittest.TestCase):
 
     def tearDown(self):
         self.f.close()
+        del self.f
 
     def test_readfile(self):
         ih = intelhex.IntelHex(self.f)
@@ -340,6 +342,7 @@ class TestIntelHex16bit(unittest.TestCase):
 
     def tearDown(self):
         self.f.close()
+        del self.f
 
     def test_readfile(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -356,7 +359,8 @@ class TestIntelHex16bit(unittest.TestCase):
         ih = intelhex.IntelHex16bit(self.f)
         ih.readfile()
         addr = ih.maxaddr()
-        self.assertEqual(0x001D, addr, 'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
+        self.assertEqual(0x001D, addr,
+                         'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
 
     def test_getitem(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -364,7 +368,8 @@ class TestIntelHex16bit(unittest.TestCase):
         ih.padding = 0x3FFF
         for addr, word in enumerate(bin16):
             self.assertEqual(word, ih[addr],
-                             'Data mismatch at address 0x%x (0x%x != 0x%x)' % (addr, word, ih[addr]))
+                             'Data mismatch at address '
+                             '0x%x (0x%x != 0x%x)' % (addr, word, ih[addr]))
 
     def test_writefile(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -384,7 +389,8 @@ class TestIntelHex16bit(unittest.TestCase):
         ih2 = intelhex.IntelHex16bit(fin)
         ih2.readfile()
 
-        self.assertEqual(ih.tobinstr(), ih2.tobinstr(), "Writed hex file does not equal with original")
+        self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
+                         "Written hex file does not equal with original")
 
     def test_setitem(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -393,7 +399,8 @@ class TestIntelHex16bit(unittest.TestCase):
         old = ih[0]
         ih[0] = old ^ 0xFFFF
 
-        self.assertNotEqual(old, ih[0], "Setting new value to internal buffer failed")
+        self.assertNotEqual(old, ih[0],
+                            "Setting new value to internal buffer failed")
 
 
 ##
