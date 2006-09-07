@@ -1,0 +1,38 @@
+# Old API
+# *******
+
+>>> ih = IntelHex('file.hex')	# create instance and specify file name for further loading
+>>> result = ih.readfile()	# load hex file (name was specified during init)	
+                                # result shows success or failure of loading hex
+
+# errors during read hex file accessible via ih.Error; ih.AddrOverlap
+
+>>> ih.tobinfile(file)		# store to bin
+
+>>> ih.writefile(file)		# store to hex
+
+
+# New API
+# *******
+
+>>> ih = IntelHex()		# create empty object
+>>> ih = IntelHex('file.hex')	# immediately load data from hex file
+>>> ih = IntelHex(ih2)		# copying constructor from another
+				# IntelHex object
+>>> ih = IntelHex(dict)		# init from dictionary (keys are addresses,
+				# values are bytes)
+
+# Multiple times load data from hex/bin files:
+
+>>> ih.loadfile('file.hex', format='hex')
+>>> ih.loadfile('file.bin', format='bin')
+
+# New handling of errors during loading hex:
+# errors wiil be raised
+
+>>> NotAHexFile, BadHexRecord, AddrOverlap
+
+# Save data to file (hex/bin):
+
+>>> ih.tofile('out.hex', format='hex')
+>>> ih.tofile('out.bin', format='bin')
