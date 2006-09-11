@@ -20,122 +20,146 @@ import array
 class IntelHex: #FOLD00
     ''' Intel HEX file reader. '''
 
-    def __init__(self, fname): #fold01
+    def __init__(self, source=None): #FOLD01
         ''' Constructor.
-        @param  fname   file name of HEX file or file object.
+
+        @param  source      source for initialization
+                            (file name of HEX file or file object)
         '''
         #public members
-        self.Error = None
-        self.AddrOverlap = None
         self.padding = 0x0FF
 
         # private members
-        self._fname = fname
         self._buf = {}
-        self._readed = False
-        self._eof = False
         self._offset = 0
 
-    def readfile(self): #fold01
-        ''' Read file into internal buffer.
-        @return True    if successful.
-        '''
-        if self._readed:
-            return True
+        if source is not None:
+            if type(source) == type('') or hasattr(source, "read"):
+                # load hex file
+                self.loadhex(source)
+            else:
+                raise ValueError("source: bad initializer type")
 
-        if not hasattr(self._fname, "read"):
-            f = file(self._fname, "rU")
-        else:
-            f = self._fname
+    def decode_record(self, s, line=0, wrap64k=True): #fold01
+        '''Decode one record of HEX file.
 
-        self._offset = 0
-        self._eof = False
-
-        while True:
-            s = f.readline()
-            if s == '':
-                break
-
-            if not self.decode_record(s):
-                return False
-
-            if self._eof:
-                break
-
-        self._readed = True
-        return True
-
-    def decode_record(self, s): #FOLD01
-        ''' Decode one record of HEX file.
         @param  s       line with HEX record.
-        @return True    if line decode OK, or this is not HEX line.
-                False   if this is invalid HEX line or checksum error.
+        @param  line    line number (for error messages).
+        @param  wrap64k if lowest 16-bit of current address
+                        overlaps 64K boundary should decoder
+                        wrap address to 0.
+                        By default address wrapped because
+                        standard require this.
+                        But some tools generate wrong hex files
+                        (e.g. some Atmel AVR compilers),
+                        so for this situation user can disable
+                        of wrapping address.
+
+        @return True    if line proceed OK and file not ended,
+                False   if EOF record encountered.
         '''
         s = s.rstrip('\r\n')
         len_ = len(s)
-        if len_ == 0: return True       # empty line
-        if s[0] != ':': return True     # first char must be ':'
 
-        if len_ < 11:
-            self.Error = "Too short line"
-            return False
+        if len_ == 0:
+            return True       # empty line
+
+        if s[0] != ':' or len_ < 11:
+            raise BadHexRecord(line=line)
 
         record_length = int(s[1:3], 16)
 
         if len_ != (11 + record_length*2):
-            self.Error = "Invalid line length"
-            return False
+            raise InvalidRecordLength(line=line)
 
         addr = int(s[3:7], 16)
 
         record_type = int(s[7:9], 16)
         if not record_type in (0, 1, 2, 4):
-            self.Error = "Invalid type of record"
-            return False
+            raise InvalidRecordType(line=line)
 
         data_bytes = [int(s[i:i+2], 16) for i in xrange(1,len_,2)]
 
         crc = reduce(lambda x, y: x+y, data_bytes, 0)
         crc &= 0x0FF
         if crc != 0:
-            self.Error = "Invalid crc"
-            return False
+            raise InvalidRecordChecksum(line=line)
 
         if record_type == 0:
             # data record
-            addr += self._offset
             for i in data_bytes[4:4+record_length]:
-                if not self._buf.get(addr, None) is None:
-                    self.AddrOverlap = addr
-                self._buf[addr] = i
-                addr += 1       # FIXME: addr should be wrapped on 64K boundary
+                full_addr = addr + self._offset
+                if not self._buf.get(full_addr, None) is None:
+                    raise HexAddressOverlap(address=full_addr, line=line)
+                self._buf[full_addr] = i
+                addr += 1
+                if wrap64k and addr == 65536:
+                    addr = 0
 
         elif record_type == 1:
             # end of file record
             if record_length != 0:
-                self.Error = "Bad End-of-File Record"
-                return False
-            self._eof = True
+                raise InvalidEOFRecord(line=line)
+            return False
 
         elif record_type == 2:
             # Extended 8086 Segment Record
             if record_length != 2 or addr != 0:
-                self.Error = "Bad Extended 8086 Segment Record"
-                return False
+                raise InvalidExtendedSegmentRecord(line=line)
             self._offset = int(s[9:13], 16) << 4
 
         elif record_type == 4:
             # Extended Linear Address Record
             if record_length != 2 or addr != 0:
-                self.Error = "Bad Extended Linear Address Record"
-                return False
+                raise InvalidExtendedLinearAddressRecord(line=line)
             self._offset = int(s[9:13], 16) << 16
 
-        else:
-            self.Error = "Invalid type of record"
-            return False
-
         return True
+
+    def loadhex(self, fobj, wrap64k=True): #FOLD01
+        """Load hex file into internal buffer.
+
+        @param  fobj        file name or file-like object
+        @param  wrap64k     is lowest 16-bit of address should
+                            wrap on 64K boundary
+        """
+        if not hasattr(fobj, "read"):
+            fobj = file(fobj, "rU")
+            close_fd = True
+        else:
+            close_fd = False
+
+        self._offset = 0
+        line = 0
+
+        for s in fobj.readlines():
+            line += 1
+            if not self.decode_record(s, line, wrap64k):
+                break
+
+        if close_fd:
+            fobj.close()
+
+    def loadbin(self, fobj, offset=0): #FOLD01
+        """Load bin file into internal buffer.
+
+        @param  fobj        file name or file-like object
+        @param  offset      starting address offset
+        """
+        raise NotImplementedError
+
+    def loadfile(self, fobj, format): #FOLD01
+        """Load data file into internal buffer.
+
+        @param  fobj        file name or file-like object
+        @param  format      file format ("hex" or "bin")
+        """
+        if format == "hex":
+            self.loadhex(fobj)
+        elif format == "bin":
+            self.loadbin(fobj)
+        else:
+            raise ValueError('format should be either "hex" or "bin"')
 
     def tobinarray(self, start=None, end=None, pad=None): #fold01
         ''' Convert to binary form.
@@ -457,13 +481,13 @@ class BadHexRecord(HexReaderError): #FOLD00
 class InvalidRecordLength(BadHexRecord): #FOLD00
     '''Record at line %(line)d has invalid length'''
 
-class InvalidHexRecordType(BadHexRecord): #FOLD00
+class InvalidRecordType(BadHexRecord): #FOLD00
     '''Record at line %(line)d has invalid record type'''
 
 class InvalidRecordChecksum(BadHexRecord): #FOLD00
     '''Record at line %(line)d has invalid checksum'''
 
-class InvalidEndOfFileRecord(BadHexRecord): #FOLD00
+class InvalidEOFRecord(BadHexRecord): #FOLD00
     '''File has invalid End-of-File record'''
 
 class InvalidExtendedSegmentRecord(BadHexRecord): #FOLD00
@@ -471,6 +495,9 @@ class InvalidExtendedSegmentRecord(BadHexRecord): #FOLD00
 
 class InvalidExtendedLinearAddressRecord(BadHexRecord): #FOLD00
     '''Invalid Extended Linear Address Record at line %(line)d'''
+
+class HexAddressOverlap(HexReaderError): #FOLD00
+    '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''
 
 
 ##

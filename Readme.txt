@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2006-09-05
-:Version: 0.8.3
+:Date: 2006-09-11
+:Version: 0.9.devel
 
 .. Contents::
 
@@ -53,13 +53,12 @@ Example of typical usage of ``IntelHex`` class::
 
 	>>> from intelhex import IntelHex	# 1
 	>>> h = IntelHex("foo.hex")		# 2
-	>>> h.readfile()			# 3
-	>>> h.tobinfile("foo.bin")		# 4
+	>>> h.tobinfile("foo.bin")		# 3
 
-In second line we are create instance of class. Constructor has one parameter:
-name of HEX file or file object. For reading and decoding content of HEX file
-we need to invoke ``readfile()`` method (see line 3 in example above). 
-It returns True if file processed successful, or False if some error detected.
+In second line we are create instance of class. Constructor has one optional 
+parameter: name of HEX file or file object. 
+Specified file automatically read and decoded.
+
 Class IntelHex has 3 methods for converting content of HEX file 
 into binary form (see line 4 in example above):
 

@@ -9,15 +9,17 @@ import tempfile
 import unittest
 
 import intelhex
-from intelhex import IntelHexError, HexReaderError, NotAHexFile, \
+from intelhex import IntelHex, \
+                     IntelHexError, HexReaderError, NotAHexFile, \
                      BadHexRecord, InvalidRecordLength, \
-                     InvalidHexRecordType, InvalidRecordChecksum, \
-                     InvalidEndOfFileRecord, InvalidExtendedSegmentRecord, \
-                     InvalidExtendedLinearAddressRecord
+                     InvalidRecordType, InvalidRecordChecksum, \
+                     InvalidEOFRecord, InvalidExtendedSegmentRecord, \
+                     InvalidExtendedLinearAddressRecord, \
+                     HexAddressOverlap
 
 
 ##
-# Data for tests #fold00
+# Data for tests #FOLD00
 
 hex8 = '''\
 :1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396
@@ -320,7 +322,7 @@ class TestIntelHexBase(unittest.TestCase): #fold00
 #/class TestIntelHexBase
 
 
-class TestIntelHex(unittest.TestCase): #fold00
+class TestIntelHex(unittest.TestCase): #FOLD00
 
     def setUp(self): #FOLD01
         self.f = StringIO(hex8)
@@ -329,20 +331,17 @@ class TestIntelHex(unittest.TestCase): #fold00
         self.f.close()
         del self.f
 
-    def test_readfile(self): #FOLD01
+    def test_init_form_file(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
-        self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
-        self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
 
     def test_tobinstr(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
-        ih.readfile()
         s1 = ih.tobinstr()
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
 
-class TestIntelHex_big_files(unittest.TestCase): #fold00
+class TestIntelHex_big_files(unittest.TestCase): #FOLD00
     """Test that data bigger than 64K read/write correctly"""
 
     def setUp(self): #FOLD01
@@ -354,14 +353,12 @@ class TestIntelHex_big_files(unittest.TestCase): #fold00
 
     def test_readfile(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
-        ih.readfile()
         for addr, byte in data64k.items():
             readed = ih[addr]
             self.assertEquals(byte, readed, "data not equal at addr %X (%X != %X)" % (addr, byte, readed))
 
     def test_writefile(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
-        ih.readfile()
         # prepare for writing
         handle, fout = tempfile.mkstemp()
         os.close(handle)
@@ -383,7 +380,7 @@ Written:
 """ % (hex64k, s))
 
 
-class TestIntelHex16bit(unittest.TestCase): #fold00
+class TestIntelHex16bit(unittest.TestCase): #FOLD00
 
     def setUp(self): #FOLD01
         self.f = StringIO(hex16)
@@ -392,27 +389,22 @@ class TestIntelHex16bit(unittest.TestCase): #fold00
         self.f.close()
         del self.f
 
-    def test_readfile(self): #FOLD01
+    def test_init_from_file(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        self.assert_(ih.readfile(), "readfile return error: %s" % ih.Error)
-        self.assertEqual(ih.AddrOverlap, None, "Address overlapping: %r" % ih.AddrOverlap)
 
     def test_minaddr(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        ih.readfile()
         addr = ih.minaddr()
         self.assertEqual(0, addr, 'Error in detection of minaddr (0 != 0x%x)' % addr)
 
     def test_maxaddr(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        ih.readfile()
         addr = ih.maxaddr()
         self.assertEqual(0x001D, addr,
                          'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
 
     def test_getitem(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        ih.readfile()
         ih.padding = 0x3FFF
         for addr, word in enumerate(bin16):
             self.assertEqual(word, ih[addr],
@@ -421,7 +413,6 @@ class TestIntelHex16bit(unittest.TestCase): #fold00
 
     def test_writefile(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        ih.readfile()
 
         handle, fout = tempfile.mkstemp()
         os.close(handle)
@@ -435,14 +426,12 @@ class TestIntelHex16bit(unittest.TestCase): #fold00
 
         fin = StringIO(s)
         ih2 = intelhex.IntelHex16bit(fin)
-        ih2.readfile()
 
         self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
                          "Written hex file does not equal with original")
 
     def test_setitem(self): #FOLD01
         ih = intelhex.IntelHex16bit(self.f)
-        ih.readfile()
 
         old = ih[0]
         ih[0] = old ^ 0xFFFF
@@ -492,11 +481,11 @@ class TestIntelHexErrors(TestIntelHexBase): #FOLD00
                              InvalidRecordLength,
                              {'line': 1})
 
-    def test_InvalidHexRecordType(self): #FOLD01
-        self.assertRaisesMsg(InvalidHexRecordType,
+    def test_InvalidRecordType(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordType,
                              'Record at line 1 has invalid record type',
                              self._raise_error,
-                             InvalidHexRecordType,
+                             InvalidRecordType,
                              {'line': 1})
 
     def test_InvalidRecordChecksum(self): #FOLD01
@@ -506,11 +495,11 @@ class TestIntelHexErrors(TestIntelHexBase): #FOLD00
                              InvalidRecordChecksum,
                              {'line': 1})
 
-    def test_InvalidEndOfFileRecord(self): #FOLD01
-        self.assertRaisesMsg(InvalidEndOfFileRecord,
+    def test_InvalidEOFRecord(self): #FOLD01
+        self.assertRaisesMsg(InvalidEOFRecord,
                              'File has invalid End-of-File record',
                              self._raise_error,
-                             InvalidEndOfFileRecord)
+                             InvalidEOFRecord)
 
     def test_InvalidExtendedSegmentRecord(self): #FOLD01
         self.assertRaisesMsg(InvalidExtendedSegmentRecord,
@@ -525,7 +514,119 @@ class TestIntelHexErrors(TestIntelHexBase): #FOLD00
                              self._raise_error,
                              InvalidExtendedLinearAddressRecord,
                              {'line': 1})
+
+    def test_HexAddressOverlap(self): #FOLD01
+        self.assertRaisesMsg(HexAddressOverlap,
+                             'Hex file has address overlap at address 0x1234 on line 1',
+                             self._raise_error,
+                             HexAddressOverlap,
+                             {'address': 0x1234, 'line': 1})
+
 #/class TestIntelHexErrors
+
+
+class TestDecodeHexRecords(TestIntelHexBase): #FOLD00
+    """Testing that decoding of records is correct
+    and all errors raised when needed
+    """
+
+    def setUp(self): #FOLD01
+        self.ih = IntelHex()
+
+    def tearDown(self): #FOLD01
+        del self.ih
+
+    def test_empty_line(self): #FOLD01
+        # do we could to accept empty lines in hex files?
+        # standard don't say anything about this
+        self.assertEqual(True, self.ih.decode_record(''))
+
+    def test_non_empty_line(self): #FOLD01
+        self.assertRaisesMsg(BadHexRecord,
+                             'Hex file contains invalid record at line 1',
+                             self.ih.decode_record,
+                             ' ',
+                             1)
+
+    def test_short_record(self): #FOLD01
+        # if record too short it's not a hex record
+        self.assertRaisesMsg(BadHexRecord,
+                             'Hex file contains invalid record at line 1',
+                             self.ih.decode_record,
+                             ':',
+                             1)
+
+    def test_invalid_length(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordLength,
+                             'Record at line 1 has invalid length',
+                             self.ih.decode_record,
+                             ':FF00000100',
+                             1)
+
+    def test_invalid_record_type(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordType,
+                             'Record at line 1 has invalid record type',
+                             self.ih.decode_record,
+                             ':000000FF01',
+                             1)
+
+    def test_invalid_checksum(self): #FOLD01
+        self.assertRaisesMsg(InvalidRecordChecksum,
+                             'Record at line 1 has invalid checksum',
+                             self.ih.decode_record,
+                             ':0000000100',
+                             1)
+
+    def test_invalid_eof(self): #FOLD01
+        self.assertRaisesMsg(InvalidEOFRecord,
+                             'File has invalid End-of-File record',
+                             self.ih.decode_record,
+                             ':0100000100FE',
+                             1)
+
+    def test_invalid_extended_segment(self): #FOLD01
+        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
+                             'Invalid Extended 8086 Segment Record at line 1',
+                             self.ih.decode_record,
+                             ':00000002FE',
+                             1)
+        
+        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
+                             'Invalid Extended 8086 Segment Record at line 1',
+                             self.ih.decode_record,
+                             ':020001020000FB',
+                             1)
+
+    def test_invalid_linear_address(self): #FOLD01
+        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+                             'Invalid Extended Linear Address Record at line 1',
+                             self.ih.decode_record,
+                             ':00000004FC',
+                             1)
+        
+        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+                             'Invalid Extended Linear Address Record at line 1',
+                             self.ih.decode_record,
+                             ':020001040000F9',
+                             1)
+
+    def test_addr_overlap(self): #FOLD01
+        self.ih.decode_record(':0100000000FF')
+        self.assertRaisesMsg(HexAddressOverlap,
+                             'Hex file has address overlap at address 0x0 on line 1',
+                             self.ih.decode_record,
+                             ':0100000000FF',
+                             1)
+
+    def test_data_record(self): #FOLD01
+        self.assertEqual(True, self.ih.decode_record(':0100000000FF'))
+        self.assertEqual(True, self.ih.decode_record(':03000100000102F9'))
+        self.assertEqual(True, self.ih.decode_record(':1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396'))
+
+    def test_eof(self): #FOLD01
+        self.assertEqual(False, self.ih.decode_record(':00000001FF'))
+
+#/class TestDecodeHexRecords
 
 
 ##
