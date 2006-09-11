@@ -333,6 +333,10 @@ class TestIntelHex(unittest.TestCase): #FOLD00
 
     def test_init_form_file(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
+        for addr in xrange(len(bin8)):
+            expected = bin8[addr]
+            actual = ih[addr]
+            self.assertEqual(expected, actual, "Data different at address %x (%x != %x)" % (addr, expected, actual))
 
     def test_tobinstr(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
