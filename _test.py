@@ -331,7 +331,7 @@ class TestIntelHex(unittest.TestCase): #FOLD00
         self.f.close()
         del self.f
 
-    def test_init_form_file(self): #FOLD01
+    def test_init_from_file(self): #FOLD01
         ih = intelhex.IntelHex(self.f)
         for addr in xrange(len(bin8)):
             expected = bin8[addr]
