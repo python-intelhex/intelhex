@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2005-2007, Alexander Beclhenko
+# Copyright (c) 2005-2007, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
