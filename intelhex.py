@@ -38,7 +38,7 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
-@version    0.8.4
+@version    0.8.5
 @date       2007/02/26
 '''
 
@@ -260,9 +260,10 @@ class IntelHex:
         else:
             fobj = file(f, 'w')
 
+        minaddr = IntelHex.minaddr(self)
         maxaddr = IntelHex.maxaddr(self)
         if maxaddr > 65535:
-            offset = 0
+            offset = (minaddr/65536)*65536
         else:
             offset = None
 
