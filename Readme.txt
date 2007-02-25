@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2006-09-05
-:Version: 0.8.3
+:Date: 2007-02-26
+:Version: 0.8.4
 
 .. Contents::
 
@@ -26,21 +26,25 @@ as IntelHex class. You also may use this script as standalone hex-to-bin
 convertor.
 
 
+License
+-------
+The code distributed under BSD license. See LICENSE.txt in sources achive.
+
+
 Download
 --------
 http://www.onembedding.com/tools/python/code/intelhex.zip
 
 
-Bzr repository
---------------
-You can branch development repository to working on your own improvements
-for intelhex::
+Project at Launchpad
+--------------------
+Intelhex project at Launchpad.net:
 
-	$ bzr branch http://bzr.onembedding.com/branches/intelhex/
+    https://launchpad.net/intelhex/
 
-You can prepare patches with ``bzr bundle`` command and then sending it to me
-via e-mail.
-        
+There is bug tracker and source code history browser. I use Bazaar version
+control system for development of intelhex.
+    
 Bzr (Bazaar version-control system) itself is here: 
 http://bazaar-vcs.org
 

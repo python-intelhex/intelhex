@@ -1,6 +1,12 @@
 NEWS
 ====
 
+* 2007/02/26 v.0.8.4 (License added)
+
+    The code actually licensed under BSD, but there was 
+    no LICENSE file in sources archive. Added license file
+    and explicit declaration in the source code.
+
 * 2006/09/05 v.0.8.3 (BugFix Release)
 
     Fix writing hex files with extended linear records
