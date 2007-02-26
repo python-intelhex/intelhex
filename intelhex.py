@@ -164,7 +164,7 @@ class IntelHex:
         self._offset = 0
         line = 0
 
-        for s in fobj.readlines():
+        for s in fobj:
             line += 1
             if not self.decode_record(s, line, wrap64k):
                 break
@@ -193,6 +193,17 @@ class IntelHex:
         else:
             raise ValueError('format should be either "hex" or "bin"')
 
+    def _get_start_end(self, start, end):
+        """Return default values for start and end if they are None
+        """
+        if start is None:
+            start = min(self._buf.keys())
+        if end is None:
+            end = max(self._buf.keys())
+        if start > end:
+            start, end = end, start
+        return start, end
+
     def tobinarray(self, start=None, end=None, pad=None):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
@@ -206,17 +217,10 @@ class IntelHex:
 
         bin = array.array('B')
 
-        addresses = self._buf.keys()
-        if addresses == []:
+        if self._buf == {}:
             return bin
 
-        if start is None:
-            start = min(addresses)
-        if end is None:
-            end = max(addresses)
-
-        if start > end:
-            start, end = end, start
+        start, end = self._get_start_end(start, end)
 
         for i in xrange(start, end+1):
             bin.append(self._buf.get(i, pad))
@@ -231,22 +235,27 @@ class IntelHex:
                         (if None used self.padding).
         @return         string of binary data.
         '''
-        bin = self.tobinarray(start, end, pad)
-        return bin.tostring()
+        return self.tobinarray(start, end, pad).tostring()
 
-    def tobinfile(self, fname, start=None, end=None, pad=0xFF):
-        ''' Convert to binary and write to fname file.
-        @param  fname   file name or file object for write output bytes.
+    def tobinfile(self, fobj, start=None, end=None, pad=0xFF):
+        '''Convert to binary and write to file.
+
+        @param  fobj    file name or file object for writing output bytes.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
-        @return         Nothing.
         '''
-        bin = self.tobinarray(start, end, pad)
-        if not hasattr(fname, "write"):
-            fname = file(fname, "wb")
-        bin.tofile(fname)
+        if not hasattr(fobj, "write"):
+            fobj = file(fobj, "wb")
+            close_fd = True
+        else:
+            close_fd = False
+
+        fobj.write(self.tobinstr(start, end, pad))
+
+        if close_fd:
+            fobj.close()
 
     def minaddr(self):
         ''' Get minimal address of HEX content. '''
@@ -364,7 +373,6 @@ class IntelHex:
         # end-of-file record
         fobj.write(":00000001FF\n")
         fobj.close()
-
 #/IntelHex
 
 

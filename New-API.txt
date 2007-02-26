@@ -28,7 +28,7 @@
 >>> ih.loadfile('file.bin', format='bin')
 
 # New handling of errors during loading hex:
-# errors wiil be raised
+# errors will be raised
 
 >>> NotAHexFile, BadHexRecord, AddrOverlap
 

@@ -344,6 +344,15 @@ class TestIntelHex(unittest.TestCase):
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
+    def test_tobinfile(self):
+        ih = intelhex.IntelHex(self.f)
+        sio = StringIO()
+        ih.tobinfile(sio)
+        s1 = sio.getvalue()
+        sio.close()
+        s2 = bin8.tostring()
+        self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+
 
 class TestIntelHex_big_files(unittest.TestCase):
     """Test that data bigger than 64K read/write correctly"""
