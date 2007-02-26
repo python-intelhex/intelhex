@@ -49,10 +49,10 @@ __docformat__ = "javadoc"
 import array
 
 
-class IntelHex: #FOLD00
+class IntelHex:
     ''' Intel HEX file reader. '''
 
-    def __init__(self, source=None): #FOLD01
+    def __init__(self, source=None):
         ''' Constructor.
 
         @param  source      source for initialization
@@ -72,7 +72,7 @@ class IntelHex: #FOLD00
             else:
                 raise ValueError("source: bad initializer type")
 
-    def decode_record(self, s, line=0, wrap64k=True): #fold01
+    def decode_record(self, s, line=0, wrap64k=True):
         '''Decode one record of HEX file.
 
         @param  s       line with HEX record.
@@ -148,7 +148,7 @@ class IntelHex: #FOLD00
 
         return True
 
-    def loadhex(self, fobj, wrap64k=True): #FOLD01
+    def loadhex(self, fobj, wrap64k=True):
         """Load hex file into internal buffer.
 
         @param  fobj        file name or file-like object
@@ -172,7 +172,7 @@ class IntelHex: #FOLD00
         if close_fd:
             fobj.close()
 
-    def loadbin(self, fobj, offset=0): #FOLD01
+    def loadbin(self, fobj, offset=0):
         """Load bin file into internal buffer.
 
         @param  fobj        file name or file-like object
@@ -180,7 +180,7 @@ class IntelHex: #FOLD00
         """
         raise NotImplementedError
 
-    def loadfile(self, fobj, format): #FOLD01
+    def loadfile(self, fobj, format):
         """Load data file into internal buffer.
 
         @param  fobj        file name or file-like object
@@ -193,7 +193,7 @@ class IntelHex: #FOLD00
         else:
             raise ValueError('format should be either "hex" or "bin"')
 
-    def tobinarray(self, start=None, end=None, pad=None): #fold01
+    def tobinarray(self, start=None, end=None, pad=None):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
@@ -223,7 +223,7 @@ class IntelHex: #FOLD00
 
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=0xFF): #fold01
+    def tobinstr(self, start=None, end=None, pad=0xFF):
         ''' Convert to binary form.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
@@ -234,7 +234,7 @@ class IntelHex: #FOLD00
         bin = self.tobinarray(start, end, pad)
         return bin.tostring()
 
-    def tobinfile(self, fname, start=None, end=None, pad=0xFF): #fold01
+    def tobinfile(self, fname, start=None, end=None, pad=0xFF):
         ''' Convert to binary and write to fname file.
         @param  fname   file name or file object for write output bytes.
         @param  start   start address of output bytes.
@@ -248,7 +248,7 @@ class IntelHex: #FOLD00
             fname = file(fname, "wb")
         bin.tofile(fname)
 
-    def minaddr(self): #fold01
+    def minaddr(self):
         ''' Get minimal address of HEX content. '''
         aa = self._buf.keys()
         if aa == []:
@@ -256,7 +256,7 @@ class IntelHex: #FOLD00
         else:
             return min(aa)
 
-    def maxaddr(self): #fold01
+    def maxaddr(self):
         ''' Get maximal address of HEX content. '''
         aa = self._buf.keys()
         if aa == []:
@@ -264,7 +264,7 @@ class IntelHex: #FOLD00
         else:
             return max(aa)
 
-    def __getitem__(self, addr): #fold01
+    def __getitem__(self, addr):
         ''' Get byte from address.
         @param  addr    address of byte.
         @return         byte if address exists in HEX file, or self.padding
@@ -272,10 +272,10 @@ class IntelHex: #FOLD00
         '''
         return self._buf.get(addr, self.padding)
 
-    def __setitem__(self, addr, byte): #fold01
+    def __setitem__(self, addr, byte):
         self._buf[addr] = byte
 
-    def writefile(self, f): #fold01
+    def writefile(self, f):
         """Write data to file f in HEX format.
         @return True    if successful.
         """
@@ -368,10 +368,10 @@ class IntelHex: #FOLD00
 #/IntelHex
 
 
-class IntelHex16bit(IntelHex): #fold00
+class IntelHex16bit(IntelHex):
     """Access to data as 16-bit words."""
 
-    def __init__(self, source): #FOLD01
+    def __init__(self, source):
         """Construct class from HEX file
         or from instance of ordinary IntelHex class.
 
@@ -396,7 +396,7 @@ class IntelHex16bit(IntelHex): #fold00
         if self.padding == 0x0FF:
             self.padding = 0x0FFFF
 
-    def __getitem__(self, addr16): #FOLD01
+    def __getitem__(self, addr16):
         """Get 16-bit word from address.
         Raise error if found only one byte from pair.
 
@@ -417,13 +417,13 @@ class IntelHex16bit(IntelHex): #fold00
 
         raise Exception, 'Bad access in 16-bit mode (not enough data)'
 
-    def __setitem__(self, addr16, word): #FOLD01
+    def __setitem__(self, addr16, word):
         addr_byte = addr16 * 2
         bytes = divmod(word, 256)
         self._buf[addr_byte] = bytes[1]
         self._buf[addr_byte+1] = bytes[0]
 
-    def minaddr(self): #FOLD01
+    def minaddr(self):
         '''Get minimal address of HEX content in 16-bit mode.'''
         aa = self._buf.keys()
         if aa == []:
@@ -431,7 +431,7 @@ class IntelHex16bit(IntelHex): #fold00
         else:
             return min(aa)/2
 
-    def maxaddr(self): #FOLD01
+    def maxaddr(self):
         '''Get maximal address of HEX content in 16-bit mode.'''
         aa = self._buf.keys()
         if aa == []:
@@ -442,7 +442,7 @@ class IntelHex16bit(IntelHex): #fold00
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF): #fold00
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -481,16 +481,16 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF): #fold00
 
 
 ##
-# Custom Errors #FOLD00
+# Custom Errors
 
-class IntelHexError(StandardError): #FOLD00
+class IntelHexError(StandardError):
     '''Base Exception class for IntelHex module'''
 
-    def __init__(self, **kw): #FOLD01
+    def __init__(self, **kw):
         for key, value in kw.items():
             setattr(self, key, value)
 
-    def __str__(self): #FOLD01
+    def __str__(self):
         try:
             # __str__() should always return a 'str' object
             # never a 'unicode' object.
@@ -502,39 +502,39 @@ class IntelHexError(StandardError): #FOLD00
             return 'Unprintable exception %s: %s' \
                 % (self.__class__.__name__, str(e))
 
-class HexReaderError(IntelHexError): #FOLD00
+class HexReaderError(IntelHexError):
     '''Generic error of reading HEX file'''
 
-class NotAHexFile(HexReaderError): #FOLD00
+class NotAHexFile(HexReaderError):
     '''File "%(filename)s" is not a valid HEX file'''
 
-class BadHexRecord(HexReaderError): #FOLD00
+class BadHexRecord(HexReaderError):
     '''Hex file contains invalid record at line %(line)d'''
 
-class InvalidRecordLength(BadHexRecord): #FOLD00
+class InvalidRecordLength(BadHexRecord):
     '''Record at line %(line)d has invalid length'''
 
-class InvalidRecordType(BadHexRecord): #FOLD00
+class InvalidRecordType(BadHexRecord):
     '''Record at line %(line)d has invalid record type'''
 
-class InvalidRecordChecksum(BadHexRecord): #FOLD00
+class InvalidRecordChecksum(BadHexRecord):
     '''Record at line %(line)d has invalid checksum'''
 
-class InvalidEOFRecord(BadHexRecord): #FOLD00
+class InvalidEOFRecord(BadHexRecord):
     '''File has invalid End-of-File record'''
 
-class InvalidExtendedSegmentRecord(BadHexRecord): #FOLD00
+class InvalidExtendedSegmentRecord(BadHexRecord):
     '''Invalid Extended 8086 Segment Record at line %(line)d'''
 
-class InvalidExtendedLinearAddressRecord(BadHexRecord): #FOLD00
+class InvalidExtendedLinearAddressRecord(BadHexRecord):
     '''Invalid Extended Linear Address Record at line %(line)d'''
 
-class HexAddressOverlap(HexReaderError): #FOLD00
+class HexAddressOverlap(HexReaderError):
     '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''
 
 
 ##
-# MAIN #FOLD00
+# MAIN
 if __name__ == '__main__':
     import getopt
     import os
