@@ -292,7 +292,8 @@ class TestIntelHexBase(unittest.TestCase):
         See: http://www.nedbatchelder.com/blog/200609.html#e20060905T064418
 
         Typical usage:
-            self.assertRaisesMsg(MyException, "Exception message", my_function, (arg1, arg2))
+            self.assertRaisesMsg(MyException, "Exception message",
+                                 my_function, (arg1, arg2))
         """
         try:
             callableObj(*args, **kwargs)
@@ -307,7 +308,7 @@ class TestIntelHexBase(unittest.TestCase):
             else:
                 # Message provided, and it didn't match: fail!
                 raise self.failureException(
-                    "Right exception, wrong message: got '%s' expected '%s'" % 
+                    "Right exception, wrong message: got '%s' expected '%s'" %
                     (excMsg, msg)
                     )
         else:
@@ -316,7 +317,7 @@ class TestIntelHexBase(unittest.TestCase):
             else:
                 excName = str(excClass)
             raise self.failureException(
-                "Expected to raise %s, didn't get an exception at all" % 
+                "Expected to raise %s, didn't get an exception at all" %
                 excName
                 )
 #/class TestIntelHexBase
@@ -336,7 +337,9 @@ class TestIntelHex(unittest.TestCase):
         for addr in xrange(len(bin8)):
             expected = bin8[addr]
             actual = ih[addr]
-            self.assertEqual(expected, actual, "Data different at address %x (%x != %x)" % (addr, expected, actual))
+            self.assertEqual(expected, actual,
+                             "Data different at address "
+                             "%x (%x != %x)" % (addr, expected, actual))
 
     def test_tobinstr(self):
         ih = intelhex.IntelHex(self.f)
@@ -368,7 +371,9 @@ class TestIntelHex_big_files(unittest.TestCase):
         ih = intelhex.IntelHex(self.f)
         for addr, byte in data64k.items():
             readed = ih[addr]
-            self.assertEquals(byte, readed, "data not equal at addr %X (%X != %X)" % (addr, byte, readed))
+            self.assertEquals(byte, readed,
+                              "data not equal at addr %X "
+                              "(%X != %X)" % (addr, byte, readed))
 
     def test_writefile(self):
         ih = intelhex.IntelHex(self.f)
@@ -408,13 +413,15 @@ class TestIntelHex16bit(unittest.TestCase):
     def test_minaddr(self):
         ih = intelhex.IntelHex16bit(self.f)
         addr = ih.minaddr()
-        self.assertEqual(0, addr, 'Error in detection of minaddr (0 != 0x%x)' % addr)
+        self.assertEqual(0, addr,
+                         'Error in detection of minaddr (0 != 0x%x)' % addr)
 
     def test_maxaddr(self):
         ih = intelhex.IntelHex16bit(self.f)
         addr = ih.maxaddr()
         self.assertEqual(0x001D, addr,
-                         'Error in detection of maxaddr (0x001D != 0x%x)' % addr)
+                         'Error in detection of maxaddr '
+                         '(0x001D != 0x%x)' % addr)
 
     def test_getitem(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -523,14 +530,16 @@ class TestIntelHexErrors(TestIntelHexBase):
 
     def test_InvalidExtendedLinearAddressRecord(self):
         self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
-                             'Invalid Extended Linear Address Record at line 1',
+                             'Invalid Extended Linear Address Record '
+                             'at line 1',
                              self._raise_error,
                              InvalidExtendedLinearAddressRecord,
                              {'line': 1})
 
     def test_HexAddressOverlap(self):
         self.assertRaisesMsg(HexAddressOverlap,
-                             'Hex file has address overlap at address 0x1234 on line 1',
+                             'Hex file has address overlap at address 0x1234 '
+                             'on line 1',
                              self._raise_error,
                              HexAddressOverlap,
                              {'address': 0x1234, 'line': 1})
@@ -612,13 +621,15 @@ class TestDecodeHexRecords(TestIntelHexBase):
 
     def test_invalid_linear_address(self):
         self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
-                             'Invalid Extended Linear Address Record at line 1',
+                             'Invalid Extended Linear Address Record '
+                             'at line 1',
                              self.ih.decode_record,
                              ':00000004FC',
                              1)
         
         self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
-                             'Invalid Extended Linear Address Record at line 1',
+                             'Invalid Extended Linear Address Record '
+                             'at line 1',
                              self.ih.decode_record,
                              ':020001040000F9',
                              1)
@@ -626,7 +637,8 @@ class TestDecodeHexRecords(TestIntelHexBase):
     def test_addr_overlap(self):
         self.ih.decode_record(':0100000000FF')
         self.assertRaisesMsg(HexAddressOverlap,
-                             'Hex file has address overlap at address 0x0 on line 1',
+                             'Hex file has address overlap at address 0x0 '
+                             'on line 1',
                              self.ih.decode_record,
                              ':0100000000FF',
                              1)
@@ -634,7 +646,9 @@ class TestDecodeHexRecords(TestIntelHexBase):
     def test_data_record(self):
         self.assertEqual(True, self.ih.decode_record(':0100000000FF'))
         self.assertEqual(True, self.ih.decode_record(':03000100000102F9'))
-        self.assertEqual(True, self.ih.decode_record(':1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396'))
+        self.assertEqual(True,
+                         self.ih.decode_record(':1004E300CFF0FBE2FDF220'
+                                               'FF20F2E120E2FBE6F396'))
 
     def test_eof(self):
         self.assertEqual(False, self.ih.decode_record(':00000001FF'))

@@ -99,7 +99,7 @@ Documentation
 -------------
 You can use epydoc_ for creating documentation for IntelHex class. Run epydoc::
 
-	$ python epydoc.py intelhex
+	$ python epydoc.py intelhex.py
 
 .. _epydoc: http://epydoc.sourceforge.net/
 
