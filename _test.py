@@ -564,6 +564,13 @@ class TestDecodeHexRecords(TestIntelHexBase):
                              ':',
                              1)
 
+    def test_odd_hexascii_digits(self):
+        self.assertRaisesMsg(BadHexRecord,
+                             'Hex file contains invalid record at line 1',
+                             self.ih.decode_record,
+                             ':0100000100F',
+                             1)
+
     def test_invalid_length(self):
         self.assertRaisesMsg(InvalidRecordLength,
                              'Record at line 1 has invalid length',

@@ -96,7 +96,11 @@ class IntelHex:
             return True       # empty line
 
         if s[0] == ':':
-            bin = array('B', unhexlify(s[1:]))
+            try:
+                bin = array('B', unhexlify(s[1:]))
+            except TypeError:
+                # this might be raised by unhexlify when odd hexascii digits
+                raise BadHexRecord(line=line)
             length = len(bin)
             if length < 5:
                 raise BadHexRecord(line=line)
@@ -165,13 +169,14 @@ class IntelHex:
         self._offset = 0
         line = 0
 
-        for s in fobj:
-            line += 1
-            if not self.decode_record(s, line, wrap64k):
-                break
-
-        if close_fd:
-            fobj.close()
+        try:
+            for s in fobj:
+                line += 1
+                if not self.decode_record(s, line, wrap64k):
+                    break
+        finally:
+            if close_fd:
+                fobj.close()
 
     def loadbin(self, fobj, offset=0):
         """Load bin file into internal buffer.
