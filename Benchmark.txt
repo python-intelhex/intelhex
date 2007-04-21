@@ -1,0 +1,17 @@
+21/04/2007 revno.40
+Python 2.5 @ Windows XP, Intel Celeron M CPU 430 @ 1.73GHz
+
+Read operation:
+base 10K  	  0.031
+100K      	  0.360	  1.161
+1M        	  3.500	  1.129
+100K+100K 	  0.719	  1.160
+0+100K    	  0.360	  1.161
+
+Write operation:
+base 10K  	  0.031
+100K      	  0.297	  0.958
+1M        	  2.953	  0.953
+100K+100K 	  1.328	  2.142
+0+100K    	  0.312	  1.006
+
