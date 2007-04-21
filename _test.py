@@ -377,18 +377,10 @@ class TestIntelHex_big_files(unittest.TestCase):
 
     def test_writefile(self):
         ih = intelhex.IntelHex(self.f)
-        # prepare for writing
-        handle, fout = tempfile.mkstemp()
-        os.close(handle)
-
-        ih.writefile(fout)
-
-        # check written
-        fi = file(fout)
-        s = fi.read()
-        fi.close()
-        os.remove(fout)
-
+        sio = StringIO()
+        ih.writefile(sio)
+        s = sio.getvalue()
+        sio.close()
         self.assertEquals(hex64k, s, """Written data is incorrect
 Should be:
 %s
@@ -433,16 +425,10 @@ class TestIntelHex16bit(unittest.TestCase):
 
     def test_writefile(self):
         ih = intelhex.IntelHex16bit(self.f)
-
-        handle, fout = tempfile.mkstemp()
-        os.close(handle)
-
-        ih.writefile(fout)
-
-        fi = file(fout)
-        s = fi.read()
-        fi.close()
-        os.remove(fout)
+        sio = StringIO()
+        ih.writefile(sio)
+        s = sio.getvalue()
+        sio.close()
 
         fin = StringIO(s)
         ih2 = intelhex.IntelHex16bit(fin)

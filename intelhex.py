@@ -290,8 +290,10 @@ class IntelHex:
         """
         if hasattr(f, "write"):
             fobj = f
+            close_fd = False
         else:
             fobj = file(f, 'w')
+            close_fd = True
 
         minaddr = IntelHex.minaddr(self)
         maxaddr = IntelHex.maxaddr(self)
@@ -372,7 +374,8 @@ class IntelHex:
 
         # end-of-file record
         fobj.write(":00000001FF\n")
-        fobj.close()
+        if close_fd:
+            fobj.close()
 #/IntelHex
 
 
