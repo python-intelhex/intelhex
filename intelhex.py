@@ -46,7 +46,8 @@ This script also may be used as hex2bin convertor utility.
 __docformat__ = "javadoc"
 
 
-import array
+from array import array
+from binascii import hexlify, unhexlify
 
 
 class IntelHex:
@@ -91,39 +92,39 @@ class IntelHex:
                 False   if EOF record encountered.
         '''
         s = s.rstrip('\r\n')
-        len_ = len(s)
-
-        if len_ == 0:
+        if not s:
             return True       # empty line
 
-        if s[0] != ':' or len_ < 11:
+        if s[0] == ':':
+            bin = array('B', unhexlify(s[1:]))
+            length = len(bin)
+            if length < 5:
+                raise BadHexRecord(line=line)
+        else:
             raise BadHexRecord(line=line)
 
-        record_length = int(s[1:3], 16)
-
-        if len_ != (11 + record_length*2):
+        record_length = bin[0]
+        if length != (5 + record_length):
             raise InvalidRecordLength(line=line)
 
-        addr = int(s[3:7], 16)
+        addr = bin[1]*256 + bin[2]
 
-        record_type = int(s[7:9], 16)
+        record_type = bin[3]
         if not record_type in (0, 1, 2, 4):
             raise InvalidRecordType(line=line)
 
-        data_bytes = [int(s[i:i+2], 16) for i in xrange(1,len_,2)]
-
-        crc = sum(data_bytes)
+        crc = sum(bin)
         crc &= 0x0FF
         if crc != 0:
             raise InvalidRecordChecksum(line=line)
 
         if record_type == 0:
             # data record
-            for i in data_bytes[4:4+record_length]:
+            for i in xrange(4, 4+record_length):
                 full_addr = addr + self._offset
                 if not self._buf.get(full_addr, None) is None:
                     raise HexAddressOverlap(address=full_addr, line=line)
-                self._buf[full_addr] = i
+                self._buf[full_addr] = bin[i]
                 addr += 1
                 if wrap64k and addr == 65536:
                     addr = 0
@@ -138,13 +139,13 @@ class IntelHex:
             # Extended 8086 Segment Record
             if record_length != 2 or addr != 0:
                 raise InvalidExtendedSegmentRecord(line=line)
-            self._offset = int(s[9:13], 16) << 4
+            self._offset = (bin[4]*256 + bin[5]) * 16
 
         elif record_type == 4:
             # Extended Linear Address Record
             if record_length != 2 or addr != 0:
                 raise InvalidExtendedLinearAddressRecord(line=line)
-            self._offset = int(s[9:13], 16) << 16
+            self._offset = (bin[4]*256 + bin[5]) * 65536
 
         return True
 
@@ -215,7 +216,7 @@ class IntelHex:
         if pad is None:
             pad = self.padding
 
-        bin = array.array('B')
+        bin = array('B')
 
         if self._buf == {}:
             return bin
