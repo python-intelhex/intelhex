@@ -193,7 +193,7 @@ class IntelHex:
         else:
             raise ValueError('format should be either "hex" or "bin"')
 
-    def _get_start_end(self, start, end):
+    def _get_start_end(self, start=None, end=None):
         """Return default values for start and end if they are None
         """
         if start is None:
