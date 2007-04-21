@@ -16,15 +16,23 @@ import intelhex
 
 n, hexstr, ih_obj = _bench.get_100K_100K()
 
-def run_read():
+def read_closure():
     sio = StringIO(hexstr)
-    ih = intelhex.IntelHex(sio)
-    sio.close()
+    ih = intelhex.IntelHex()
+    def _run_read():
+        ih.loadhex(sio)
+    return _run_read
 
-def run_write():
+run_read = read_closure()
+
+def write_closure():
     sio = StringIO()
-    ih_obj.writefile(sio)
-    sio.close()
+    def _run_write():
+        ih_obj.writefile(sio)
+    return _run_write
+
+run_write = write_closure()
+
 
 if __name__ == '__main__':
     print 'Profile 100K+100K data pattern'
