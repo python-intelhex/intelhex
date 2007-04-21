@@ -112,7 +112,7 @@ class IntelHex:
 
         data_bytes = [int(s[i:i+2], 16) for i in xrange(1,len_,2)]
 
-        crc = reduce(lambda x, y: x+y, data_bytes, 0)
+        crc = sum(data_bytes)
         crc &= 0x0FF
         if crc != 0:
             raise InvalidRecordChecksum(line=line)
