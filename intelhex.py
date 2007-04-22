@@ -39,7 +39,7 @@ This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix@ukr.net)
 @version    0.9.devel
-@date       2007/02/26
+@date       2007/04/22
 '''
 
 
@@ -160,9 +160,9 @@ class IntelHex:
         """
         if not hasattr(fobj, "read"):
             fobj = file(fobj, "rU")
-            close_fd = True
+            fclose = fobj.close
         else:
-            close_fd = False
+            fclose = None
 
         self._offset = 0
         line = 0
@@ -176,8 +176,8 @@ class IntelHex:
             except EndOfFile:
                 pass
         finally:
-            if close_fd:
-                fobj.close()
+            if fclose:
+                fclose()
 
     def loadbin(self, fobj, offset=0):
         """Load bin file into internal buffer.

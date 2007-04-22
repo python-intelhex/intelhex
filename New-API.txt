@@ -15,8 +15,8 @@
 # New API
 # *******
 
->>> ih = IntelHex()		# create empty object
->>> ih = IntelHex('file.hex')	# immediately load data from hex file
+>>> ih = IntelHex()		# (DONE) create empty object
+>>> ih = IntelHex('file.hex')	# (DONE) immediately load data from hex file
 >>> ih = IntelHex(ih2)		# copying constructor from another
 				# IntelHex object
 >>> ih = IntelHex(dict)		# init from dictionary (keys are addresses,
@@ -24,13 +24,13 @@
 
 # Multiple times load data from hex/bin files:
 
->>> ih.loadfile('file.hex', format='hex')
+>>> ih.loadfile('file.hex', format='hex')	# (DONE)
 >>> ih.loadfile('file.bin', format='bin')
 
 # New handling of errors during loading hex:
 # errors will be raised
 
->>> NotAHexFile, BadHexRecord, AddrOverlap
+>>> NotAHexFile, BadHexRecord, AddrOverlap	# (DONE)
 
 # Save data to file (hex/bin):
 

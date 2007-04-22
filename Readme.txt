@@ -7,7 +7,7 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2007-02-26
+:Date: 2007-04-22
 :Version: 0.9.devel
 
 .. Contents::
@@ -53,22 +53,23 @@ IntelHex classes
 ----------------
 Basic
 *****
-Example of typical usage of ``IntelHex`` class::
+Example of typical initialization of ``IntelHex`` class::
 
-	>>> from intelhex import IntelHex	# 1
-	>>> h = IntelHex("foo.hex")		# 2
-	>>> h.tobinfile("foo.bin")		# 3
+	>>> from intelhex import IntelHex
+	>>> ih = IntelHex("foo.hex")
 
 In second line we are create instance of class. Constructor has one optional 
 parameter: name of HEX file or file object. 
 Specified file automatically read and decoded.
 
-Class IntelHex has 3 methods for converting content of HEX file 
-into binary form (see line 4 in example above):
+In version 0.9 API slightly changed. Now you can create empty object
+and load data later, and even load data several times (but if addresses
+in those files overlap you get exception ``AddrOverlap``). E.g.::
 
-	* ``tobinarray`` (returns array of unsigned char bytes);
-	* ``tobinstr``   (returns string of bytes);
-	* ``tobinfile``  (convert content to binary form and write to file).
+	>>> from intelhex import IntelHex
+	>>> ih = IntelHex()			# create empty object
+	>>> ih.loadhex('foo.hex')		# load from hex
+	>>> ih.loadfile('bar.hex',format='hex')	# also load from hex
 
 Access to data by address
 *************************
@@ -76,7 +77,7 @@ You can get or modify some data by address in usual way: via indexing
 operations::
 
 	>>> print ih[0]			# read data from address 0
-        >>> ih[1] = 0x55		# modify data at address 1
+	>>> ih[1] = 0x55		# modify data at address 1
 
 When you try to read from non-existent address you get default data. Default
 data sets via attribute ``.padding`` of class instance.
@@ -89,11 +90,40 @@ When you need to work with 16-bit data stored in 8-bit Intel HEX file you need
 to use class ``IntelHex16bit``. This class derived from IntelHex and has all their
 methods. But some of methods modified to implement 16-bit behaviour.
 
+Convert data to binary form
+***************************
+Class IntelHex has 3 methods for converting data of IntelHex object
+into binary form:
+
+	* ``tobinarray`` (returns array of unsigned char bytes);
+	* ``tobinstr``   (returns string of bytes);
+	* ``tobinfile``  (convert content to binary form and write to file).
+        
+Example::
+
+	>>> from intelhex import IntelHex
+	>>> ih = IntelHex("foo.hex")
+	>>> ih.tobinfile("foo.bin")
+
 Write data to HEX file
 **********************
 You can store data contained in object by method ``.writefile(f)``. Parameter
-``f`` should be filename or file-like object. After writing file will be closed.
+``f`` should be filename or file-like object.
 
+To convert data of IntelHex object to HEX8 file format without actually saving
+it to disk you can use StringIO file-like object, e.g.::
+
+	>>> from cStringIO import StringIO
+	>>> from intelhex import IntelHex
+	>>> ih = IntelHex()
+	>>> ih[0] = 0x55
+
+	>>> sio = StringIO()
+	>>> ih.writefile(sio)
+	>>> hexstr = sio.getvalue()
+	>>> sio.close()
+
+Variable ``hexstr`` contains string with content of HEX8 file.
 
 Documentation
 -------------
@@ -138,18 +168,18 @@ You can use intelhex.py as stand-alone hex-to-bin convertor.
 	    python intelhex.py [options] file.hex [out.bin]
 
 	Arguments:
-	    file.hex                name of hex file to processing.
-	    out.bin                 name of output file.
+	    file.hex		    name of hex file to processing.
+	    out.bin		    name of output file.
 				    If omitted then output write to file.bin.
 
 	Options:
-	    -h, --help              this help message.
-	    -p, --pad=FF            pad byte for empty spaces (hex value).
+	    -h, --help		    this help message.
+	    -p, --pad=FF	    pad byte for empty spaces (hex value).
 	    -r, --range=START:END   specify address range for writing output
 				    (hex value).
 				    Range can be in form 'START:' or ':END'.
 	    -l, --length=NNNN,
-	    -s, --size=NNNN         size of output (decimal value).
+	    -s, --size=NNNN	    size of output (decimal value).
 
 Per example, converting content of foo.hex to foo.bin addresses from 0 to FF::
 
