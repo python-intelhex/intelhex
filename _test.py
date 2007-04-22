@@ -15,7 +15,7 @@ from intelhex import IntelHex, \
                      InvalidRecordType, InvalidRecordChecksum, \
                      InvalidEOFRecord, InvalidExtendedSegmentRecord, \
                      InvalidExtendedLinearAddressRecord, \
-                     HexAddressOverlap
+                     HexAddressOverlap, EndOfFile
 
 
 ##
@@ -637,14 +637,14 @@ class TestDecodeHexRecords(TestIntelHexBase):
                              1)
 
     def test_data_record(self):
-        self.assertEqual(True, self.ih.decode_record(':0100000000FF'))
-        self.assertEqual(True, self.ih.decode_record(':03000100000102F9'))
-        self.assertEqual(True,
-                         self.ih.decode_record(':1004E300CFF0FBE2FDF220'
-                                               'FF20F2E120E2FBE6F396'))
+        # should be no exceptions
+        self.ih.decode_record(':0100000000FF\n')
+        self.ih.decode_record(':03000100000102F9\r\n')
+        self.ih.decode_record(':1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396')
 
     def test_eof(self):
-        self.assertEqual(False, self.ih.decode_record(':00000001FF'))
+        # EOF should raise special exception
+        self.assertRaises(EndOfFile, self.ih.decode_record, ':00000001FF')
 
 #/class TestDecodeHexRecords
 

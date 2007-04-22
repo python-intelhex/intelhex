@@ -137,7 +137,7 @@ class IntelHex:
             # end of file record
             if record_length != 0:
                 raise InvalidEOFRecord(line=line)
-            return False
+            raise EndOfFile
 
         elif record_type == 2:
             # Extended 8086 Segment Record
@@ -150,8 +150,6 @@ class IntelHex:
             if record_length != 2 or addr != 0:
                 raise InvalidExtendedLinearAddressRecord(line=line)
             self._offset = (bin[4]*256 + bin[5]) * 65536
-
-        return True
 
     def loadhex(self, fobj, wrap64k=True):
         """Load hex file into internal buffer.
@@ -170,10 +168,13 @@ class IntelHex:
         line = 0
 
         try:
-            for s in fobj:
-                line += 1
-                if not self.decode_record(s, line, wrap64k):
-                    break
+            decode = self.decode_record
+            try:
+                for s in fobj:
+                    line += 1
+                    decode(s, line, wrap64k)
+            except EndOfFile:
+                pass
         finally:
             if close_fd:
                 fobj.close()
@@ -518,6 +519,9 @@ class IntelHexError(StandardError):
         except (NameError, ValueError, KeyError), e:
             return 'Unprintable exception %s: %s' \
                 % (self.__class__.__name__, str(e))
+
+class EndOfFile(IntelHexError):
+    '''EOF record reached -- signal to stop read file'''
 
 class HexReaderError(IntelHexError):
     '''Generic error of reading HEX file'''
