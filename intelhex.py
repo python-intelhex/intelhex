@@ -78,18 +78,16 @@ class IntelHex:
 
         @param  s       line with HEX record.
         @param  line    line number (for error messages).
-        @param  wrap64k if lowest 16-bit of current address
-                        overlaps 64K boundary should decoder
-                        wrap address to 0.
+        @param  wrap64k is decoder should wrap lowest 16-bit
+                        of current address at 64K boundary.
                         By default address wrapped because
                         standard require this.
                         But some tools generate wrong hex files
                         (e.g. some Atmel AVR compilers),
                         so for this situation user can disable
-                        of wrapping address.
+                        address wrapping.
 
-        @return True    if line proceed OK and file not ended,
-                False   if EOF record encountered.
+        @raise  EndOfFile   if EOF record encountered.
         '''
         s = s.rstrip('\r\n')
         if not s:
@@ -156,7 +154,7 @@ class IntelHex:
 
         @param  fobj        file name or file-like object
         @param  wrap64k     is lowest 16-bit of address should
-                            wrap on 64K boundary
+                            wrap at 64K boundary
         """
         if not hasattr(fobj, "read"):
             fobj = file(fobj, "rU")
