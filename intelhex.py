@@ -37,7 +37,7 @@
 
 This script also may be used as hex2bin convertor utility.
 
-@author     Alexander Belchenko (bialix@ukr.net)
+@author     Alexander Belchenko (bialix AT ukr net)
 @version    0.9.devel
 @date       2007/04/22
 '''

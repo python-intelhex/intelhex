@@ -1,6 +1,11 @@
 NEWS
 ====
 
+* 2007/04/22 v.0.9.devel (New API pre-release)
+
+    - New API
+    - Performance improvemenets: read hex file now ~45% faster
+
 * 2007/02/26 v.0.8.5 (BugFix Release)
 
     Performance improvements for writing big hex files

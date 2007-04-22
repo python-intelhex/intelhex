@@ -33,7 +33,7 @@ The code distributed under BSD license. See LICENSE.txt in sources achive.
 
 Download
 --------
-http://www.onembedding.com/tools/python/code/intelhex.zip
+http://www.bialix.com/intelhex/intelhex.zip
 
 
 Project at Launchpad
@@ -132,6 +132,10 @@ You can use epydoc_ for creating documentation for IntelHex class. Run epydoc::
 	$ python epydoc.py intelhex.py
 
 .. _epydoc: http://epydoc.sourceforge.net/
+
+`You can see API documentation on my site.`__
+
+__ http://www.bialix.com/intelhex/api/
 
 
 Hex-to-Bin convertor
