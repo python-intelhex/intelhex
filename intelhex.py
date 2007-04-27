@@ -39,7 +39,7 @@ This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix AT ukr net)
 @version    0.9.devel
-@date       2007/04/22
+@date       2007/04/27
 '''
 
 
@@ -61,6 +61,8 @@ class IntelHex:
         '''
         #public members
         self.padding = 0x0FF
+        # Start Address
+        self.start_addr = None
 
         # private members
         self._buf = {}
@@ -98,12 +100,12 @@ class IntelHex:
                 bin = array('B', unhexlify(s[1:]))
             except TypeError:
                 # this might be raised by unhexlify when odd hexascii digits
-                raise BadHexRecord(line=line)
+                raise BadHexRecordError(line=line)
             length = len(bin)
             if length < 5:
-                raise BadHexRecord(line=line)
+                raise BadHexRecordError(line=line)
         else:
-            raise BadHexRecord(line=line)
+            raise BadHexRecordError(line=line)
 
         record_length = bin[0]
         if length != (5 + record_length):
@@ -112,7 +114,7 @@ class IntelHex:
         addr = bin[1]*256 + bin[2]
 
         record_type = bin[3]
-        if not record_type in (0, 1, 2, 4):
+        if not (0 <= record_type <= 5):
             raise InvalidRecordType(line=line)
 
         crc = sum(bin)
@@ -127,9 +129,10 @@ class IntelHex:
                 if not self._buf.get(full_addr, None) is None:
                     raise HexAddressOverlap(address=full_addr, line=line)
                 self._buf[full_addr] = bin[i]
-                addr += 1
-                if wrap64k and addr == 65536:
-                    addr = 0
+                addr += 1   # FIXME: addr should be wrapped on 64K boundary
+                            # BUT only after 02 record
+#                if wrap64k and addr == 65536:
+#                    addr = 0
 
         elif record_type == 1:
             # end of file record
@@ -148,6 +151,28 @@ class IntelHex:
             if record_length != 2 or addr != 0:
                 raise InvalidExtendedLinearAddressRecord(line=line)
             self._offset = (bin[4]*256 + bin[5]) * 65536
+
+        elif record_type == 3:
+            # Start Segment Address Record
+            if record_length != 4 or addr != 0:
+                raise InvalidStartSegmentAddressRecord(line=line)
+            if self.start_addr:
+                raise DuplicateStartAddressRecordError(line=line)
+            self.start_addr = {'CS': bin[4]*256 + bin[5],
+                               'IP': bin[6]*256 + bin[7],
+                              }
+
+        elif record_type == 5:
+            # Start Linear Address Record
+            if record_length != 4 or addr != 0:
+                raise InvalidStartLinearAddressRecord(line=line)
+            if self.start_addr:
+                raise DuplicateStartAddressRecordError(line=line)
+            self.start_addr = {'EIP': (bin[4]*16777216 +
+                                       bin[5]*65536 +
+                                       bin[6]*256 +
+                                       bin[7]),
+                              }
 
     def loadhex(self, fobj, wrap64k=True):
         """Load hex file into internal buffer.
@@ -289,17 +314,68 @@ class IntelHex:
     def __setitem__(self, addr, byte):
         self._buf[addr] = byte
 
-    def writefile(self, f):
+    def writefile(self, f, write_start_addr=True):
         """Write data to file f in HEX format.
+
+        @param  f                   filename or file-like object for writing
+        @param  write_start_addr    enable or disable writing start address
+                                    record to file (enabled by default).
+                                    If there is no start address nothing
+                                    will be written.
+
         @return True    if successful.
         """
-        if hasattr(f, "write"):
+        fwrite = getattr(f, "write", None)
+        if fwrite:
             fobj = f
-            close_fd = False
+            fclose = None
         else:
             fobj = file(f, 'w')
-            close_fd = True
+            fwrite = fobj.write
+            fclose = fobj.close
 
+        # start address record if any
+        if self.start_addr and write_start_addr:
+            keys = self.start_addr.keys()
+            keys.sort()
+            bin = array('B', '\0'*9)
+            if keys == ['CS','IP']:
+                # Start Segment Address Record
+                bin[0] = 4      # reclen
+                bin[1] = 0      # offset msb
+                bin[2] = 0      # offset lsb
+                bin[3] = 3      # rectyp
+                cs = self.start_addr['CS']
+                bin[4] = (cs >> 8) & 0x0FF
+                bin[5] = cs & 0x0FF
+                ip = self.start_addr['IP']
+                bin[6] = (ip >> 8) & 0x0FF
+                bin[7] = ip & 0x0FF
+                bin[8] = (-sum(bin)) & 0x0FF    # chksum
+                fwrite(':')
+                fwrite(hexlify(bin.tostring()).upper())
+                fwrite('\n')
+            elif keys == ['EIP']:
+                # Start Linear Address Record
+                bin[0] = 4      # reclen
+                bin[1] = 0      # offset msb
+                bin[2] = 0      # offset lsb
+                bin[3] = 5      # rectyp
+                eip = self.start_addr['EIP']
+                bin[4] = (eip >> 24) & 0x0FF
+                bin[5] = (eip >> 16) & 0x0FF
+                bin[6] = (eip >> 8) & 0x0FF
+                bin[7] = eip & 0x0FF
+                bin[8] = (-sum(bin)) & 0x0FF    # chksum
+                fwrite(':')
+                fwrite(hexlify(bin.tostring()).upper())
+                fwrite('\n')
+            else:
+                self.Error = ('Invalid start address value: %r'
+                              % self.start_addr)
+                return False
+
+        # data
         minaddr = IntelHex.minaddr(self)
         maxaddr = IntelHex.maxaddr(self)
         if maxaddr > 65535:
@@ -379,8 +455,10 @@ class IntelHex:
 
         # end-of-file record
         fobj.write(":00000001FF\n")
-        if close_fd:
-            fobj.close()
+        if fclose:
+            fclose()
+
+        return True
 #/IntelHex
 
 
@@ -527,26 +605,38 @@ class HexReaderError(IntelHexError):
 class NotAHexFile(HexReaderError):
     '''File "%(filename)s" is not a valid HEX file'''
 
-class BadHexRecord(HexReaderError):
+class BadHexRecordError(HexReaderError):
     '''Hex file contains invalid record at line %(line)d'''
 
-class InvalidRecordLength(BadHexRecord):
+class InvalidRecordLength(BadHexRecordError):
     '''Record at line %(line)d has invalid length'''
 
-class InvalidRecordType(BadHexRecord):
+class InvalidRecordType(BadHexRecordError):
     '''Record at line %(line)d has invalid record type'''
 
-class InvalidRecordChecksum(BadHexRecord):
+class InvalidRecordChecksum(BadHexRecordError):
     '''Record at line %(line)d has invalid checksum'''
 
-class InvalidEOFRecord(BadHexRecord):
+class InvalidEOFRecord(BadHexRecordError):
     '''File has invalid End-of-File record'''
 
-class InvalidExtendedSegmentRecord(BadHexRecord):
+class InvalidExtendedSegmentRecord(BadHexRecordError):
     '''Invalid Extended 8086 Segment Record at line %(line)d'''
 
-class InvalidExtendedLinearAddressRecord(BadHexRecord):
+class InvalidExtendedLinearAddressRecord(BadHexRecordError):
     '''Invalid Extended Linear Address Record at line %(line)d'''
+
+class StartAddressRecordError(BadHexRecordError):
+    pass
+
+class InvalidStartSegmentAddressRecord(StartAddressRecordError):
+    '''Invalid Start Segment Address Record at line %(line)d'''
+
+class InvalidStartLinearAddressRecord(StartAddressRecordError):
+    '''Invalid Start Linear Address Record at line %(line)d'''
+
+class DuplicateStartAddressRecordError(StartAddressRecordError):
+    '''Start Address Record appears twice at line %(line)d'''
 
 class HexAddressOverlap(HexReaderError):
     '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''

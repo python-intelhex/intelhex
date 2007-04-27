@@ -1,6 +1,13 @@
 NEWS
 ====
 
+* 2007/04/27 v.0.8.6 (BugFix and Performance improvements)
+
+    - IntelHex is able to read/write start address records
+      (HEX record type 03 and 05). (fix bug #109872)
+    - Backport (from 0.9 branch) of performance improvements 
+      for reading hex files
+
 * 2007/04/22 v.0.9.devel (New API pre-release)
 
     - New API

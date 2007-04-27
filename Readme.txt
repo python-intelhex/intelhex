@@ -7,7 +7,7 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2007-04-22
+:Date: 2007-04-27
 :Version: 0.9.devel
 
 .. Contents::
@@ -18,7 +18,7 @@ Intel HEX file format widely used in microprocessors and microcontrollers
 area as de-facto standard for representation of code for programming into
 microelectronic devices.
 
-This work implements 8-bit HEX (also known as Intel HEX8) file format reader
+This work implements HEX (also known as Intel HEX) file format reader
 and convertor to binary form as python script.
 
 Script intelhex.py contain implementation of HEX file reader and convertor
@@ -124,6 +124,65 @@ it to disk you can use StringIO file-like object, e.g.::
 	>>> sio.close()
 
 Variable ``hexstr`` contains string with content of HEX8 file.
+
+Start address
+*************
+Some linkers write to produced HEX file information about start address
+(either record 03 or 05). Now IntelHex is able correctly read such records
+and store information internally in ``start_addr`` attribute that itself
+is ``None`` or dictionary with address value(s). 
+
+When input HEX file contains record type 03 (Start Segment Address Record),
+``start_addr`` takes value::
+
+	{'CS': XXX, 'IP': YYY}
+        
+Here:
+
+	* ``XXX`` is value of CS register
+	* ``YYY`` is value of IP register
+
+To obtain or change ``CS`` or ``IP`` value you need to use their names
+as keys for ``start_addr`` dictionary::
+
+	>>> ih = IntelHex('file_with_03.hex')
+	>>> ih.readfile()
+	>>> print ih.start_addr['CS']
+	>>> print ih.start_addr['IP']
+
+When input HEX file contains record type 05 (Start Linear Address Record),
+``start_addr`` takes value::
+
+	{'EIP': ZZZ}
+
+Here ``ZZZ`` is value of EIP register.
+
+Example::
+
+	>>> ih = IntelHex('file_with_05.hex')
+	>>> ih.readfile()
+	>>> print ih.start_addr['EIP']
+
+You can manually set required start address::
+
+	>>> ih.start_addr = {'CS': 0x1234, 'IP': 0x5678}
+	>>> ih.start_addr = {'EIP': 0x12345678}
+
+To delete start address info give value ``None`` or empty dictionary::
+
+	>>> ih.start_addr = None
+	>>> ih.start_addr = {}
+
+When you write data to HEX file you can disable writing start address
+with additional argument ``write_start_addr``:
+
+	>>> ih.writefile('out.hex')	# by default writing start address
+	>>> ih.writefile('out.hex', True)	# as above
+	>>> ih.writefile('out.hex', False)	# don't write start address
+
+When ``start_addr`` is ``None`` or empty dictionary nothing will be written
+regardless of ``write_start_addr`` argument value.
+
 
 Documentation
 -------------

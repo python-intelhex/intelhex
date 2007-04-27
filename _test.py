@@ -11,10 +11,13 @@ import unittest
 import intelhex
 from intelhex import IntelHex, \
                      IntelHexError, HexReaderError, NotAHexFile, \
-                     BadHexRecord, InvalidRecordLength, \
+                     BadHexRecordError, InvalidRecordLength, \
                      InvalidRecordType, InvalidRecordChecksum, \
                      InvalidEOFRecord, InvalidExtendedSegmentRecord, \
                      InvalidExtendedLinearAddressRecord, \
+                     InvalidStartSegmentAddressRecord, \
+                     InvalidStartLinearAddressRecord, \
+                     DuplicateStartAddressRecordError, \
                      HexAddressOverlap, EndOfFile
 
 
@@ -121,7 +124,6 @@ hex8 = '''\
 :07059B0099FDC299F59922B8
 :00000001FF
 '''
-
 bin8 = array.array('B',[2, 5, 162, 229, 118, 36, 106, 248, 230, 5, 118, 34,
                         120, 103, 48, 7, 2, 120, 106, 228, 117, 240, 1, 18,
                         4, 173, 2, 4, 85, 32, 0, 235, 127, 46, 210, 0, 128,
@@ -255,7 +257,6 @@ hex16 = """:020000040000FA
 :0C003000831203130C1E1A28990008000C
 :00000001FF
 """
-
 bin16 = array.array('H', [0x0000, 0x1283, 0x1303, 0x2007,
                           0x3055, 0x2018, 0x2804, 0x1683,
                           0x1303, 0x3040, 0x0099, 0x1518,
@@ -272,8 +273,23 @@ hex64k = """:020000040000FA
 :0100000002FD
 :00000001FF
 """
-
 data64k = {0: 1, 0x10000: 2}
+
+
+hex_rectype3 = """:0400000312345678E5
+:0100000001FE
+:00000001FF
+"""
+data_rectype3 = {0: 1}
+start_addr_rectype3 = {'CS': 0x1234, 'IP': 0x5678}
+
+
+hex_rectype5 = """:0400000512345678E3
+:0100000002FD
+:00000001FF
+"""
+data_rectype5 = {0: 2}
+start_addr_rectype5 = {'EIP': 0x12345678}
 
 
 ##
@@ -357,6 +373,62 @@ class TestIntelHex(unittest.TestCase):
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
 
+class TestIntelHexStartingAddressRecords(unittest.TestCase):
+
+    def _test_read(self, hexstr, data, start_addr):
+        sio = StringIO(hexstr)
+        ih = IntelHex(sio)
+        sio.close()
+        # test data
+        self.assertEqual(data, ih._buf,
+                         "Internal buffer: %r != %r" %
+                         (data, ih._buf))
+        self.assertEqual(start_addr, ih.start_addr,
+                         "Start address: %r != %r" %
+                         (start_addr, ih.start_addr))
+
+    def test_read_rectype3(self):
+        self._test_read(hex_rectype3, data_rectype3, start_addr_rectype3)
+
+    def test_read_rectype5(self):
+        self._test_read(hex_rectype5, data_rectype5, start_addr_rectype5)
+
+    def _test_write(self, hexstr, data, start_addr, write_start_addr=True):
+        # prepare
+        ih = IntelHex(None)
+        ih._buf = data
+        ih.start_addr = start_addr
+        # write
+        sio = StringIO()
+        self.assertTrue(ih.writefile(sio, write_start_addr))
+        s = sio.getvalue()
+        sio.close()
+        # check
+        self.assertEquals(hexstr, s, """Written data is incorrect
+Should be:
+%s
+
+Written:
+%s
+""" % (hexstr, s))
+
+    def _test_dont_write(self, hexstr, data, start_addr):
+        expected = ''.join(hexstr.splitlines(True)[1:])
+        self._test_write(expected, data, start_addr, False)
+
+    def test_write_rectype3(self):
+        self._test_write(hex_rectype3, data_rectype3, start_addr_rectype3)
+
+    def test_dont_write_rectype3(self):
+        self._test_dont_write(hex_rectype3, data_rectype3, start_addr_rectype3)
+
+    def test_write_rectype5(self):
+        self._test_write(hex_rectype5, data_rectype5, start_addr_rectype5)
+
+    def test_dont_write_rectype5(self):
+        self._test_dont_write(hex_rectype5, data_rectype5, start_addr_rectype5)
+
+
 class TestIntelHex_big_files(unittest.TestCase):
     """Test that data bigger than 64K read/write correctly"""
 
@@ -378,7 +450,7 @@ class TestIntelHex_big_files(unittest.TestCase):
     def test_writefile(self):
         ih = intelhex.IntelHex(self.f)
         sio = StringIO()
-        ih.writefile(sio)
+        self.assertTrue(ih.writefile(sio))
         s = sio.getvalue()
         sio.close()
         self.assertEquals(hex64k, s, """Written data is incorrect
@@ -474,10 +546,10 @@ class TestIntelHexErrors(TestIntelHexBase):
                              {'filename': 'foo.hex'})
 
     def test_BadHexRecord(self):
-        self.assertRaisesMsg(BadHexRecord,
+        self.assertRaisesMsg(BadHexRecordError,
                              'Hex file contains invalid record at line 1',
                              self._raise_error,
-                             BadHexRecord,
+                             BadHexRecordError,
                              {'line': 1})
 
     def test_InvalidRecordLength(self):
@@ -522,6 +594,27 @@ class TestIntelHexErrors(TestIntelHexBase):
                              InvalidExtendedLinearAddressRecord,
                              {'line': 1})
 
+    def test_InvalidStartSegmentAddressRecord(self):
+        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+                             'Invalid Start Segment Address Record at line 1',
+                             self._raise_error,
+                             InvalidStartSegmentAddressRecord,
+                             {'line': 1})
+
+    def test_InvalidStartLinearAddressRecord(self):
+        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+                             'Invalid Start Linear Address Record at line 1',
+                             self._raise_error,
+                             InvalidStartLinearAddressRecord,
+                             {'line': 1})
+
+    def test_DuplicateStartAddressRecord(self):
+        self.assertRaisesMsg(DuplicateStartAddressRecordError,
+                             'Start Address Record appears twice at line 1',
+                             self._raise_error,
+                             DuplicateStartAddressRecordError,
+                             {'line': 1})
+
     def test_HexAddressOverlap(self):
         self.assertRaisesMsg(HexAddressOverlap,
                              'Hex file has address overlap at address 0x1234 '
@@ -550,7 +643,7 @@ class TestDecodeHexRecords(TestIntelHexBase):
         self.assertEqual(True, self.ih.decode_record(''))
 
     def test_non_empty_line(self):
-        self.assertRaisesMsg(BadHexRecord,
+        self.assertRaisesMsg(BadHexRecordError,
                              'Hex file contains invalid record at line 1',
                              self.ih.decode_record,
                              ' ',
@@ -558,14 +651,14 @@ class TestDecodeHexRecords(TestIntelHexBase):
 
     def test_short_record(self):
         # if record too short it's not a hex record
-        self.assertRaisesMsg(BadHexRecord,
+        self.assertRaisesMsg(BadHexRecordError,
                              'Hex file contains invalid record at line 1',
                              self.ih.decode_record,
                              ':',
                              1)
 
     def test_odd_hexascii_digits(self):
-        self.assertRaisesMsg(BadHexRecord,
+        self.assertRaisesMsg(BadHexRecordError,
                              'Hex file contains invalid record at line 1',
                              self.ih.decode_record,
                              ':0100000100F',
@@ -600,12 +693,13 @@ class TestDecodeHexRecords(TestIntelHexBase):
                              1)
 
     def test_invalid_extended_segment(self):
+        # length
         self.assertRaisesMsg(InvalidExtendedSegmentRecord,
                              'Invalid Extended 8086 Segment Record at line 1',
                              self.ih.decode_record,
                              ':00000002FE',
                              1)
-        
+        # addr field
         self.assertRaisesMsg(InvalidExtendedSegmentRecord,
                              'Invalid Extended 8086 Segment Record at line 1',
                              self.ih.decode_record,
@@ -613,19 +707,64 @@ class TestDecodeHexRecords(TestIntelHexBase):
                              1)
 
     def test_invalid_linear_address(self):
+        # length
         self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
                              'Invalid Extended Linear Address Record '
                              'at line 1',
                              self.ih.decode_record,
                              ':00000004FC',
                              1)
-        
+        # addr field
         self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
                              'Invalid Extended Linear Address Record '
                              'at line 1',
                              self.ih.decode_record,
                              ':020001040000F9',
                              1)
+
+    def test_invalid_start_segment_addr(self):
+        # length
+        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+                             'Invalid Start Segment Address Record at line 1',
+                             self.ih.decode_record,
+                             ':00000003FD',
+                             1)
+        # addr field
+        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+                             'Invalid Start Segment Address Record at line 1',
+                             self.ih.decode_record,
+                             ':0400010300000000F8',
+                             1)
+
+    def test_duplicate_start_segment_addr(self):
+        self.ih.decode_record(':0400000312345678E5')
+        self.assertRaisesMsg(DuplicateStartAddressRecordError,
+                             'Start Address Record appears twice at line 2',
+                             self.ih.decode_record,
+                             ':0400000300000000F9',
+                             2)
+
+    def test_invalid_start_linear_addr(self):
+        # length
+        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+                             'Invalid Start Linear Address Record at line 1',
+                             self.ih.decode_record,
+                             ':00000005FB',
+                             1)
+        # addr field
+        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+                             'Invalid Start Linear Address Record at line 1',
+                             self.ih.decode_record,
+                             ':0400010500000000F6',
+                             1)
+
+    def test_duplicate_start_linear_addr(self):
+        self.ih.decode_record(':0400000512345678E3')
+        self.assertRaisesMsg(DuplicateStartAddressRecordError,
+                             'Start Address Record appears twice at line 2',
+                             self.ih.decode_record,
+                             ':0400000500000000F7',
+                             2)
 
     def test_addr_overlap(self):
         self.ih.decode_record(':0100000000FF')
