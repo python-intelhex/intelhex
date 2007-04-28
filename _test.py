@@ -10,15 +10,20 @@ import unittest
 
 import intelhex
 from intelhex import IntelHex, \
-                     IntelHexError, HexReaderError, NotAHexFile, \
-                     BadHexRecordError, InvalidRecordLength, \
-                     InvalidRecordType, InvalidRecordChecksum, \
-                     InvalidEOFRecord, InvalidExtendedSegmentRecord, \
-                     InvalidExtendedLinearAddressRecord, \
-                     InvalidStartSegmentAddressRecord, \
-                     InvalidStartLinearAddressRecord, \
+                     IntelHexError, \
+                     HexReaderError, \
+                     AddressOverlapError, \
+                     HexRecordError, \
+                     RecordLengthError, \
+                     RecordTypeError, \
+                     RecordChecksumError, \
+                     EOFRecordError, \
+                     ExtendedSegmentAddressRecordError, \
+                     ExtendedLinearAddressRecordError, \
+                     StartSegmentAddressRecordError, \
+                     StartLinearAddressRecordError, \
                      DuplicateStartAddressRecordError, \
-                     HexAddressOverlap, EndOfFile
+                     _EndOfFile
 
 
 ##
@@ -537,75 +542,127 @@ class TestIntelHexErrors(TestIntelHexBase):
                              'Generic error of reading HEX file',
                              self._raise_error,
                              HexReaderError)
-
-    def test_NotAHexFile(self):
-        self.assertRaisesMsg(NotAHexFile,
-                             'File "foo.hex" is not a valid HEX file',
+        # also catch via base exception class
+        self.assertRaisesMsg(IntelHexError,
+                             'Generic error of reading HEX file',
                              self._raise_error,
-                             NotAHexFile,
-                             {'filename': 'foo.hex'})
+                             HexReaderError)
 
-    def test_BadHexRecord(self):
-        self.assertRaisesMsg(BadHexRecordError,
+    def test_HexRecordError(self):
+        self.assertRaisesMsg(HexRecordError,
                              'Hex file contains invalid record at line 1',
                              self._raise_error,
-                             BadHexRecordError,
+                             HexRecordError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Hex file contains invalid record at line 1',
+                             self._raise_error,
+                             HexRecordError,
                              {'line': 1})
 
-    def test_InvalidRecordLength(self):
-        self.assertRaisesMsg(InvalidRecordLength,
+    def test_RecordLengthError(self):
+        self.assertRaisesMsg(RecordLengthError,
                              'Record at line 1 has invalid length',
                              self._raise_error,
-                             InvalidRecordLength,
+                             RecordLengthError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Record at line 1 has invalid length',
+                             self._raise_error,
+                             RecordLengthError,
                              {'line': 1})
 
-    def test_InvalidRecordType(self):
-        self.assertRaisesMsg(InvalidRecordType,
+    def test_RecordTypeError(self):
+        self.assertRaisesMsg(RecordTypeError,
                              'Record at line 1 has invalid record type',
                              self._raise_error,
-                             InvalidRecordType,
+                             RecordTypeError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Record at line 1 has invalid record type',
+                             self._raise_error,
+                             RecordTypeError,
                              {'line': 1})
 
-    def test_InvalidRecordChecksum(self):
-        self.assertRaisesMsg(InvalidRecordChecksum,
+    def test_RecordChecksumError(self):
+        self.assertRaisesMsg(RecordChecksumError,
                              'Record at line 1 has invalid checksum',
                              self._raise_error,
-                             InvalidRecordChecksum,
+                             RecordChecksumError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Record at line 1 has invalid checksum',
+                             self._raise_error,
+                             RecordChecksumError,
                              {'line': 1})
 
-    def test_InvalidEOFRecord(self):
-        self.assertRaisesMsg(InvalidEOFRecord,
+    def test_EOFRecordError(self):
+        self.assertRaisesMsg(EOFRecordError,
                              'File has invalid End-of-File record',
                              self._raise_error,
-                             InvalidEOFRecord)
-
-    def test_InvalidExtendedSegmentRecord(self):
-        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
-                             'Invalid Extended 8086 Segment Record at line 1',
+                             EOFRecordError)
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'File has invalid End-of-File record',
                              self._raise_error,
-                             InvalidExtendedSegmentRecord,
+                             EOFRecordError)
+
+    def test_ExtendedSegmentAddressRecordError(self):
+        self.assertRaisesMsg(ExtendedSegmentAddressRecordError,
+                             'Invalid Extended Segment Address Record at line 1',
+                             self._raise_error,
+                             ExtendedSegmentAddressRecordError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Invalid Extended Segment Address Record at line 1',
+                             self._raise_error,
+                             ExtendedSegmentAddressRecordError,
                              {'line': 1})
 
-    def test_InvalidExtendedLinearAddressRecord(self):
-        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+    def test_ExtendedLinearAddressRecordError(self):
+        self.assertRaisesMsg(ExtendedLinearAddressRecordError,
                              'Invalid Extended Linear Address Record '
                              'at line 1',
                              self._raise_error,
-                             InvalidExtendedLinearAddressRecord,
+                             ExtendedLinearAddressRecordError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Invalid Extended Linear Address Record '
+                             'at line 1',
+                             self._raise_error,
+                             ExtendedLinearAddressRecordError,
                              {'line': 1})
 
-    def test_InvalidStartSegmentAddressRecord(self):
-        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+    def test_StartSegmentAddressRecordError(self):
+        self.assertRaisesMsg(StartSegmentAddressRecordError,
                              'Invalid Start Segment Address Record at line 1',
                              self._raise_error,
-                             InvalidStartSegmentAddressRecord,
+                             StartSegmentAddressRecordError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Invalid Start Segment Address Record at line 1',
+                             self._raise_error,
+                             StartSegmentAddressRecordError,
                              {'line': 1})
 
-    def test_InvalidStartLinearAddressRecord(self):
-        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+    def test_StartLinearAddressRecordError(self):
+        self.assertRaisesMsg(StartLinearAddressRecordError,
                              'Invalid Start Linear Address Record at line 1',
                              self._raise_error,
-                             InvalidStartLinearAddressRecord,
+                             StartLinearAddressRecordError,
+                             {'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Invalid Start Linear Address Record at line 1',
+                             self._raise_error,
+                             StartLinearAddressRecordError,
                              {'line': 1})
 
     def test_DuplicateStartAddressRecord(self):
@@ -615,12 +672,19 @@ class TestIntelHexErrors(TestIntelHexBase):
                              DuplicateStartAddressRecordError,
                              {'line': 1})
 
-    def test_HexAddressOverlap(self):
-        self.assertRaisesMsg(HexAddressOverlap,
+    def test_AddressOverlapError(self):
+        self.assertRaisesMsg(AddressOverlapError,
                              'Hex file has address overlap at address 0x1234 '
                              'on line 1',
                              self._raise_error,
-                             HexAddressOverlap,
+                             AddressOverlapError,
+                             {'address': 0x1234, 'line': 1})
+        # also catch via base exception class
+        self.assertRaisesMsg(HexReaderError,
+                             'Hex file has address overlap at address 0x1234 '
+                             'on line 1',
+                             self._raise_error,
+                             AddressOverlapError,
                              {'address': 0x1234, 'line': 1})
 
 #/class TestIntelHexErrors
@@ -633,6 +697,7 @@ class TestDecodeHexRecords(TestIntelHexBase):
 
     def setUp(self):
         self.ih = IntelHex()
+        self.decode_record = self.ih._decode_record
 
     def tearDown(self):
         del self.ih
@@ -640,150 +705,150 @@ class TestDecodeHexRecords(TestIntelHexBase):
     def test_empty_line(self):
         # do we could to accept empty lines in hex files?
         # standard don't say anything about this
-        self.assertEqual(True, self.ih.decode_record(''))
+        self.decode_record('')
 
     def test_non_empty_line(self):
-        self.assertRaisesMsg(BadHexRecordError,
+        self.assertRaisesMsg(HexRecordError,
                              'Hex file contains invalid record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ' ',
                              1)
 
     def test_short_record(self):
         # if record too short it's not a hex record
-        self.assertRaisesMsg(BadHexRecordError,
+        self.assertRaisesMsg(HexRecordError,
                              'Hex file contains invalid record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':',
                              1)
 
     def test_odd_hexascii_digits(self):
-        self.assertRaisesMsg(BadHexRecordError,
+        self.assertRaisesMsg(HexRecordError,
                              'Hex file contains invalid record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0100000100F',
                              1)
 
     def test_invalid_length(self):
-        self.assertRaisesMsg(InvalidRecordLength,
+        self.assertRaisesMsg(RecordLengthError,
                              'Record at line 1 has invalid length',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':FF00000100',
                              1)
 
     def test_invalid_record_type(self):
-        self.assertRaisesMsg(InvalidRecordType,
+        self.assertRaisesMsg(RecordTypeError,
                              'Record at line 1 has invalid record type',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':000000FF01',
                              1)
 
     def test_invalid_checksum(self):
-        self.assertRaisesMsg(InvalidRecordChecksum,
+        self.assertRaisesMsg(RecordChecksumError,
                              'Record at line 1 has invalid checksum',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0000000100',
                              1)
 
     def test_invalid_eof(self):
-        self.assertRaisesMsg(InvalidEOFRecord,
+        self.assertRaisesMsg(EOFRecordError,
                              'File has invalid End-of-File record',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0100000100FE',
                              1)
 
     def test_invalid_extended_segment(self):
         # length
-        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
-                             'Invalid Extended 8086 Segment Record at line 1',
-                             self.ih.decode_record,
+        self.assertRaisesMsg(ExtendedSegmentAddressRecordError,
+                             'Invalid Extended Segment Address Record at line 1',
+                             self.decode_record,
                              ':00000002FE',
                              1)
         # addr field
-        self.assertRaisesMsg(InvalidExtendedSegmentRecord,
-                             'Invalid Extended 8086 Segment Record at line 1',
-                             self.ih.decode_record,
+        self.assertRaisesMsg(ExtendedSegmentAddressRecordError,
+                             'Invalid Extended Segment Address Record at line 1',
+                             self.decode_record,
                              ':020001020000FB',
                              1)
 
     def test_invalid_linear_address(self):
         # length
-        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+        self.assertRaisesMsg(ExtendedLinearAddressRecordError,
                              'Invalid Extended Linear Address Record '
                              'at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':00000004FC',
                              1)
         # addr field
-        self.assertRaisesMsg(InvalidExtendedLinearAddressRecord,
+        self.assertRaisesMsg(ExtendedLinearAddressRecordError,
                              'Invalid Extended Linear Address Record '
                              'at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':020001040000F9',
                              1)
 
     def test_invalid_start_segment_addr(self):
         # length
-        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+        self.assertRaisesMsg(StartSegmentAddressRecordError,
                              'Invalid Start Segment Address Record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':00000003FD',
                              1)
         # addr field
-        self.assertRaisesMsg(InvalidStartSegmentAddressRecord,
+        self.assertRaisesMsg(StartSegmentAddressRecordError,
                              'Invalid Start Segment Address Record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0400010300000000F8',
                              1)
 
     def test_duplicate_start_segment_addr(self):
-        self.ih.decode_record(':0400000312345678E5')
+        self.decode_record(':0400000312345678E5')
         self.assertRaisesMsg(DuplicateStartAddressRecordError,
                              'Start Address Record appears twice at line 2',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0400000300000000F9',
                              2)
 
     def test_invalid_start_linear_addr(self):
         # length
-        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+        self.assertRaisesMsg(StartLinearAddressRecordError,
                              'Invalid Start Linear Address Record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':00000005FB',
                              1)
         # addr field
-        self.assertRaisesMsg(InvalidStartLinearAddressRecord,
+        self.assertRaisesMsg(StartLinearAddressRecordError,
                              'Invalid Start Linear Address Record at line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0400010500000000F6',
                              1)
 
     def test_duplicate_start_linear_addr(self):
-        self.ih.decode_record(':0400000512345678E3')
+        self.decode_record(':0400000512345678E3')
         self.assertRaisesMsg(DuplicateStartAddressRecordError,
                              'Start Address Record appears twice at line 2',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0400000500000000F7',
                              2)
 
     def test_addr_overlap(self):
-        self.ih.decode_record(':0100000000FF')
-        self.assertRaisesMsg(HexAddressOverlap,
+        self.decode_record(':0100000000FF')
+        self.assertRaisesMsg(AddressOverlapError,
                              'Hex file has address overlap at address 0x0 '
                              'on line 1',
-                             self.ih.decode_record,
+                             self.decode_record,
                              ':0100000000FF',
                              1)
 
     def test_data_record(self):
         # should be no exceptions
-        self.ih.decode_record(':0100000000FF\n')
-        self.ih.decode_record(':03000100000102F9\r\n')
-        self.ih.decode_record(':1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396')
+        self.decode_record(':0100000000FF\n')
+        self.decode_record(':03000100000102F9\r\n')
+        self.decode_record(':1004E300CFF0FBE2FDF220FF20F2E120E2FBE6F396')
 
     def test_eof(self):
         # EOF should raise special exception
-        self.assertRaises(EndOfFile, self.ih.decode_record, ':00000001FF')
+        self.assertRaises(_EndOfFile, self.decode_record, ':00000001FF')
 
 #/class TestDecodeHexRecords
 

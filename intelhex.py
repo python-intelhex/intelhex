@@ -75,7 +75,7 @@ class IntelHex:
             else:
                 raise ValueError("source: bad initializer type")
 
-    def decode_record(self, s, line=0):
+    def _decode_record(self, s, line=0):
         '''Decode one record of HEX file.
 
         @param  s       line with HEX record.
@@ -85,68 +85,68 @@ class IntelHex:
         '''
         s = s.rstrip('\r\n')
         if not s:
-            return True       # empty line
+            return          # empty line
 
         if s[0] == ':':
             try:
                 bin = array('B', unhexlify(s[1:]))
             except TypeError:
                 # this might be raised by unhexlify when odd hexascii digits
-                raise BadHexRecordError(line=line)
+                raise HexRecordError(line=line)
             length = len(bin)
             if length < 5:
-                raise BadHexRecordError(line=line)
+                raise HexRecordError(line=line)
         else:
-            raise BadHexRecordError(line=line)
+            raise HexRecordError(line=line)
 
         record_length = bin[0]
         if length != (5 + record_length):
-            raise InvalidRecordLength(line=line)
+            raise RecordLengthError(line=line)
 
         addr = bin[1]*256 + bin[2]
 
         record_type = bin[3]
         if not (0 <= record_type <= 5):
-            raise InvalidRecordType(line=line)
+            raise RecordTypeError(line=line)
 
         crc = sum(bin)
         crc &= 0x0FF
         if crc != 0:
-            raise InvalidRecordChecksum(line=line)
+            raise RecordChecksumError(line=line)
 
         if record_type == 0:
             # data record
+            addr += self._offset
             for i in xrange(4, 4+record_length):
-                full_addr = addr + self._offset
-                if not self._buf.get(full_addr, None) is None:
-                    raise HexAddressOverlap(address=full_addr, line=line)
-                self._buf[full_addr] = bin[i]
+                if not self._buf.get(addr, None) is None:
+                    raise AddressOverlapError(address=addr, line=line)
+                self._buf[addr] = bin[i]
                 addr += 1   # FIXME: addr should be wrapped 
-                            # BUT after 02 record (on 64K boundary)
-                            # and after 04 record (on 4G boundary)
+                            # BUT after 02 record (at 64K boundary)
+                            # and after 04 record (at 4G boundary)
 
         elif record_type == 1:
             # end of file record
             if record_length != 0:
-                raise InvalidEOFRecord(line=line)
-            raise EndOfFile
+                raise EOFRecordError(line=line)
+            raise _EndOfFile
 
         elif record_type == 2:
             # Extended 8086 Segment Record
             if record_length != 2 or addr != 0:
-                raise InvalidExtendedSegmentRecord(line=line)
+                raise ExtendedSegmentAddressRecordError(line=line)
             self._offset = (bin[4]*256 + bin[5]) * 16
 
         elif record_type == 4:
             # Extended Linear Address Record
             if record_length != 2 or addr != 0:
-                raise InvalidExtendedLinearAddressRecord(line=line)
+                raise ExtendedLinearAddressRecordError(line=line)
             self._offset = (bin[4]*256 + bin[5]) * 65536
 
         elif record_type == 3:
             # Start Segment Address Record
             if record_length != 4 or addr != 0:
-                raise InvalidStartSegmentAddressRecord(line=line)
+                raise StartSegmentAddressRecordError(line=line)
             if self.start_addr:
                 raise DuplicateStartAddressRecordError(line=line)
             self.start_addr = {'CS': bin[4]*256 + bin[5],
@@ -156,7 +156,7 @@ class IntelHex:
         elif record_type == 5:
             # Start Linear Address Record
             if record_length != 4 or addr != 0:
-                raise InvalidStartLinearAddressRecord(line=line)
+                raise StartLinearAddressRecordError(line=line)
             if self.start_addr:
                 raise DuplicateStartAddressRecordError(line=line)
             self.start_addr = {'EIP': (bin[4]*16777216 +
@@ -180,12 +180,12 @@ class IntelHex:
         line = 0
 
         try:
-            decode = self.decode_record
+            decode = self._decode_record
             try:
                 for s in fobj:
                     line += 1
                     decode(s, line)
-            except EndOfFile:
+            except _EndOfFile:
                 pass
         finally:
             if fclose:
@@ -564,7 +564,24 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 
 
 ##
-# Custom Errors
+# IntelHex Errors Hierarchy:
+#
+#  IntelHexError    - basic error
+#       HexReaderError  - general hex reader error
+#           AddressOverlapError - data for the same address overlap
+#           HexRecordError      - hex record decoder base error
+#               RecordLengthError    - record has invalid length
+#               RecordTypeError      - record has invalid type (RECTYP)
+#               RecordChecksumError  - record checksum mismatch
+#               EOFRecordError              - invalid EOF record (type 01)
+#               ExtendedAddressRecordError  - extended address record base error
+#                   ExtendedSegmentAddressRecordError   - invalid extended segment address record (type 02)
+#                   ExtendedLinearAddressRecordError    - invalid extended linear address record (type 04)
+#               StartAddressRecordError     - start address record base error
+#                   StartSegmentAddressRecordError      - invalid start segment address record (type 03)
+#                   StartLinearAddressRecordError       - invalid start linear address record (type 05)
+#                   DuplicateStartAddressRecordError    - start address record appears twice
+#       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
 
 class IntelHexError(StandardError):
     '''Base Exception class for IntelHex module'''
@@ -585,50 +602,56 @@ class IntelHexError(StandardError):
             return 'Unprintable exception %s: %s' \
                 % (self.__class__.__name__, str(e))
 
-class EndOfFile(IntelHexError):
+class _EndOfFile(IntelHexError):
     '''EOF record reached -- signal to stop read file'''
 
 class HexReaderError(IntelHexError):
     '''Generic error of reading HEX file'''
 
-class NotAHexFile(HexReaderError):
-    '''File "%(filename)s" is not a valid HEX file'''
+class AddressOverlapError(HexReaderError):
+    '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''
 
-class BadHexRecordError(HexReaderError):
+# class NotAHexFileError was removed in trunk.revno.54 because it's not used
+
+
+class HexRecordError(HexReaderError):
     '''Hex file contains invalid record at line %(line)d'''
 
-class InvalidRecordLength(BadHexRecordError):
+
+class RecordLengthError(HexRecordError):
     '''Record at line %(line)d has invalid length'''
 
-class InvalidRecordType(BadHexRecordError):
+class RecordTypeError(HexRecordError):
     '''Record at line %(line)d has invalid record type'''
 
-class InvalidRecordChecksum(BadHexRecordError):
+class RecordChecksumError(HexRecordError):
     '''Record at line %(line)d has invalid checksum'''
 
-class InvalidEOFRecord(BadHexRecordError):
+class EOFRecordError(HexRecordError):
     '''File has invalid End-of-File record'''
 
-class InvalidExtendedSegmentRecord(BadHexRecordError):
-    '''Invalid Extended 8086 Segment Record at line %(line)d'''
 
-class InvalidExtendedLinearAddressRecord(BadHexRecordError):
+class ExtendedAddressRecordError(HexRecordError):
+    '''Base class for extended address exceptions'''
+
+class ExtendedSegmentAddressRecordError(ExtendedAddressRecordError):
+    '''Invalid Extended Segment Address Record at line %(line)d'''
+
+class ExtendedLinearAddressRecordError(ExtendedAddressRecordError):
     '''Invalid Extended Linear Address Record at line %(line)d'''
 
-class StartAddressRecordError(BadHexRecordError):
-    pass
 
-class InvalidStartSegmentAddressRecord(StartAddressRecordError):
+class StartAddressRecordError(HexRecordError):
+    '''Base class for start address exceptions'''
+
+class StartSegmentAddressRecordError(StartAddressRecordError):
     '''Invalid Start Segment Address Record at line %(line)d'''
 
-class InvalidStartLinearAddressRecord(StartAddressRecordError):
+class StartLinearAddressRecordError(StartAddressRecordError):
     '''Invalid Start Linear Address Record at line %(line)d'''
 
 class DuplicateStartAddressRecordError(StartAddressRecordError):
     '''Start Address Record appears twice at line %(line)d'''
-
-class HexAddressOverlap(HexReaderError):
-    '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''
 
 
 ##
