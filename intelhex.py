@@ -75,19 +75,11 @@ class IntelHex:
             else:
                 raise ValueError("source: bad initializer type")
 
-    def decode_record(self, s, line=0, wrap64k=True):
+    def decode_record(self, s, line=0):
         '''Decode one record of HEX file.
 
         @param  s       line with HEX record.
         @param  line    line number (for error messages).
-        @param  wrap64k is decoder should wrap lowest 16-bit
-                        of current address at 64K boundary.
-                        By default address wrapped because
-                        standard require this.
-                        But some tools generate wrong hex files
-                        (e.g. some Atmel AVR compilers),
-                        so for this situation user can disable
-                        address wrapping.
 
         @raise  EndOfFile   if EOF record encountered.
         '''
@@ -129,10 +121,9 @@ class IntelHex:
                 if not self._buf.get(full_addr, None) is None:
                     raise HexAddressOverlap(address=full_addr, line=line)
                 self._buf[full_addr] = bin[i]
-                addr += 1   # FIXME: addr should be wrapped on 64K boundary
-                            # BUT only after 02 record
-#                if wrap64k and addr == 65536:
-#                    addr = 0
+                addr += 1   # FIXME: addr should be wrapped 
+                            # BUT after 02 record (on 64K boundary)
+                            # and after 04 record (on 4G boundary)
 
         elif record_type == 1:
             # end of file record
@@ -174,12 +165,10 @@ class IntelHex:
                                        bin[7]),
                               }
 
-    def loadhex(self, fobj, wrap64k=True):
+    def loadhex(self, fobj):
         """Load hex file into internal buffer.
 
         @param  fobj        file name or file-like object
-        @param  wrap64k     is lowest 16-bit of address should
-                            wrap at 64K boundary
         """
         if not hasattr(fobj, "read"):
             fobj = file(fobj, "rU")
@@ -195,7 +184,7 @@ class IntelHex:
             try:
                 for s in fobj:
                     line += 1
-                    decode(s, line, wrap64k)
+                    decode(s, line)
             except EndOfFile:
                 pass
         finally:
