@@ -583,7 +583,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 #                   DuplicateStartAddressRecordError    - start address record appears twice
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
 
-class IntelHexError(StandardError):
+class IntelHexError(Exception):
     '''Base Exception class for IntelHex module'''
 
     _fmt = 'IntelHex base error'   #: format string
