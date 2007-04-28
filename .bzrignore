@@ -1,13 +1,6 @@
-*.bin
-*.hex
 html
-HEX2BIN.EXE
-*.tws
-__x.py
 fte.dsk
-garbage
-*.htm
-intelhex.kpf
 _profile.txt
 api
 Readme.html
+doc/*.html

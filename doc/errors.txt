@@ -1,0 +1,24 @@
+IntelHex Errors Hierarchy
+=========================
+
+* ``IntelHexError`` - base error
+
+  * ``HexReaderError`` - general hex reader error
+
+    * ``AddressOverlapError`` - data for the same address overlap
+    * ``HexRecordError``      - hex record decoder base error
+
+      * ``RecordLengthError``    - record has invalid length
+      * ``RecordTypeError``      - record has invalid type (RECTYP)
+      * ``RecordChecksumError``  - record checksum mismatch
+      * ``EOFRecordError``             - invalid EOF record (type 01)
+      * ``ExtendedAddressRecordError`` - extended address record base error
+
+        * ``ExtendedSegmentAddressRecordError`` - invalid extended segment address record (type 02)
+        * ``ExtendedLinearAddressRecordError``  - invalid extended linear address record (type 04)
+
+      * ``StartAddressRecordError``    - start address record base error
+
+        * ``StartSegmentAddressRecordError``    - invalid start segment address record (type 03)
+        * ``StartLinearAddressRecordError``     - invalid start linear address record (type 05)
+        * ``DuplicateStartAddressRecordError``  - start address record appears twice
