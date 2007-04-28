@@ -533,18 +533,18 @@ class TestIntelHexErrors(TestIntelHexBase):
 
     def test_IntelHexError(self):
         self.assertRaisesMsg(IntelHexError,
-                             'Base Exception class for IntelHex module',
+                             'IntelHex base error',
                              self._raise_error,
                              IntelHexError)
 
     def test_HexReaderError(self):
         self.assertRaisesMsg(HexReaderError,
-                             'Generic error of reading HEX file',
+                             'Hex reader base error',
                              self._raise_error,
                              HexReaderError)
         # also catch via base exception class
         self.assertRaisesMsg(IntelHexError,
-                             'Generic error of reading HEX file',
+                             'Hex reader base error',
                              self._raise_error,
                              HexReaderError)
 
@@ -674,14 +674,14 @@ class TestIntelHexErrors(TestIntelHexBase):
 
     def test_AddressOverlapError(self):
         self.assertRaisesMsg(AddressOverlapError,
-                             'Hex file has address overlap at address 0x1234 '
+                             'Hex file has data overlap at address 0x1234 '
                              'on line 1',
                              self._raise_error,
                              AddressOverlapError,
                              {'address': 0x1234, 'line': 1})
         # also catch via base exception class
         self.assertRaisesMsg(HexReaderError,
-                             'Hex file has address overlap at address 0x1234 '
+                             'Hex file has data overlap at address 0x1234 '
                              'on line 1',
                              self._raise_error,
                              AddressOverlapError,
@@ -834,7 +834,7 @@ class TestDecodeHexRecords(TestIntelHexBase):
     def test_addr_overlap(self):
         self.decode_record(':0100000000FF')
         self.assertRaisesMsg(AddressOverlapError,
-                             'Hex file has address overlap at address 0x0 '
+                             'Hex file has data overlap at address 0x0 '
                              'on line 1',
                              self.decode_record,
                              ':0100000000FF',

@@ -586,72 +586,69 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 class IntelHexError(StandardError):
     '''Base Exception class for IntelHex module'''
 
+    _fmt = 'IntelHex base error'   #: format string
+
     def __init__(self, **kw):
         for key, value in kw.items():
             setattr(self, key, value)
 
     def __str__(self):
         try:
-            # __str__() should always return a 'str' object
-            # never a 'unicode' object.
-            s = self.__doc__ % self.__dict__
-            if isinstance(s, unicode):
-                return s.encode('utf8')
-            return s
+            return self._fmt % self.__dict__
         except (NameError, ValueError, KeyError), e:
             return 'Unprintable exception %s: %s' \
                 % (self.__class__.__name__, str(e))
 
 class _EndOfFile(IntelHexError):
-    '''EOF record reached -- signal to stop read file'''
+    _fmt = 'EOF record reached -- signal to stop read file'
 
 class HexReaderError(IntelHexError):
-    '''Generic error of reading HEX file'''
+    _fmt = 'Hex reader base error'
 
 class AddressOverlapError(HexReaderError):
-    '''Hex file has address overlap at address 0x%(address)X on line %(line)d'''
+    _fmt = 'Hex file has data overlap at address 0x%(address)X on line %(line)d'
 
 # class NotAHexFileError was removed in trunk.revno.54 because it's not used
 
 
 class HexRecordError(HexReaderError):
-    '''Hex file contains invalid record at line %(line)d'''
+    _fmt = 'Hex file contains invalid record at line %(line)d'
 
 
 class RecordLengthError(HexRecordError):
-    '''Record at line %(line)d has invalid length'''
+    _fmt = 'Record at line %(line)d has invalid length'
 
 class RecordTypeError(HexRecordError):
-    '''Record at line %(line)d has invalid record type'''
+    _fmt = 'Record at line %(line)d has invalid record type'
 
 class RecordChecksumError(HexRecordError):
-    '''Record at line %(line)d has invalid checksum'''
+    _fmt = 'Record at line %(line)d has invalid checksum'
 
 class EOFRecordError(HexRecordError):
-    '''File has invalid End-of-File record'''
+    _fmt = 'File has invalid End-of-File record'
 
 
 class ExtendedAddressRecordError(HexRecordError):
-    '''Base class for extended address exceptions'''
+    _fmt = 'Base class for extended address exceptions'
 
 class ExtendedSegmentAddressRecordError(ExtendedAddressRecordError):
-    '''Invalid Extended Segment Address Record at line %(line)d'''
+    _fmt = 'Invalid Extended Segment Address Record at line %(line)d'
 
 class ExtendedLinearAddressRecordError(ExtendedAddressRecordError):
-    '''Invalid Extended Linear Address Record at line %(line)d'''
+    _fmt = 'Invalid Extended Linear Address Record at line %(line)d'
 
 
 class StartAddressRecordError(HexRecordError):
-    '''Base class for start address exceptions'''
+    _fmt = 'Base class for start address exceptions'
 
 class StartSegmentAddressRecordError(StartAddressRecordError):
-    '''Invalid Start Segment Address Record at line %(line)d'''
+    _fmt = 'Invalid Start Segment Address Record at line %(line)d'
 
 class StartLinearAddressRecordError(StartAddressRecordError):
-    '''Invalid Start Linear Address Record at line %(line)d'''
+    _fmt = 'Invalid Start Linear Address Record at line %(line)d'
 
 class DuplicateStartAddressRecordError(StartAddressRecordError):
-    '''Start Address Record appears twice at line %(line)d'''
+    _fmt = 'Start Address Record appears twice at line %(line)d'
 
 
 ##
