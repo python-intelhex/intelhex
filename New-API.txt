@@ -25,7 +25,7 @@
 # Multiple times load data from hex/bin files:
 
 >>> ih.loadfile('file.hex', format='hex')	# (DONE)
->>> ih.loadfile('file.bin', format='bin')
+>>> ih.loadfile('file.bin', format='bin')	# (DONE)
 
 # New handling of errors during loading hex:
 # errors will be raised

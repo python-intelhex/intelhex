@@ -171,7 +171,7 @@ class IntelHex:
         @param  fobj        file name or file-like object
         """
         if not hasattr(fobj, "read"):
-            fobj = file(fobj, "rU")
+            fobj = file(fobj, "r")
             fclose = fobj.close
         else:
             fclose = None
@@ -197,7 +197,22 @@ class IntelHex:
         @param  fobj        file name or file-like object
         @param  offset      starting address offset
         """
-        raise NotImplementedError
+        fread = getattr(fobj, "read", None)
+        if fread is None:
+            f = file(fobj, "rb")
+            fread = f.read
+            fclose = f.close
+        else:
+            fclose = None
+
+        try:
+            for b in fread():
+                self._buf[offset] = ord(b)
+                offset += 1
+        finally:
+            if fclose:
+                fclose()
+        
 
     def loadfile(self, fobj, format):
         """Load data file into internal buffer.

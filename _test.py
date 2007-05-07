@@ -355,7 +355,7 @@ class TestIntelHex(unittest.TestCase):
         del self.f
 
     def test_init_from_file(self):
-        ih = intelhex.IntelHex(self.f)
+        ih = IntelHex(self.f)
         for addr in xrange(len(bin8)):
             expected = bin8[addr]
             actual = ih[addr]
@@ -380,19 +380,50 @@ class TestIntelHex(unittest.TestCase):
             os.remove(fname)
 
     def test_tobinstr(self):
-        ih = intelhex.IntelHex(self.f)
+        ih = IntelHex(self.f)
         s1 = ih.tobinstr()
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile(self):
-        ih = intelhex.IntelHex(self.f)
+        ih = IntelHex(self.f)
         sio = StringIO()
         ih.tobinfile(sio)
         s1 = sio.getvalue()
         sio.close()
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+
+
+class TestIntelHexLoadBin(unittest.TestCase):
+
+    def setUp(self):
+        self.data = '0123456789'
+        self.f = StringIO(self.data)
+
+    def tearDown(self):
+        self.f.close()
+
+    def test_loadbin(self):
+        ih = IntelHex()
+        ih.loadbin(self.f)
+        self.assertEqual(0, ih.minaddr())
+        self.assertEqual(9, ih.maxaddr())
+        self.assertEqual(self.data, ih.tobinstr())
+
+    def test_loadbin_w_offset(self):
+        ih = IntelHex()
+        ih.loadbin(self.f, offset=100)
+        self.assertEqual(100, ih.minaddr())
+        self.assertEqual(109, ih.maxaddr())
+        self.assertEqual(self.data, ih.tobinstr())
+
+    def test_loadfile_format_bin(self):
+        ih = IntelHex()
+        ih.loadfile(self.f, format='bin')
+        self.assertEqual(0, ih.minaddr())
+        self.assertEqual(9, ih.maxaddr())
+        self.assertEqual(self.data, ih.tobinstr())
 
 
 class TestIntelHexStartingAddressRecords(unittest.TestCase):
