@@ -23,7 +23,8 @@ from intelhex import IntelHex, \
                      StartSegmentAddressRecordError, \
                      StartLinearAddressRecordError, \
                      DuplicateStartAddressRecordError, \
-                     _EndOfFile
+                     _EndOfFile, \
+                     hex2bin
 
 
 ##
@@ -851,6 +852,27 @@ class TestDecodeHexRecords(TestIntelHexBase):
         self.assertRaises(_EndOfFile, self.decode_record, ':00000001FF')
 
 #/class TestDecodeHexRecords
+
+
+class TestHex2Bin(unittest.TestCase):
+
+    def setUp(self):
+        self.fin = StringIO(hex8)
+        self.fout = StringIO()
+
+    def tearDown(self):
+        self.fin.close()
+        self.fout.close()
+
+    def test_hex2bin(self):
+        ih = hex2bin(self.fin, self.fout)
+        data = array.array('B', self.fout.getvalue())
+        for addr in xrange(len(bin8)):
+            expected = bin8[addr]
+            actual = data[addr]
+            self.assertEqual(expected, actual,
+                             "Data different at address "
+                             "%x (%x != %x)" % (addr, expected, actual))
 
 
 ##

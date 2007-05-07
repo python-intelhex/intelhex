@@ -536,9 +536,10 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     @param  size    size of resulting file (in bytes) (optional)
     @param  pad     padding byte (optional)
     """
-    h = IntelHex(fin)
-    if not h.readfile():
-        print "Bad HEX file"
+    try:
+        h = IntelHex(fin)
+    except HexReaderError, e:
+        print "Error: bad HEX file: %s" % str(e)
         return 1
 
     # start, end, size
