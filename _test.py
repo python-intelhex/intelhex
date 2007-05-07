@@ -363,6 +363,22 @@ class TestIntelHex(unittest.TestCase):
                              "Data different at address "
                              "%x (%x != %x)" % (addr, expected, actual))
 
+    def test_unicode_filename(self):
+        handle, fname = tempfile.mkstemp(u'')
+        os.close(handle)
+        try:
+            self.assertTrue(isinstance(fname, unicode))
+            f = file(fname, 'w')
+            try:
+                f.write(hex8)
+            finally:
+                f.close()
+            ih = IntelHex(fname)
+            self.assertEqual(0, ih.minaddr())
+            self.assertEqual(len(bin8)-1, ih.maxaddr())
+        finally:
+            os.remove(fname)
+
     def test_tobinstr(self):
         ih = intelhex.IntelHex(self.f)
         s1 = ih.tobinstr()

@@ -69,7 +69,7 @@ class IntelHex:
         self._offset = 0
 
         if source is not None:
-            if type(source) == type('') or hasattr(source, "read"):
+            if isinstance(source, basestring) or hasattr(source, "read"):
                 # load hex file
                 self.loadhex(source)
             else:
