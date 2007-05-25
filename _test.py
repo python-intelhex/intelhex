@@ -585,6 +585,18 @@ class TestIntelHexErrors(TestIntelHexBase):
                              self._raise_error,
                              IntelHexError)
 
+    def test_IntelHexError_message(self):
+        self.assertRaisesMsg(IntelHexError,
+                             'IntelHex custom error',
+                             self._raise_error,
+                             IntelHexError,
+                             {'message': 'IntelHex custom error'})
+        self.assertRaisesMsg(IntelHexError,
+                             'IntelHex base error',
+                             self._raise_error,
+                             IntelHexError,
+                             {'message': ''})
+
     def test_HexReaderError(self):
         self.assertRaisesMsg(HexReaderError,
                              'Hex reader base error',

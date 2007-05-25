@@ -604,11 +604,14 @@ class IntelHexError(Exception):
 
     _fmt = 'IntelHex base error'   #: format string
 
-    def __init__(self, **kw):
+    def __init__(self, message=None, **kw):
+        self.message = message
         for key, value in kw.items():
             setattr(self, key, value)
 
     def __str__(self):
+        if self.message:
+            return self.message
         try:
             return self._fmt % self.__dict__
         except (NameError, ValueError, KeyError), e:
