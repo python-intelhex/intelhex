@@ -507,7 +507,7 @@ class IntelHex16bit(IntelHex):
         if byte1 == None and byte2 == None:
             return self.padding
 
-        raise Exception, 'Bad access in 16-bit mode (not enough data)'
+        raise BadAccess16bit(address=addr16)
 
     def __setitem__(self, addr16, word):
         addr_byte = addr16 * 2
@@ -592,6 +592,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 #                   StartLinearAddressRecordError       - invalid start linear address record (type 05)
 #                   DuplicateStartAddressRecordError    - start address record appears twice
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
+#       BadAccess16bit - not enough data to read 16 bit value
 
 class IntelHexError(Exception):
     '''Base Exception class for IntelHex module'''
@@ -662,6 +663,10 @@ class StartLinearAddressRecordError(StartAddressRecordError):
 
 class DuplicateStartAddressRecordError(StartAddressRecordError):
     _fmt = 'Start Address Record appears twice at line %(line)d'
+
+
+class BadAccess16bit(IntelHexError):
+    _fmt = 'Bad access at 0x%(address)X: not enough data to read 16 bit value'
 
 
 ##

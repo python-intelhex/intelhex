@@ -24,6 +24,7 @@ from intelhex import IntelHex, \
                      StartLinearAddressRecordError, \
                      DuplicateStartAddressRecordError, \
                      _EndOfFile, \
+                     BadAccess16bit, \
                      hex2bin
 
 
@@ -515,7 +516,7 @@ Written:
 """ % (hex64k, s))
 
 
-class TestIntelHex16bit(unittest.TestCase):
+class TestIntelHex16bit(TestIntelHexBase):
 
     def setUp(self):
         self.f = StringIO(hex16)
@@ -551,6 +552,16 @@ class TestIntelHex16bit(unittest.TestCase):
             self.assertEqual(word, ih[addr],
                              'Data mismatch at address '
                              '0x%x (0x%x != 0x%x)' % (addr, word, ih[addr]))
+
+    def test_not_enough_data(self):
+        ih = intelhex.IntelHex()
+        ih[0] = 1
+        ih16 = intelhex.IntelHex16bit(ih)
+        self.assertRaisesMsg(BadAccess16bit,
+                             'Bad access at 0x0: '
+                             'not enough data to read 16 bit value',
+                             lambda x: ih16[x],
+                             0)
 
     def test_writefile(self):
         ih = intelhex.IntelHex16bit(self.f)
@@ -751,6 +762,13 @@ class TestIntelHexErrors(TestIntelHexBase):
                              AddressOverlapError,
                              {'address': 0x1234, 'line': 1})
 
+    def test_BadAccess16bit(self):
+        self.assertRaisesMsg(BadAccess16bit,
+                             'Bad access at 0x1234: '
+                             'not enough data to read 16 bit value',
+                             self._raise_error,
+                             BadAccess16bit,
+                             {'address': 0x1234})
 #/class TestIntelHexErrors
 
 
