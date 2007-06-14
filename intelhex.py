@@ -478,15 +478,9 @@ class IntelHex16bit(IntelHex):
         """
         if isinstance(source, IntelHex):
             # from ihex8
-            self.Error = source.Error
-            self.AddrOverlap = source.AddrOverlap
             self.padding = source.padding
-    
             # private members
-            self._fname = source._fname
             self._buf = source._buf
-            self._readed = source._readed
-            self._eof = source._eof
             self._offset = source._offset
         else:
             IntelHex.__init__(self, source)

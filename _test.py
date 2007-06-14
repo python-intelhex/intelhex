@@ -527,6 +527,10 @@ class TestIntelHex16bit(unittest.TestCase):
     def test_init_from_file(self):
         ih = intelhex.IntelHex16bit(self.f)
 
+    def test_init_from_ih(self):
+        ih = intelhex.IntelHex(self.f)
+        ih16 = intelhex.IntelHex16bit(ih)
+
     def test_minaddr(self):
         ih = intelhex.IntelHex16bit(self.f)
         addr = ih.minaddr()
