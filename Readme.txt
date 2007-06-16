@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2007-04-27
-:Version: 0.9.devel
+:Date: 2007-06-16
+:Version: 0.9.0
 
 .. Contents::
 
@@ -33,7 +33,7 @@ The code distributed under BSD license. See LICENSE.txt in sources achive.
 
 Download
 --------
-http://www.bialix.com/intelhex/intelhex.zip
+http://www.bialix.com/intelhex/intelhex-0.9.0.zip
 
 
 Project at Launchpad
@@ -64,7 +64,7 @@ Specified file automatically read and decoded.
 
 In version 0.9 API slightly changed. Now you can create empty object
 and load data later, and even load data several times (but if addresses
-in those files overlap you get exception ``AddrOverlap``). E.g.::
+in those files overlap you get exception ``AddressOverlapError``). E.g.::
 
 	>>> from intelhex import IntelHex
 	>>> ih = IntelHex()			# create empty object

@@ -1,6 +1,10 @@
 NEWS
 ====
 
+* 2007/06/16 v.0.9.0 (New API release)
+
+    - New API for IntelHex16bit
+
 * 2007/04/27 v.0.8.6 (BugFix and Performance improvements)
 
     - IntelHex is able to read/write start address records
