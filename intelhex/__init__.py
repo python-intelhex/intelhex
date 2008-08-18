@@ -1,6 +1,4 @@
-#!/usr/bin/python
-
-# Copyright (c) 2005-2007, Alexander Belchenko
+# Copyright (c) 2005-2008, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -170,7 +168,7 @@ class IntelHex:
 
         @param  fobj        file name or file-like object
         """
-        if not hasattr(fobj, "read"):
+        if getattr(fobj, "read", None) is None:
             fobj = file(fobj, "r")
             fclose = fobj.close
         else:
@@ -279,7 +277,7 @@ class IntelHex:
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
         '''
-        if not hasattr(fobj, "write"):
+        if getattr(fobj, "write", None) is None:
             fobj = file(fobj, "wb")
             close_fd = True
         else:
@@ -564,8 +562,8 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 
     try:
         h.tobinfile(fout, start, end, pad)
-    except IOError:
-        print "Could not write to file: %s" % fout
+    except IOError, e:
+        print "Could not write to file: %s: %s" % (fout, str(e))
         return 1
 
     return 0
@@ -666,92 +664,3 @@ class DuplicateStartAddressRecordError(StartAddressRecordError):
 
 class BadAccess16bit(IntelHexError):
     _fmt = 'Bad access at 0x%(address)X: not enough data to read 16 bit value'
-
-
-##
-# MAIN
-if __name__ == '__main__':
-    import getopt
-    import os
-    import sys
-
-    usage = '''Hex2Bin python converting utility.
-Usage:
-    python intelhex.py [options] file.hex [out.bin]
-
-Arguments:
-    file.hex                name of hex file to processing.
-    out.bin                 name of output file.
-                            If omitted then output write to file.bin.
-
-Options:
-    -h, --help              this help message.
-    -p, --pad=FF            pad byte for empty spaces (ascii hex value).
-    -r, --range=START:END   specify address range for writing output
-                            (ascii hex value).
-                            Range can be in form 'START:' or ':END'.
-    -l, --length=NNNN,
-    -s, --size=NNNN         size of output (decimal value).
-'''
-
-    pad = 0xFF
-    start = None
-    end = None
-    size = None
-
-    try:
-        opts, args = getopt.getopt(sys.argv[1:], "hp:r:l:s:",
-                                  ["help", "pad=", "range=",
-                                   "length=", "size="])
-
-        for o, a in opts:
-            if o in ("-h", "--help"):
-                print usage
-                sys.exit(0)
-            elif o in ("-p", "--pad"):
-                try:
-                    pad = int(a, 16) & 0x0FF
-                except:
-                    raise getopt.GetoptError, 'Bad pad value'
-            elif o in ("-r", "--range"):
-                try:
-                    l = a.split(":")
-                    if l[0] != '':
-                        start = int(l[0], 16)
-                    if l[1] != '':
-                        end = int(l[1], 16)
-                except:
-                    raise getopt.GetoptError, 'Bad range value(s)'
-            elif o in ("-l", "--lenght", "-s", "--size"):
-                try:
-                    size = int(a, 10)
-                except:
-                    raise getopt.GetoptError, 'Bad size value'
-
-        if start != None and end != None and size != None:
-            raise getopt.GetoptError, 'Cannot specify START:END and SIZE simultaneously'
-
-        if not args:
-            raise getopt.GetoptError, 'Hex file is not specified'
-
-        if len(args) > 2:
-            raise getopt.GetoptError, 'Too many arguments'
-
-    except getopt.GetoptError, msg:
-        print msg
-        print usage
-        sys.exit(2)
-
-    fin = args[0]
-    if len(args) == 1:
-        import os.path
-        name, ext = os.path.splitext(fin)
-        fout = name + ".bin"
-    else:
-        fout = args[1]
-
-    if not os.path.isfile(fin):
-        print "File not found"
-        sys.exit(1)
-
-    sys.exit(hex2bin(fin, fout, start, end, size, pad))
