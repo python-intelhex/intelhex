@@ -57,6 +57,7 @@ from intelhex import IntelHex, \
                      StartSegmentAddressRecordError, \
                      StartLinearAddressRecordError, \
                      DuplicateStartAddressRecordError, \
+                     InvalidStartAddressRecordValue, \
                      _EndOfFile, \
                      BadAccess16bit, \
                      hex2bin
@@ -451,7 +452,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_write_empty_hexfile(self):
         ih = intelhex.IntelHex()
         sio = StringIO()
-        self.assertTrue(ih.writefile(sio))
+        ih.write_hex_file(sio)
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex_empty_file, s)
@@ -459,7 +460,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_write_hexfile(self):
         ih = intelhex.IntelHex(StringIO(hex_simple))
         sio = StringIO()
-        self.assertTrue(ih.writefile(sio))
+        ih.write_hex_file(sio)
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex_simple, s)
@@ -523,7 +524,7 @@ class TestIntelHexStartingAddressRecords(TestIntelHexBase):
         ih.start_addr = start_addr
         # write
         sio = StringIO()
-        self.assertTrue(ih.writefile(sio, write_start_addr))
+        ih.write_hex_file(sio, write_start_addr)
         s = sio.getvalue()
         sio.close()
         # check
@@ -564,10 +565,10 @@ class TestIntelHex_big_files(TestIntelHexBase):
                               "data not equal at addr %X "
                               "(%X != %X)" % (addr, byte, readed))
 
-    def test_writefile(self):
+    def test_write_hex_file(self):
         ih = intelhex.IntelHex(self.f)
         sio = StringIO()
-        self.assertTrue(ih.writefile(sio))
+        ih.write_hex_file(sio)
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex64k, s)
@@ -620,10 +621,10 @@ class TestIntelHex16bit(TestIntelHexBase):
                              lambda x: ih16[x],
                              0)
 
-    def test_writefile(self):
+    def test_write_hex_file(self):
         ih = intelhex.IntelHex16bit(self.f)
         sio = StringIO()
-        ih.writefile(sio)
+        ih.write_hex_file(sio)
         s = sio.getvalue()
         sio.close()
 
@@ -803,6 +804,13 @@ class TestIntelHexErrors(TestIntelHexBase):
                              self._raise_error,
                              DuplicateStartAddressRecordError,
                              {'line': 1})
+
+    def test_InvalidStartAddressRecordValue(self):
+        self.assertRaisesMsg(InvalidStartAddressRecordValue,
+                             "Invalid start address value: {'foo': 1}",
+                             self._raise_error,
+                             InvalidStartAddressRecordValue,
+                             {'start_addr': {'foo': 1}})
 
     def test_AddressOverlapError(self):
         self.assertRaisesMsg(AddressOverlapError,

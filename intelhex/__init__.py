@@ -316,7 +316,7 @@ class IntelHex(object):
     def __setitem__(self, addr, byte):
         self._buf[addr] = byte
 
-    def writefile(self, f, write_start_addr=True):
+    def write_hex_file(self, f, write_start_addr=True):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -324,8 +324,6 @@ class IntelHex(object):
                                     record to file (enabled by default).
                                     If there is no start address nothing
                                     will be written.
-
-        @return True    if successful (XXX: old API).
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -375,10 +373,9 @@ class IntelHex(object):
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
                 fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
             else:
-                # XXX raise error
-                self.Error = ('Invalid start address value: %r'
-                              % self.start_addr)
-                return False
+                if fclose:
+                    fclose()
+                raise InvalidStartAddressRecordValue(start_addr=self.start_addr)
 
         # data
         addresses = self._buf.keys()
@@ -453,8 +450,6 @@ class IntelHex(object):
         fwrite(":00000001FF\n")
         if fclose:
             fclose()
-
-        return True
 #/IntelHex
 
 
@@ -655,6 +650,9 @@ class StartLinearAddressRecordError(StartAddressRecordError):
 
 class DuplicateStartAddressRecordError(StartAddressRecordError):
     _fmt = 'Start Address Record appears twice at line %(line)d'
+
+class InvalidStartAddressRecordValue(StartAddressRecordError):
+    _fmt = 'Invalid start address value: %(start_addr)s'
 
 
 class BadAccess16bit(IntelHexError):
