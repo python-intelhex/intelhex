@@ -38,8 +38,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix AT ukr net)
-@version    0.9.0
-@date       2007/06/16
+@version    1.0.0dev0
+@date       2008/08/18
 '''
 
 
@@ -212,7 +212,6 @@ class IntelHex:
         finally:
             if fclose:
                 fclose()
-        
 
     def loadfile(self, fobj, format):
         """Load data file into internal buffer.
