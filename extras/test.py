@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2008, Alexander Belchenko
 # All rights reserved.
 #
@@ -33,41 +31,28 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Setup script for IntelHex."""
+"""Test suite for IntelHex."""
 
-from distutils.core import setup
+from distutils.core import Command
 
-from extras.test import test
 
-cmdclass = {
-    'test': test,
-    }
+class test(Command):
+    description = "unittest for intelhex"
+    user_options = []
+    boolean_options = []
 
-setup(name='intelhex',
-      version='1.0.0',
+    def initialize_options(self):
+        pass
 
-      scripts=['scripts/hex2bin.py'],
-      packages=['intelhex'],
-      cmdclass=cmdclass,
+    def finalize_options(self):
+        pass
 
-      author='Alexander Belchenko',
-      author_email='bialix@ukr.net',
-      url='http://www.bialix.com/intelhex/',
-
-      description='Intel HEX file format reader and convertor',
-      keywords='Intel HEX hex2bin HEX8',
-      license='BSD',
-      classifiers = [
-        'Classifier: Development Status :: 5 - Production/Stable',
-        'Classifier: Environment :: Console',
-        'Classifier: Intended Audience :: Developers',
-        'Classifier: Intended Audience :: Telecommunications Industry',
-        'Classifier: License :: OSI Approved :: BSD License',
-        'Classifier: Operating System :: OS Independent',
-        'Classifier: Programming Language :: Python',
-        'Classifier: Topic :: Scientific/Engineering',
-        'Classifier: Topic :: Software Development :: Embedded Systems',
-        'Classifier: Topic :: Utilities',
-      ],
-)
-
+    def run(self):
+        import unittest
+        import intelhex
+        import intelhex.test
+        argv = ['']     # argv[0] is ignored
+        if self.verbose:
+            argv.append('-v')
+        argv.append('test')
+        return unittest.main(intelhex, argv=argv)
