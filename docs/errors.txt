@@ -22,5 +22,6 @@ IntelHex Errors Hierarchy
         * ``StartSegmentAddressRecordError``    - invalid start segment address record (type 03)
         * ``StartLinearAddressRecordError``     - invalid start linear address record (type 05)
         * ``DuplicateStartAddressRecordError``  - start address record appears twice
+        * ``InvalidStartAddressRecordValue``    - invalid value of start addr record
 
   * ``BadAccess16bit`` - not enough data to read 16 bit value

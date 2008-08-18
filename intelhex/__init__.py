@@ -578,6 +578,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
 #                   StartSegmentAddressRecordError      - invalid start segment address record (type 03)
 #                   StartLinearAddressRecordError       - invalid start linear address record (type 05)
 #                   DuplicateStartAddressRecordError    - start address record appears twice
+#                   InvalidStartAddressRecordValue      - invalid value of start addr record
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
 #       BadAccess16bit - not enough data to read 16 bit value
 
