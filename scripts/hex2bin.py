@@ -35,8 +35,6 @@
 
 '''Intel HEX file format hex2bin convertor utility.'''
 
-##
-# MAIN
 if __name__ == '__main__':
     import getopt
     import os
@@ -44,14 +42,14 @@ if __name__ == '__main__':
 
     from intelhex import hex2bin
 
-    usage = '''Hex2Bin converting utility.
+    usage = '''Hex2Bin convertor utility.
 Usage:
     python hex2bin.py [options] INFILE [OUTFILE]
 
 Arguments:
-    INFILE      name of hex file to processing.
-    OUTFILE     name of output file.
-                If omitted then output will be writing to stdout.
+    INFILE      name of hex file for processing.
+    OUTFILE     name of output file. If omitted then output
+                will be writing to stdout.
 
 Options:
     -h, --help              this help message.
