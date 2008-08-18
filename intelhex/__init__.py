@@ -450,6 +450,19 @@ class IntelHex(object):
         fwrite(":00000001FF\n")
         if fclose:
             fclose()
+
+    def tofile(self, f, format='hex'):
+        """Write data to hex or bin file.
+        @param  f   filename or file-like object for writing
+        @param  format  'hex' or 'bin'
+        """
+        if format == 'hex':
+            return self.write_hex_file(f)
+        elif format == 'bin':
+            return self.tobinfile(f)
+        else:
+            raise ValueError('format should be either "hex" or "bin";'
+                'got %r instead' % format)
 #/IntelHex
 
 

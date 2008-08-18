@@ -448,6 +448,13 @@ class TestIntelHex(TestIntelHexBase):
         sio.close()
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+        # new API: .tofile universal method
+        sio = StringIO()
+        ih.tofile(sio, format='bin')
+        s1 = sio.getvalue()
+        sio.close()
+        s2 = bin8.tostring()
+        self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_write_empty_hexfile(self):
         ih = intelhex.IntelHex()
@@ -461,6 +468,12 @@ class TestIntelHex(TestIntelHexBase):
         ih = intelhex.IntelHex(StringIO(hex_simple))
         sio = StringIO()
         ih.write_hex_file(sio)
+        s = sio.getvalue()
+        sio.close()
+        self.assertEqualWrittenData(hex_simple, s)
+        # new API: .tofile universal method
+        sio = StringIO()
+        ih.tofile(sio, format='hex')
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex_simple, s)
