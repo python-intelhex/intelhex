@@ -332,6 +332,16 @@ hex_rectype5 = """:0400000512345678E3
 data_rectype5 = {0: 2}
 start_addr_rectype5 = {'EIP': 0x12345678}
 
+hex_empty_file = ':00000001FF\n'
+
+hex_simple = """\
+:10000000000083120313072055301820042883169C
+:10001000031340309900181598168312031318160D
+:1000200098170800831203138C1E14281A0808005E
+:0C003000831203130C1E1A28990008000C
+:00000001FF
+"""
+
 
 ##
 # Test cases
@@ -377,10 +387,19 @@ class TestIntelHexBase(unittest.TestCase):
                 "Expected to raise %s, didn't get an exception at all" %
                 excName
                 )
+
+    def assertEqualWrittenData(self, a, b):
+        return self.assertEquals(a, b, """Written data is incorrect
+Should be:
+%s
+
+Written:
+%s
+""" % (a, b))
 #/class TestIntelHexBase
 
 
-class TestIntelHex(unittest.TestCase):
+class TestIntelHex(TestIntelHexBase):
 
     def setUp(self):
         self.f = StringIO(hex8)
@@ -429,8 +448,24 @@ class TestIntelHex(unittest.TestCase):
         s2 = bin8.tostring()
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
+    def test_write_empty_hexfile(self):
+        ih = intelhex.IntelHex()
+        sio = StringIO()
+        self.assertTrue(ih.writefile(sio))
+        s = sio.getvalue()
+        sio.close()
+        self.assertEqualWrittenData(hex_empty_file, s)
 
-class TestIntelHexLoadBin(unittest.TestCase):
+    def test_write_hexfile(self):
+        ih = intelhex.IntelHex(StringIO(hex_simple))
+        sio = StringIO()
+        self.assertTrue(ih.writefile(sio))
+        s = sio.getvalue()
+        sio.close()
+        self.assertEqualWrittenData(hex_simple, s)
+
+
+class TestIntelHexLoadBin(TestIntelHexBase):
 
     def setUp(self):
         self.data = '0123456789'
@@ -461,7 +496,7 @@ class TestIntelHexLoadBin(unittest.TestCase):
         self.assertEqual(self.data, ih.tobinstr())
 
 
-class TestIntelHexStartingAddressRecords(unittest.TestCase):
+class TestIntelHexStartingAddressRecords(TestIntelHexBase):
 
     def _test_read(self, hexstr, data, start_addr):
         sio = StringIO(hexstr)
@@ -492,13 +527,7 @@ class TestIntelHexStartingAddressRecords(unittest.TestCase):
         s = sio.getvalue()
         sio.close()
         # check
-        self.assertEquals(hexstr, s, """Written data is incorrect
-Should be:
-%s
-
-Written:
-%s
-""" % (hexstr, s))
+        self.assertEqualWrittenData(hexstr, s)
 
     def _test_dont_write(self, hexstr, data, start_addr):
         expected = ''.join(hexstr.splitlines(True)[1:])
@@ -517,7 +546,7 @@ Written:
         self._test_dont_write(hex_rectype5, data_rectype5, start_addr_rectype5)
 
 
-class TestIntelHex_big_files(unittest.TestCase):
+class TestIntelHex_big_files(TestIntelHexBase):
     """Test that data bigger than 64K read/write correctly"""
 
     def setUp(self):
@@ -541,13 +570,7 @@ class TestIntelHex_big_files(unittest.TestCase):
         self.assertTrue(ih.writefile(sio))
         s = sio.getvalue()
         sio.close()
-        self.assertEquals(hex64k, s, """Written data is incorrect
-Should be:
-%s
-
-Written:
-%s
-""" % (hex64k, s))
+        self.assertEqualWrittenData(hex64k, s)
 
 
 class TestIntelHex16bit(TestIntelHexBase):

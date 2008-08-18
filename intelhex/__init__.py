@@ -46,9 +46,10 @@ __docformat__ = "javadoc"
 
 from array import array
 from binascii import hexlify, unhexlify
+from bisect import bisect_left, bisect_right
 
 
-class IntelHex:
+class IntelHex(object):
     ''' Intel HEX file reader. '''
 
     def __init__(self, source=None):
@@ -324,7 +325,7 @@ class IntelHex:
                                     If there is no start address nothing
                                     will be written.
 
-        @return True    if successful.
+        @return True    if successful (XXX: old API).
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -334,6 +335,12 @@ class IntelHex:
             fobj = file(f, 'w')
             fwrite = fobj.write
             fclose = fobj.close
+
+        # Translation table for uppercasing hex ascii string.
+        # timeit shows that using hexstr.translate(table)
+        # is faster than hexstr.upper():
+        # 0.452ms vs. 0.652ms (translate vs. upper)
+        table = ''.join(chr(i).upper() for  i in range(256))
 
         # start address record if any
         if self.start_addr and write_start_addr:
@@ -353,9 +360,7 @@ class IntelHex:
                 bin[6] = (ip >> 8) & 0x0FF
                 bin[7] = ip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':')
-                fwrite(hexlify(bin.tostring()).upper())
-                fwrite('\n')
+                fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
             elif keys == ['EIP']:
                 # Start Linear Address Record
                 bin[0] = 4      # reclen
@@ -368,94 +373,84 @@ class IntelHex:
                 bin[6] = (eip >> 8) & 0x0FF
                 bin[7] = eip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':')
-                fwrite(hexlify(bin.tostring()).upper())
-                fwrite('\n')
+                fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
             else:
+                # XXX raise error
                 self.Error = ('Invalid start address value: %r'
                               % self.start_addr)
                 return False
 
         # data
-        minaddr = IntelHex.minaddr(self)
-        maxaddr = IntelHex.maxaddr(self)
-        if maxaddr > 65535:
-            offset = (minaddr/65536)*65536
-        else:
-            offset = None
-
-        while True:
-            if offset != None:
-                # emit 32-bit offset record
-                high_ofs = offset / 65536
-                offset_record = ":02000004%04X" % high_ofs
-                bytes = divmod(high_ofs, 256)
-                csum = 2 + 4 + bytes[0] + bytes[1]
-                csum = (-csum) & 0x0FF
-                offset_record += "%02X\n" % csum 
-
-                ofs = offset
-                if (ofs + 65536) > maxaddr:
-                    rng = xrange(maxaddr - ofs + 1)
-                else:
-                    rng = xrange(65536)
+        addresses = self._buf.keys()
+        addresses.sort()
+        addr_len = len(addresses)
+        if addr_len:
+            minaddr = addresses[0]
+            maxaddr = addresses[-1]
+    
+            if maxaddr > 65535:
+                need_offset_record = True
             else:
-                ofs = 0
-                offset_record = ''
-                rng = xrange(maxaddr + 1)
+                need_offset_record = False
+            high_ofs = 0
 
-            csum = 0
-            k = 0
-            record = ""
-            for addr in rng:
-                byte = self._buf.get(ofs+addr, None)
-                if byte != None:
-                    if k == 0:
-                        # optionally offset record
-                        fobj.write(offset_record)
-                        offset_record = ''
-                        # start data record
-                        record += "%04X00" % addr
-                        bytes = divmod(addr, 256)
-                        csum = bytes[0] + bytes[1]
+            cur_addr = minaddr
+            cur_ix = 0
 
-                    k += 1
-                    # continue data in record
-                    record += "%02X" % byte
-                    csum += byte
+            while cur_addr <= maxaddr:
+                if need_offset_record:
+                    bin = array('B', '\0'*7)
+                    bin[0] = 2      # reclen
+                    bin[1] = 0      # offset msb
+                    bin[2] = 0      # offset lsb
+                    bin[3] = 4      # rectyp
+                    high_ofs = int(cur_addr/65536)
+                    bytes = divmod(high_ofs, 256)
+                    bin[4] = bytes[0]   # msb of high_ofs
+                    bin[5] = bytes[1]   # lsb of high_ofs
+                    bin[6] = (-sum(bin)) & 0x0FF    # chksum
+                    fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
 
-                    # check for length of record
-                    if k < 16:
-                        continue
+                while True:
+                    # produce one record
+                    low_addr = cur_addr & 0x0FFFF
+                    # chain_len off by 1
+                    chain_len = min(15, 65535-low_addr, maxaddr-cur_addr)
 
-                if k != 0:
-                    # close record
-                    csum += k
-                    csum = (-csum) & 0x0FF
-                    record += "%02X" % csum
-                    fobj.write(":%02X%s\n" % (k, record))
-                    # cleanup
-                    csum = 0
-                    k = 0
-                    record = ""
-            else:
-                if k != 0:
-                    # close record
-                    csum += k
-                    csum = (-csum) & 0x0FF
-                    record += "%02X" % csum
-                    fobj.write(":%02X%s\n" % (k, record))
+                    # search continuous chain
+                    stop_addr = cur_addr + chain_len
+                    if chain_len:
+                        ix = bisect_right(addresses, stop_addr,
+                                          cur_ix,
+                                          min(cur_ix+chain_len+1, addr_len))
+                        chain_len = ix - cur_ix     # real chain_len
+                    else:
+                        chain_len = 1               # real chain_len
 
-            # advance offset
-            if offset is None:
-                break
+                    bin = array('B', '\0'*(5+chain_len))
+                    bin[0] = chain_len
+                    bytes = divmod(low_addr, 256)
+                    bin[1] = bytes[0]   # msb of low_addr
+                    bin[2] = bytes[1]   # lsb of low_addr
+                    bin[3] = 0          # rectype
+                    for i in xrange(chain_len):
+                        bin[4+i] = self._buf[cur_addr+i]
+                    bin[4+chain_len] = (-sum(bin)) & 0x0FF    # chksum
+                    fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
 
-            offset += 65536
-            if offset > maxaddr:
-                break
+                    # adjust cur_addr/cur_ix
+                    cur_ix += chain_len
+                    if cur_ix < addr_len:
+                        cur_addr = addresses[cur_ix]
+                    else:
+                        cur_addr = maxaddr + 1
+                        break
+                    high_addr = int(cur_addr/65536)
+                    if high_addr > high_ofs:
+                        break
 
         # end-of-file record
-        fobj.write(":00000001FF\n")
+        fwrite(":00000001FF\n")
         if fclose:
             fclose()
 
