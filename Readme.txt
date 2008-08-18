@@ -7,8 +7,8 @@ Python implementation
 
 :Author: Alexander Belchenko
 :Contact: bialix AT ukr net
-:Date: 2007-06-16
-:Version: 0.9.0
+:Date: 2008-08-19
+:Version: 1.0
 
 .. Contents::
 
@@ -21,9 +21,9 @@ microelectronic devices.
 This work implements HEX (also known as Intel HEX) file format reader
 and convertor to binary form as python script.
 
-Script intelhex.py contain implementation of HEX file reader and convertor
-as IntelHex class. You also may use this script as standalone hex-to-bin
-convertor.
+Python package **intelhex** contains implementation of HEX file reader 
+and convertor as IntelHex class. You also may use ``hex2bin.py`` script 
+as handy hex-to-bin convertor.
 
 
 License
@@ -33,7 +33,9 @@ The code distributed under BSD license. See LICENSE.txt in sources achive.
 
 Download
 --------
-http://www.bialix.com/intelhex/intelhex-0.9.0.zip
+XXX
+
+.. http://www.bialix.com/intelhex/intelhex.zip
 
 
 Project at Launchpad
@@ -105,10 +107,14 @@ Example::
 	>>> ih = IntelHex("foo.hex")
 	>>> ih.tobinfile("foo.bin")
 
+To write data as binary file you also can use universal method ``tofile``::
+
+	>>> ih.tofile("foo.bin", format='bin')
+
 Write data to HEX file
 **********************
-You can store data contained in object by method ``.writefile(f)``. Parameter
-``f`` should be filename or file-like object.
+You can store data contained in object by method ``.write_hex_file(f)``. Parameter
+``f`` should be filename or file-like object. Also you can use universal
 
 To convert data of IntelHex object to HEX8 file format without actually saving
 it to disk you can use StringIO file-like object, e.g.::
@@ -119,11 +125,16 @@ it to disk you can use StringIO file-like object, e.g.::
 	>>> ih[0] = 0x55
 
 	>>> sio = StringIO()
-	>>> ih.writefile(sio)
+	>>> ih.write_hex_file(sio)
 	>>> hexstr = sio.getvalue()
 	>>> sio.close()
 
-Variable ``hexstr`` contains string with content of HEX8 file.
+Variable ``hexstr`` will contains string with content of HEX8 file.
+
+To write data as hex file you also can use universal method ``tofile``::
+
+	>>> ih.tofile(sio, format='hex')
+
 
 Start address
 *************
@@ -146,7 +157,6 @@ To obtain or change ``CS`` or ``IP`` value you need to use their names
 as keys for ``start_addr`` dictionary::
 
 	>>> ih = IntelHex('file_with_03.hex')
-	>>> ih.readfile()
 	>>> print ih.start_addr['CS']
 	>>> print ih.start_addr['IP']
 
@@ -160,7 +170,6 @@ Here ``ZZZ`` is value of EIP register.
 Example::
 
 	>>> ih = IntelHex('file_with_05.hex')
-	>>> ih.readfile()
 	>>> print ih.start_addr['EIP']
 
 You can manually set required start address::
@@ -176,9 +185,9 @@ To delete start address info give value ``None`` or empty dictionary::
 When you write data to HEX file you can disable writing start address
 with additional argument ``write_start_addr``:
 
-	>>> ih.writefile('out.hex')	# by default writing start address
-	>>> ih.writefile('out.hex', True)	# as above
-	>>> ih.writefile('out.hex', False)	# don't write start address
+	>>> ih.write_hex_file('out.hex')	# by default writing start address
+	>>> ih.write_hex_file('out.hex', True)	# as above
+	>>> ih.write_hex_file('out.hex', False)	# don't write start address
 
 When ``start_addr`` is ``None`` or empty dictionary nothing will be written
 regardless of ``write_start_addr`` argument value.
@@ -222,18 +231,20 @@ Hex-to-Bin convertor engine.
 	0 if all OK 
 
 
-Stand-alone script ``intelhex.py``
+Stand-alone script ``hex2bin.py``
 **********************************
-You can use intelhex.py as stand-alone hex-to-bin convertor.
+You can use hex2bin.py as handy hex-to-bin convertor. This script is 
+just frontend for `Function hex2bin`_ described above.
 ::
 
-	Usage:
-	    python intelhex.py [options] file.hex [out.bin]
+        Usage:
+            python hex2bin.py [options] INFILE [OUTFILE]
+        
+        Arguments:
+            INFILE      name of hex file for processing.
+            OUTFILE     name of output file. If omitted then output
+                        will be writing to stdout.
 
-	Arguments:
-	    file.hex		    name of hex file to processing.
-	    out.bin		    name of output file.
-				    If omitted then output write to file.bin.
 
 	Options:
 	    -h, --help		    this help message.
@@ -246,8 +257,8 @@ You can use intelhex.py as stand-alone hex-to-bin convertor.
 
 Per example, converting content of foo.hex to foo.bin addresses from 0 to FF::
 
-	$ python intelhex.py -r 0000:00FF foo.hex
+	$ python hex2bin.py -r 0000:00FF foo.hex
 
 Or (equivalent)::
 
-	$ python intelhex.py -r 0000: -s 256 foo.hex
+	$ python hex2bin.py -r 0000: -s 256 foo.hex

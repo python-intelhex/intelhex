@@ -36,8 +36,8 @@
 This script also may be used as hex2bin convertor utility.
 
 @author     Alexander Belchenko (bialix AT ukr net)
-@version    1.0.0dev0
-@date       2008/08/18
+@version    1.0
+@date       2008/08/19
 '''
 
 
