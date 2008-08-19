@@ -418,6 +418,16 @@ class TestIntelHex(TestIntelHexBase):
                              "Data different at address "
                              "%x (%x != %x)" % (addr, expected, actual))
 
+    def test_hex_fromfile(self):
+        ih = IntelHex()
+        ih.fromfile(self.f, format='hex')
+        for addr in xrange(len(bin8)):
+            expected = bin8[addr]
+            actual = ih[addr]
+            self.assertEqual(expected, actual,
+                             "Data different at address "
+                             "%x (%x != %x)" % (addr, expected, actual))
+
     def test_unicode_filename(self):
         handle, fname = tempfile.mkstemp(u'')
         os.close(handle)
@@ -496,6 +506,13 @@ class TestIntelHexLoadBin(TestIntelHexBase):
     def test_loadbin(self):
         ih = IntelHex()
         ih.loadbin(self.f)
+        self.assertEqual(0, ih.minaddr())
+        self.assertEqual(9, ih.maxaddr())
+        self.assertEqual(self.data, ih.tobinstr())
+
+    def test_bin_fromfile(self):
+        ih = IntelHex()
+        ih.fromfile(self.f, format='bin')
         self.assertEqual(0, ih.minaddr())
         self.assertEqual(9, ih.maxaddr())
         self.assertEqual(self.data, ih.tobinstr())

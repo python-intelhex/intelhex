@@ -223,7 +223,11 @@ class IntelHex(object):
         elif format == "bin":
             self.loadbin(fobj)
         else:
-            raise ValueError('format should be either "hex" or "bin"')
+            raise ValueError('format should be either "hex" or "bin";'
+                ' got %r instead' % format)
+
+    # alias (to be consistent with method tofile)
+    fromfile = loadfile
 
     def _get_start_end(self, start=None, end=None):
         """Return default values for start and end if they are None
@@ -451,15 +455,16 @@ class IntelHex(object):
         if fclose:
             fclose()
 
-    def tofile(self, f, format='hex'):
+    def tofile(self, fobj, format):
         """Write data to hex or bin file.
-        @param  f   filename or file-like object for writing
-        @param  format  'hex' or 'bin'
+
+        @param  fobj        file name or file-like object
+        @param  format      file format ("hex" or "bin")
         """
         if format == 'hex':
-            return self.write_hex_file(f)
+            self.write_hex_file(fobj)
         elif format == 'bin':
-            return self.tobinfile(f)
+            self.tobinfile(fobj)
         else:
             raise ValueError('format should be either "hex" or "bin";'
                 ' got %r instead' % format)
