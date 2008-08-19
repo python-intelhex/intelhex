@@ -37,11 +37,15 @@
 
 from distutils.core import setup
 
-from extras.test import test
+cmdclass = {}
 
-cmdclass = {
-    'test': test,
-    }
+try:
+    from extras.test import test
+except ImportError:
+    pass
+else:
+    cmdclass['test'] = test
+
 
 setup(name='intelhex',
       version='1.0',

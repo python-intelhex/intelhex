@@ -6,3 +6,5 @@ Readme.html
 doc/*.html
 ./build
 ./README.html
+./MANIFEST
+./dist
