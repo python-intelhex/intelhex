@@ -205,8 +205,8 @@ class IntelHex(object):
             fclose = None
 
         try:
-            for b in fread():
-                self._buf[offset] = ord(b)
+            for b in array('B', fread()):
+                self._buf[offset] = b
                 offset += 1
         finally:
             if fclose:
@@ -553,7 +553,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     try:
         h = IntelHex(fin)
     except HexReaderError, e:
-        print "Error: bad HEX file: %s" % str(e)
+        print "ERROR: bad HEX file: %s" % str(e)
         return 1
 
     # start, end, size
@@ -571,12 +571,36 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     try:
         h.tobinfile(fout, start, end, pad)
     except IOError, e:
-        print "Could not write to file: %s: %s" % (fout, str(e))
+        print "ERROR: Could not write to file: %s: %s" % (fout, str(e))
         return 1
 
     return 0
 #/def hex2bin
 
+
+def bin2hex(fin, fout, offset=0):
+    """Simple bin-to-hex convertor.
+    @return     0   if all OK
+
+    @param  fin     input bin file (filename or file-like object)
+    @param  fout    output hex file (filename or file-like object)
+    @param  offset  starting address offset for loading bin
+    """
+    h = IntelHex()
+    try:
+        h.loadbin(fin, offset)
+    except IOError, e:
+        print 'ERROR: unable to load bin file:', str(e)
+        return 1
+
+    try:
+        h.tofile(fout, format='hex')
+    except IOError, e:
+        print "ERROR: Could not write to file: %s: %s" % (fout, str(e))
+        return 1
+
+    return 0
+#/def bin2hex
 
 ##
 # IntelHex Errors Hierarchy:
