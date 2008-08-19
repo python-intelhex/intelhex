@@ -72,6 +72,9 @@ in those files overlap you get exception ``AddressOverlapError``). E.g.::
 	>>> ih = IntelHex()			# create empty object
 	>>> ih.loadhex('foo.hex')		# load from hex
 	>>> ih.loadfile('bar.hex',format='hex')	# also load from hex
+	>>> ih.fromfile('bar.hex',format='hex')	# also load from hex
+
+NOTE: using IntelHex.fromfile is recommended way.
 
 Access to data by address
 *************************
@@ -111,6 +114,8 @@ To write data as binary file you also can use universal method ``tofile``::
 
 	>>> ih.tofile("foo.bin", format='bin')
 
+NOTE: using IntelHex.tofile is recommended way.
+
 Write data to HEX file
 **********************
 You can store data contained in object by method ``.write_hex_file(f)``. Parameter
@@ -134,6 +139,8 @@ Variable ``hexstr`` will contains string with content of HEX8 file.
 To write data as hex file you also can use universal method ``tofile``::
 
 	>>> ih.tofile(sio, format='hex')
+
+NOTE: using IntelHex.tofile is recommended way.
 
 
 Start address
