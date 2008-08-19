@@ -46,7 +46,10 @@ cmdclass = {
 setup(name='intelhex',
       version='1.0',
 
-      scripts=['scripts/hex2bin.py'],
+      scripts=[
+        'scripts/bin2hex.py',
+        'scripts/hex2bin.py',
+        ],
       packages=['intelhex'],
       cmdclass=cmdclass,
 
