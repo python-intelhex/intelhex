@@ -462,7 +462,7 @@ class IntelHex(object):
             return self.tobinfile(f)
         else:
             raise ValueError('format should be either "hex" or "bin";'
-                'got %r instead' % format)
+                ' got %r instead' % format)
 #/IntelHex
 
 

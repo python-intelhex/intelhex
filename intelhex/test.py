@@ -478,6 +478,11 @@ class TestIntelHex(TestIntelHexBase):
         sio.close()
         self.assertEqualWrittenData(hex_simple, s)
 
+    def test_tofile_wrong_format(self):
+        ih = IntelHex()
+        sio = StringIO()
+        self.assertRaises(ValueError, ih.tofile, sio, {'format': 'bad'})
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
