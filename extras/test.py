@@ -48,11 +48,22 @@ class test(Command):
         pass
 
     def run(self):
+        import sys
         import unittest
-        import intelhex
+
         import intelhex.test
-        argv = ['']     # argv[0] is ignored
+
+        verbosity = 1
         if self.verbose:
-            argv.append('-v')
-        argv.append('test')
-        return unittest.main(intelhex, argv=argv)
+            verbosity = 2
+
+        suite = unittest.TestSuite()
+        loader = unittest.TestLoader()
+
+        suite.addTest(loader.loadTestsFromModule(intelhex.test))
+
+        runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity)
+
+        result = runner.run(suite)
+        if result.errors or result.failures:
+            return 1
