@@ -269,3 +269,46 @@ Per example, converting content of foo.hex to foo.bin addresses from 0 to FF::
 Or (equivalent)::
 
 	$ python hex2bin.py -r 0000: -s 256 foo.hex
+
+
+Bin-to-Hex convertor
+--------------------
+You can use bin-to-hex convertor in two way: as function ``bin2hex`` (useful
+for using in other scripts) or as stand-alone script.
+
+Function ``bin2hex``
+********************
+Bin-to-Hex convertor engine.
+
+``bin2hex(fin, fout, offset=0)``
+
+**Parameters**: 
+
+* ``fin`` -- input bin file (filename or file-like object) 
+* ``fout`` -- output hex file (filename or file-like object) 
+* ``offset`` -- starting address offset for loading bin (default: 0)
+
+**Returns**: 
+
+	0 if all OK 
+
+
+Stand-alone script ``bin2hex.py``
+**********************************
+You can use bin2hex.py as simple bin-to-hex convertor. This script is 
+just frontend for `Function bin2hex`_ described above.
+::
+
+    Usage:
+        python bin2hex.py [options] INFILE [OUTFILE]
+    
+    Arguments:
+        INFILE      name of bin file for processing.
+                    Use '-' for reading from stdin.
+    
+        OUTFILE     name of output file. If omitted then output
+                    will be writing to stdout.
+    
+    Options:
+        -h, --help              this help message.
+        --offset=N              offset for loading bin file (default: 0).
