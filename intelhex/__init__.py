@@ -68,9 +68,15 @@ class IntelHex(object):
         self._offset = 0
 
         if source is not None:
-            if isinstance(source, basestring) or hasattr(source, "read"):
+            if isinstance(source, basestring) or getattr(source, "read", None):
                 # load hex file
                 self.loadhex(source)
+            elif isinstance(source, dict):
+                self.fromdict(source)
+            elif isinstance(source, IntelHex):
+                self.padding = source.padding
+                self.start_addr = source.start_addr
+                self._buf = source._buf
             else:
                 raise ValueError("source: bad initializer type")
 
@@ -232,7 +238,7 @@ class IntelHex(object):
     def fromdict(self, dikt):
         """Load data from dictionary."""
         for k in dikt.keys():
-            if type(k) not in (int, long):
+            if type(k) not in (int, long) or k < 0:
                 raise ValueError('Source dictionary should have only int keys')
         self._buf.update(dikt)
 

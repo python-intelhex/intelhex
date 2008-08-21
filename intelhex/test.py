@@ -509,6 +509,16 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals({1:2, 3:4}, ih.todict())
         ih.fromdict({1:5, 6:7})
         self.assertEquals({1:5, 3:4, 6:7}, ih.todict())
+        # bad dict
+        self.assertRaises(ValueError, ih.fromdict, {'EIP': 1234})
+        self.assertRaises(ValueError, ih.fromdict, {-1: 1234})
+
+    def test_init_from_obj(self):
+        ih = IntelHex({1:2, 3:4})
+        self.assertEquals({1:2, 3:4}, ih.todict())
+        ih2 = IntelHex(ih)
+        self.assertEquals({1:2, 3:4}, ih.todict())
+        self.assertNotEqual(id(ih), id(ih2))
 
 
 class TestIntelHexLoadBin(TestIntelHexBase):
