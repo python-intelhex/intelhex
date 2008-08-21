@@ -293,6 +293,14 @@ class IntelHex(object):
         if close_fd:
             fobj.close()
 
+    def todict(self):
+        '''Convert to python dictionary.'''
+        r = {}
+        r.update(self._buf)
+        if self.start_addr:
+            r.update(self.start_addr)
+        return r
+
     def minaddr(self):
         ''' Get minimal address of HEX content. '''
         aa = self._buf.keys()

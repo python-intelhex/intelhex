@@ -493,6 +493,16 @@ class TestIntelHex(TestIntelHexBase):
         sio = StringIO()
         self.assertRaises(ValueError, ih.tofile, sio, {'format': 'bad'})
 
+    def test_todict(self):
+        ih = IntelHex()
+        self.assertEquals({}, ih.todict())
+        ih = IntelHex(StringIO(hex64k))
+        self.assertEquals(data64k, ih.todict())
+        ih = IntelHex()
+        ih[1] = 2
+        ih.start_addr = {'EIP': 1234}
+        self.assertEquals({1: 2, 'EIP': 1234}, ih.todict())
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
