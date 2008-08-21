@@ -229,6 +229,13 @@ class IntelHex(object):
     # alias (to be consistent with method tofile)
     fromfile = loadfile
 
+    def fromdict(self, dikt):
+        """Load data from dictionary."""
+        for k in dikt.keys():
+            if type(k) not in (int, long):
+                raise ValueError('Source dictionary should have only int keys')
+        self._buf.update(dikt)
+
     def _get_start_end(self, start=None, end=None):
         """Return default values for start and end if they are None
         """

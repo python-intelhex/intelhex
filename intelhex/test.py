@@ -503,6 +503,13 @@ class TestIntelHex(TestIntelHexBase):
         ih.start_addr = {'EIP': 1234}
         self.assertEquals({1: 2, 'EIP': 1234}, ih.todict())
 
+    def test_fromdict(self):
+        ih = IntelHex()
+        ih.fromdict({1:2, 3:4})
+        self.assertEquals({1:2, 3:4}, ih.todict())
+        ih.fromdict({1:5, 6:7})
+        self.assertEquals({1:5, 3:4, 6:7}, ih.todict())
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
