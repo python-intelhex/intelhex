@@ -379,7 +379,7 @@ class IntelHex(object):
             else:
                 if fclose:
                     fclose()
-                raise InvalidStartAddressValue(start_addr=self.start_addr)
+                raise InvalidStartAddressValueError(start_addr=self.start_addr)
 
         # data
         addresses = self._buf.keys()
@@ -620,7 +620,7 @@ def bin2hex(fin, fout, offset=0):
 #                   StartSegmentAddressRecordError      - invalid start segment address record (type 03)
 #                   StartLinearAddressRecordError       - invalid start linear address record (type 05)
 #                   DuplicateStartAddressRecordError    - start address record appears twice
-#                   InvalidStartAddressValue            - invalid value of start addr record
+#                   InvalidStartAddressValueError       - invalid value of start addr record
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
 #       BadAccess16bit - not enough data to read 16 bit value
 
@@ -694,7 +694,7 @@ class StartLinearAddressRecordError(StartAddressRecordError):
 class DuplicateStartAddressRecordError(StartAddressRecordError):
     _fmt = 'Start Address Record appears twice at line %(line)d'
 
-class InvalidStartAddressValue(StartAddressRecordError):
+class InvalidStartAddressValueError(StartAddressRecordError):
     _fmt = 'Invalid start address value: %(start_addr)s'
 
 

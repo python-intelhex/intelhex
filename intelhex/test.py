@@ -57,7 +57,7 @@ from intelhex import IntelHex, \
                      StartSegmentAddressRecordError, \
                      StartLinearAddressRecordError, \
                      DuplicateStartAddressRecordError, \
-                     InvalidStartAddressValue, \
+                     InvalidStartAddressValueError, \
                      _EndOfFile, \
                      BadAccess16bit, \
                      hex2bin
@@ -585,7 +585,7 @@ class TestIntelHexStartingAddressRecords(TestIntelHexBase):
         ih = IntelHex()
         ih.start_addr = {'foo': 1}
         sio = StringIO()
-        self.assertRaises(InvalidStartAddressValue, ih.write_hex_file, sio)
+        self.assertRaises(InvalidStartAddressValueError, ih.write_hex_file, sio)
 
 
 class TestIntelHex_big_files(TestIntelHexBase):
@@ -847,10 +847,10 @@ class TestIntelHexErrors(TestIntelHexBase):
                              {'line': 1})
 
     def test_InvalidStartAddressValue(self):
-        self.assertRaisesMsg(InvalidStartAddressValue,
+        self.assertRaisesMsg(InvalidStartAddressValueError,
                              "Invalid start address value: {'foo': 1}",
                              self._raise_error,
-                             InvalidStartAddressValue,
+                             InvalidStartAddressValueError,
                              {'start_addr': {'foo': 1}})
 
     def test_AddressOverlapError(self):
