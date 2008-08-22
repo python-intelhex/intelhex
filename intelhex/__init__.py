@@ -237,10 +237,16 @@ class IntelHex(object):
 
     def fromdict(self, dikt):
         """Load data from dictionary."""
-        for k in dikt.keys():
+        s = dikt.copy()
+        start_addr = s.get('start_addr')
+        if s.has_key('start_addr'):
+            del s['start_addr']
+        for k in s.keys():
             if type(k) not in (int, long) or k < 0:
                 raise ValueError('Source dictionary should have only int keys')
-        self._buf.update(dikt)
+        self._buf.update(s)
+        if start_addr is not None:
+            self.start_addr = start_addr
 
     def _get_start_end(self, start=None, end=None):
         """Return default values for start and end if they are None
@@ -311,7 +317,7 @@ class IntelHex(object):
         r = {}
         r.update(self._buf)
         if self.start_addr:
-            r.update(self.start_addr)
+            r['start_addr'] = self.start_addr
         return r
 
     def minaddr(self):
