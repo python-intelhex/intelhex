@@ -345,7 +345,12 @@ class IntelHex(object):
         return self._buf.get(addr, self.padding)
 
     def __setitem__(self, addr, byte):
+        """Set byte at address."""
         self._buf[addr] = byte
+
+    def __delitem__(self, addr):
+        """Delete byte at address."""
+        del self._buf[addr]
 
     def write_hex_file(self, f, write_start_addr=True):
         """Write data to file f in HEX format.

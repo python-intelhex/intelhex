@@ -523,6 +523,14 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals({1:2, 3:4}, ih.todict())
         self.assertNotEqual(id(ih), id(ih2))
 
+    def test_dict_interface(self):
+        ih = IntelHex()
+        self.assertEquals(0xFF, ih[0])  # padding byte substitution
+        ih[0] = 1
+        self.assertEquals(1, ih[0])
+        del ih[0]
+        self.assertEquals({}, ih.todict())  # padding byte substitution
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
