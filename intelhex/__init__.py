@@ -75,8 +75,9 @@ class IntelHex(object):
                 self.fromdict(source)
             elif isinstance(source, IntelHex):
                 self.padding = source.padding
-                self.start_addr = source.start_addr
-                self._buf = source._buf
+                if source.start_addr:
+                    self.start_addr = source.start_addr.copy()
+                self._buf = source._buf.copy()
             else:
                 raise ValueError("source: bad initializer type")
 

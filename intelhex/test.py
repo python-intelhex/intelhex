@@ -519,8 +519,11 @@ class TestIntelHex(TestIntelHexBase):
     def test_init_from_obj(self):
         ih = IntelHex({1:2, 3:4})
         self.assertEquals({1:2, 3:4}, ih.todict())
+        ih.start_addr = {'EIP': 1234}
         ih2 = IntelHex(ih)
-        self.assertEquals({1:2, 3:4}, ih.todict())
+        ih[1] = 5
+        ih.start_addr = {'EIP': 5678}
+        self.assertEquals({1:2, 3:4, 'start_addr': {'EIP': 1234}}, ih2.todict())
         self.assertNotEqual(id(ih), id(ih2))
 
     def test_dict_interface(self):
