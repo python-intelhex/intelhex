@@ -1103,6 +1103,37 @@ class TestHex2Bin(unittest.TestCase):
                              "%x (%x != %x)" % (addr, expected, actual))
 
 
+class TestBuildRecords(TestIntelHexBase):
+
+    def test__from_bytes(self):
+        self.assertEqual(':00000001FF',
+            intelhex.Record._from_bytes([0,0,0,1]))
+
+    def test_data(self):
+        self.assertEqual(':011234005663', intelhex.Record.data(0x1234, [0x56]))
+        self.assertEqual(':0312340056789059',
+            intelhex.Record.data(0x1234, [0x56, 0x78, 0x90]))
+
+    def test_eof(self):
+        self.assertEqual(':00000001FF', intelhex.Record.eof())
+
+    def test_extended_segment_address(self):
+        self.assertEqual(':020000021234B6',
+            intelhex.Record.extended_segment_address(0x1234))
+
+    def test_start_segment_address(self):
+        self.assertEqual(':0400000312345678E5',
+            intelhex.Record.start_segment_address(0x1234, 0x5678))
+
+    def test_extended_linear_address(self):
+        self.assertEqual(':020000041234B4',
+            intelhex.Record.extended_linear_address(0x1234))
+
+    def test_start_linear_address(self):
+        self.assertEqual(':0400000512345678E3',
+            intelhex.Record.start_linear_address(0x12345678))
+
+
 ##
 # MAIN
 if __name__ == '__main__':
