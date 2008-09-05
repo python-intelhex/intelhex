@@ -4,8 +4,9 @@ all:
 	@echo  test - run unittest
 	@echo  readme - convert Readme.txt to html
 	@echo  epydoc - run epydoc to create API documentation
+	@echo  wininst - Windows installer for Python
 
-.PHONY: clean test readme epydoc
+.PHONY: clean test readme epydoc wininst
 
 clean:
 	python setup.py clean -a
@@ -20,3 +21,6 @@ README.html: README.txt
 
 epydoc:
 	epydoc.py -v intelhex
+
+wininst:
+	python setup.py bdist_wininst -d.
