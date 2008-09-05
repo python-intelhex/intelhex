@@ -60,7 +60,8 @@ from intelhex import IntelHex, \
                      InvalidStartAddressValueError, \
                      _EndOfFile, \
                      BadAccess16bit, \
-                     hex2bin
+                     hex2bin, \
+                     Record
 
 
 ##
@@ -487,6 +488,20 @@ class TestIntelHex(TestIntelHexBase):
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex_simple, s)
+
+    def test_write_hex_first_extended_linear_address(self):
+        ih = IntelHex({0x20000: 0x01})
+        sio = StringIO()
+        ih.write_hex_file(sio)
+        s = sio.getvalue()
+        sio.close()
+        # should be
+        r = [Record.extended_linear_address(2),
+             Record.data(0x0000, [0x01]),
+             Record.eof()]
+        h = '\n'.join(r) + '\n'
+        # compare
+        self.assertEqual(h, s)
 
     def test_tofile_wrong_format(self):
         ih = IntelHex()
