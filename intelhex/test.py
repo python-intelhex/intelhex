@@ -730,192 +730,74 @@ class TestIntelHex16bit(TestIntelHexBase):
 class TestIntelHexErrors(TestIntelHexBase):
     """Tests for custom errors classes"""
 
-    def _raise_error(self, ErrorClass, dict={}):
-        """Raise ErrorClass for testing"""
-        raise ErrorClass(**dict)
+    def assertEqualExc(self, message, exception):
+        return self.assertEqual(message, str(exception))
 
     def test_IntelHexError(self):
-        self.assertRaisesMsg(IntelHexError,
-                             'IntelHex base error',
-                             self._raise_error,
-                             IntelHexError)
+        self.assertEqualExc('IntelHex base error', IntelHexError())
 
     def test_IntelHexError_message(self):
-        self.assertRaisesMsg(IntelHexError,
-                             'IntelHex custom error',
-                             self._raise_error,
-                             IntelHexError,
-                             {'message': 'IntelHex custom error'})
-        self.assertRaisesMsg(IntelHexError,
-                             'IntelHex base error',
-                             self._raise_error,
-                             IntelHexError,
-                             {'message': ''})
+        self.assertEqualExc('IntelHex custom error message',
+            IntelHexError(message='IntelHex custom error message'))
+        self.assertEqualExc('IntelHex base error', IntelHexError(message=''))
 
     def test_HexReaderError(self):
-        self.assertRaisesMsg(HexReaderError,
-                             'Hex reader base error',
-                             self._raise_error,
-                             HexReaderError)
-        # also catch via base exception class
-        self.assertRaisesMsg(IntelHexError,
-                             'Hex reader base error',
-                             self._raise_error,
-                             HexReaderError)
+        self.assertEqualExc('Hex reader base error', HexReaderError())
 
     def test_HexRecordError(self):
-        self.assertRaisesMsg(HexRecordError,
-                             'Hex file contains invalid record at line 1',
-                             self._raise_error,
-                             HexRecordError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Hex file contains invalid record at line 1',
-                             self._raise_error,
-                             HexRecordError,
-                             {'line': 1})
+        self.assertEqualExc('Hex file contains invalid record at line 1',
+            HexRecordError(line=1))
 
     def test_RecordLengthError(self):
-        self.assertRaisesMsg(RecordLengthError,
-                             'Record at line 1 has invalid length',
-                             self._raise_error,
-                             RecordLengthError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Record at line 1 has invalid length',
-                             self._raise_error,
-                             RecordLengthError,
-                             {'line': 1})
+        self.assertEqualExc('Record at line 1 has invalid length',
+            RecordLengthError(line=1))
 
     def test_RecordTypeError(self):
-        self.assertRaisesMsg(RecordTypeError,
-                             'Record at line 1 has invalid record type',
-                             self._raise_error,
-                             RecordTypeError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Record at line 1 has invalid record type',
-                             self._raise_error,
-                             RecordTypeError,
-                             {'line': 1})
+        self.assertEqualExc('Record at line 1 has invalid record type',
+            RecordTypeError(line=1))
 
     def test_RecordChecksumError(self):
-        self.assertRaisesMsg(RecordChecksumError,
-                             'Record at line 1 has invalid checksum',
-                             self._raise_error,
-                             RecordChecksumError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Record at line 1 has invalid checksum',
-                             self._raise_error,
-                             RecordChecksumError,
-                             {'line': 1})
+        self.assertEqualExc('Record at line 1 has invalid checksum',
+            RecordChecksumError(line=1))
 
     def test_EOFRecordError(self):
-        self.assertRaisesMsg(EOFRecordError,
-                             'File has invalid End-of-File record',
-                             self._raise_error,
-                             EOFRecordError)
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'File has invalid End-of-File record',
-                             self._raise_error,
-                             EOFRecordError)
+        self.assertEqualExc('File has invalid End-of-File record',
+            EOFRecordError())
 
     def test_ExtendedSegmentAddressRecordError(self):
-        self.assertRaisesMsg(ExtendedSegmentAddressRecordError,
-                             'Invalid Extended Segment Address Record at line 1',
-                             self._raise_error,
-                             ExtendedSegmentAddressRecordError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Invalid Extended Segment Address Record at line 1',
-                             self._raise_error,
-                             ExtendedSegmentAddressRecordError,
-                             {'line': 1})
+        self.assertEqualExc(
+            'Invalid Extended Segment Address Record at line 1',
+            ExtendedSegmentAddressRecordError(line=1))
 
     def test_ExtendedLinearAddressRecordError(self):
-        self.assertRaisesMsg(ExtendedLinearAddressRecordError,
-                             'Invalid Extended Linear Address Record '
-                             'at line 1',
-                             self._raise_error,
-                             ExtendedLinearAddressRecordError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Invalid Extended Linear Address Record '
-                             'at line 1',
-                             self._raise_error,
-                             ExtendedLinearAddressRecordError,
-                             {'line': 1})
+        self.assertEqualExc('Invalid Extended Linear Address Record at line 1',
+            ExtendedLinearAddressRecordError(line=1))
 
     def test_StartSegmentAddressRecordError(self):
-        self.assertRaisesMsg(StartSegmentAddressRecordError,
-                             'Invalid Start Segment Address Record at line 1',
-                             self._raise_error,
-                             StartSegmentAddressRecordError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Invalid Start Segment Address Record at line 1',
-                             self._raise_error,
-                             StartSegmentAddressRecordError,
-                             {'line': 1})
+        self.assertEqualExc('Invalid Start Segment Address Record at line 1',
+            StartSegmentAddressRecordError(line=1))
 
     def test_StartLinearAddressRecordError(self):
-        self.assertRaisesMsg(StartLinearAddressRecordError,
-                             'Invalid Start Linear Address Record at line 1',
-                             self._raise_error,
-                             StartLinearAddressRecordError,
-                             {'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Invalid Start Linear Address Record at line 1',
-                             self._raise_error,
-                             StartLinearAddressRecordError,
-                             {'line': 1})
+        self.assertEqualExc('Invalid Start Linear Address Record at line 1',
+            StartLinearAddressRecordError(line=1))
 
     def test_DuplicateStartAddressRecord(self):
-        self.assertRaisesMsg(DuplicateStartAddressRecordError,
-                             'Start Address Record appears twice at line 1',
-                             self._raise_error,
-                             DuplicateStartAddressRecordError,
-                             {'line': 1})
+        self.assertEqualExc('Start Address Record appears twice at line 1',
+            DuplicateStartAddressRecordError(line=1))
 
     def test_InvalidStartAddressValue(self):
-        self.assertRaisesMsg(InvalidStartAddressValueError,
-                             "Invalid start address value: {'foo': 1}",
-                             self._raise_error,
-                             InvalidStartAddressValueError,
-                             {'start_addr': {'foo': 1}})
+        self.assertEqualExc("Invalid start address value: {'foo': 1}",
+            InvalidStartAddressValueError(start_addr={'foo': 1}))
 
     def test_AddressOverlapError(self):
-        self.assertRaisesMsg(AddressOverlapError,
-                             'Hex file has data overlap at address 0x1234 '
-                             'on line 1',
-                             self._raise_error,
-                             AddressOverlapError,
-                             {'address': 0x1234, 'line': 1})
-        # also catch via base exception class
-        self.assertRaisesMsg(HexReaderError,
-                             'Hex file has data overlap at address 0x1234 '
-                             'on line 1',
-                             self._raise_error,
-                             AddressOverlapError,
-                             {'address': 0x1234, 'line': 1})
+        self.assertEqualExc('Hex file has data overlap at address 0x1234 '
+                            'on line 1',
+                            AddressOverlapError(address=0x1234, line=1))
 
     def test_BadAccess16bit(self):
-        self.assertRaisesMsg(BadAccess16bit,
-                             'Bad access at 0x1234: '
-                             'not enough data to read 16 bit value',
-                             self._raise_error,
-                             BadAccess16bit,
-                             {'address': 0x1234})
+        self.assertEqualExc('Bad access at 0x1234: '
+                            'not enough data to read 16 bit value',
+                            BadAccess16bit(address=0x1234))
 #/class TestIntelHexErrors
 
 
