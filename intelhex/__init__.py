@@ -501,6 +501,40 @@ class IntelHex(object):
         else:
             raise ValueError('format should be either "hex" or "bin";'
                 ' got %r instead' % format)
+
+    def gets(self, addr, length):
+        """Get string of bytes from given address."""
+        a = array('B', '\0'*length)
+        try:
+            for i in xrange(length):
+                a[i] = self._buf[addr+i]
+        except KeyError:
+            raise NotEnoughDataError(address=addr, length=length)
+        return a.tostring()
+
+    def puts(self, addr, s):
+        """Put string of bytes at given address."""
+        a = array('B', s)
+        for i in xrange(len(s)):
+            self._buf[addr+i] = a[i]
+
+    def getsz(self, addr):
+        """Get zero-terminated string from given address."""
+        i = 0
+        try:
+            while True:
+                if self._buf[addr+i] == 0:
+                    break
+                i += 1
+        except KeyError:
+            raise NotEnoughDataError(message=('Bad access at 0x%X: '
+                'not enough data to read zero-terminated string') % addr)
+        return self.gets(addr, i+1)
+
+    def putsz(self, addr, s):
+        """Put string and append terminated zero at end."""
+        self.puts(addr, s)
+        self._buf[addr+len(s)] = 0
 #/IntelHex
 
 
@@ -719,7 +753,8 @@ class Record(object):
 #                   DuplicateStartAddressRecordError    - start address record appears twice
 #                   InvalidStartAddressValueError       - invalid value of start addr record
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
-#       BadAccess16bit - not enough data to read 16 bit value
+#       BadAccess16bit - not enough data to read 16 bit value (deprecated, see NotEnoughDataError)
+#       NotEnoughDataError - not enough data to read N contiguous bytes
 
 class IntelHexError(Exception):
     '''Base Exception class for IntelHex module'''
@@ -795,5 +830,11 @@ class InvalidStartAddressValueError(StartAddressRecordError):
     _fmt = 'Invalid start address value: %(start_addr)s'
 
 
-class BadAccess16bit(IntelHexError):
+
+
+class NotEnoughDataError(IntelHexError):
+    _fmt = ('Bad access at 0x%(address)X: '
+            'not enough data to read %(length)d contiguous bytes')
+
+class BadAccess16bit(NotEnoughDataError):
     _fmt = 'Bad access at 0x%(address)X: not enough data to read 16 bit value'

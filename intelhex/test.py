@@ -671,6 +671,39 @@ class TestIntelHex_big_files(TestIntelHexBase):
         self.assertEqualWrittenData(hex64k, s)
 
 
+class TestIntelHexGetPutString(TestIntelHexBase):
+
+    def setUp(self):
+        self.ih = IntelHex()
+        for i in xrange(10):
+            self.ih[i] = i
+
+    def test_gets(self):
+        self.assertEquals('\x00\x01\x02\x03\x04\x05\x06\x07', self.ih.gets(0, 8))
+        self.assertEquals('\x07\x08\x09', self.ih.gets(7, 3))
+        self.assertRaisesMsg(intelhex.NotEnoughDataError,
+            'Bad access at 0x1: '
+            'not enough data to read 10 contiguous bytes',
+            self.ih.gets, 1, 10)
+
+    def test_puts(self):
+        self.ih.puts(0x03, 'hello')
+        self.assertEquals('\x00\x01\x02hello\x08\x09', self.ih.gets(0, 10))
+
+    def test_getsz(self):
+        self.assertEquals('\x00', self.ih.getsz(0))
+        self.assertRaisesMsg(intelhex.NotEnoughDataError,
+            'Bad access at 0x1: '
+            'not enough data to read zero-terminated string',
+            self.ih.getsz, 1)
+        self.ih[4] = 0
+        self.assertEquals('\x01\x02\x03\x00', self.ih.getsz(1))
+
+    def test_puts(self):
+        self.ih.putsz(0x03, 'hello')
+        self.assertEquals('\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
+
+
 class TestIntelHex16bit(TestIntelHexBase):
 
     def setUp(self):
@@ -808,6 +841,11 @@ class TestIntelHexErrors(TestIntelHexBase):
         self.assertEqualExc('Hex file has data overlap at address 0x1234 '
                             'on line 1',
                             AddressOverlapError(address=0x1234, line=1))
+
+    def test_NotEnoughDataError(self):
+        self.assertEqualExc('Bad access at 0x1234: '
+            'not enough data to read 10 contiguous bytes',
+            intelhex.NotEnoughDataError(address=0x1234, length=10))
 
     def test_BadAccess16bit(self):
         self.assertEqualExc('Bad access at 0x1234: '
