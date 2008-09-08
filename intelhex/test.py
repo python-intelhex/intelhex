@@ -699,7 +699,7 @@ class TestIntelHexGetPutString(TestIntelHexBase):
         self.ih[4] = 0
         self.assertEquals('\x01\x02\x03\x00', self.ih.getsz(1))
 
-    def test_puts(self):
+    def test_putsz(self):
         self.ih.putsz(0x03, 'hello')
         self.assertEquals('\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
 
