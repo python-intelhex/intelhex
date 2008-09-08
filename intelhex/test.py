@@ -549,6 +549,14 @@ class TestIntelHex(TestIntelHexBase):
         del ih[0]
         self.assertEquals({}, ih.todict())  # padding byte substitution
 
+    def test_len(self):
+        ih = IntelHex()
+        self.assertEquals(0, len(ih))
+        ih[2] = 1
+        self.assertEquals(1, len(ih))
+        ih[1000] = 2
+        self.assertEquals(2, len(ih))
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 

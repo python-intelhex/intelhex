@@ -353,6 +353,10 @@ class IntelHex(object):
         """Delete byte at address."""
         del self._buf[addr]
 
+    def __len__(self):
+        """Return count of bytes with real values."""
+        return len(self._buf.keys())
+
     def write_hex_file(self, f, write_start_addr=True):
         """Write data to file f in HEX format.
 
