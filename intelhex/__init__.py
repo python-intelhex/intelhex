@@ -535,6 +535,49 @@ class IntelHex(object):
         """Put string and append terminated zero at end."""
         self.puts(addr, s)
         self._buf[addr+len(s)] = 0
+
+    def dump(self, tofile=None):
+        """Dump object content to specified file or to stdout."""
+        if tofile is None:
+            import sys
+            tofile = sys.stdout
+        # start addr possibly
+        if self.start_addr is not None:
+            cs = self.start_addr.get('CS')
+            ip = self.start_addr.get('IP')
+            eip = self.start_addr.get('EIP')
+            if eip is not None and cs is None and ip is None:
+                tofile.write('EIP = 0x%08X\n' % eip)
+            elif eip is None and cs is not None and ip is not None:
+                tofile.write('CS = 0x%04X, IP = 0x%04X\n' % (cs, ip))
+            else:
+                tofile.write('start_addr = %r\n' % start_addr)
+        # actual data
+        addresses = self._buf.keys()
+        if addresses:
+            addresses.sort()
+            minaddr = addresses[0]
+            maxaddr = addresses[-1]
+            startaddr = int(minaddr/16)*16
+            endaddr = int(maxaddr/16+1)*16
+            templa = '%%0%dX' % len(str(endaddr))
+            range16 = range(16)
+            for i in xrange(startaddr, endaddr, 16):
+                tofile.write(templa % i)
+                tofile.write(' ')
+                s = []
+                for j in range16:
+                    x = self._buf.get(i+j)
+                    if x is not None:
+                        tofile.write(' %02X' % x)
+                        if 32 <= x < 128:
+                            s.append(chr(x))
+                        else:
+                            s.append('.')
+                    else:
+                        tofile.write(' __')
+                        s.append(' ')
+                tofile.write('  |' + ''.join(s) + '|\n')
 #/IntelHex
 
 
@@ -828,8 +871,6 @@ class DuplicateStartAddressRecordError(StartAddressRecordError):
 
 class InvalidStartAddressValueError(StartAddressRecordError):
     _fmt = 'Invalid start address value: %(start_addr)s'
-
-
 
 
 class NotEnoughDataError(IntelHexError):

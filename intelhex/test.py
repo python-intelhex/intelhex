@@ -704,6 +704,62 @@ class TestIntelHexGetPutString(TestIntelHexBase):
         self.assertEquals('\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
 
 
+class TestIntelHexDump(TestIntelHexBase):
+
+    def test_empty(self):
+        ih = IntelHex()
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals('', sio.getvalue())
+
+    def test_simple(self):
+        ih = IntelHex()
+        ih[0] = 0x12
+        ih[1] = 0x34
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals(
+            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            sio.getvalue())
+        ih[16] = 0x56
+        ih[30] = 0x98
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals(
+            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n'
+            '10  56 __ __ __ __ __ __ __ __ __ __ __ __ __ 98 __  |V             . |\n',
+            sio.getvalue())
+
+    def test_minaddr_not_zero(self):
+        ih = IntelHex()
+        ih[16] = 0x56
+        ih[30] = 0x98
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals(
+            '10  56 __ __ __ __ __ __ __ __ __ __ __ __ __ 98 __  |V             . |\n',
+            sio.getvalue())
+
+    def test_start_addr(self):
+        ih = IntelHex()
+        ih[0] = 0x12
+        ih[1] = 0x34
+        ih.start_addr = {'CS': 0x1234, 'IP': 0x5678}
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals(
+            'CS = 0x1234, IP = 0x5678\n'
+            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            sio.getvalue())
+        ih.start_addr = {'EIP': 0x12345678}
+        sio = StringIO()
+        ih.dump(sio)
+        self.assertEquals(
+            'EIP = 0x12345678\n'
+            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            sio.getvalue())
+
+
 class TestIntelHex16bit(TestIntelHexBase):
 
     def setUp(self):
