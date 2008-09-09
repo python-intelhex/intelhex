@@ -569,7 +569,7 @@ class IntelHex(object):
         except KeyError:
             raise NotEnoughDataError(message=('Bad access at 0x%X: '
                 'not enough data to read zero-terminated string') % addr)
-        return self.gets(addr, i+1)
+        return self.gets(addr, i)
 
     def putsz(self, addr, s):
         """Put string and append terminated zero at end."""

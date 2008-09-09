@@ -765,13 +765,13 @@ class TestIntelHexGetPutString(TestIntelHexBase):
         self.assertEquals('\x00\x01\x02hello\x08\x09', self.ih.gets(0, 10))
 
     def test_getsz(self):
-        self.assertEquals('\x00', self.ih.getsz(0))
+        self.assertEquals('', self.ih.getsz(0))
         self.assertRaisesMsg(intelhex.NotEnoughDataError,
             'Bad access at 0x1: '
             'not enough data to read zero-terminated string',
             self.ih.getsz, 1)
         self.ih[4] = 0
-        self.assertEquals('\x01\x02\x03\x00', self.ih.getsz(1))
+        self.assertEquals('\x01\x02\x03', self.ih.getsz(1))
 
     def test_putsz(self):
         self.ih.putsz(0x03, 'hello')
