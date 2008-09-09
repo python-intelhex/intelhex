@@ -343,7 +343,26 @@ class IntelHex(object):
         @return         byte if address exists in HEX file, or self.padding
                         if no data found.
         '''
-        return self._buf.get(addr, self.padding)
+        t = type(addr)
+        if t == int:
+            if addr < 0:
+                raise TypeError('Address should be >= 0.')
+            return self._buf.get(addr, self.padding)
+        elif t == slice:
+            addresses = self._buf.keys()
+            ih = IntelHex()
+            if addresses:
+                addresses.sort()
+                start = addr.start or addresses[0]
+                stop = addr.stop or (addresses[-1]+1)
+                step = addr.step or 1
+                for i in xrange(start, stop, step):
+                    x = self._buf.get(i)
+                    if x is not None:
+                        ih[i] = x
+            return ih
+        else:
+            raise TypeError('Address has unsupported type: %s' % t)
 
     def __setitem__(self, addr, byte):
         """Set byte at address."""

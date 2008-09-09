@@ -557,6 +557,40 @@ class TestIntelHex(TestIntelHexBase):
         ih[1000] = 2
         self.assertEquals(2, len(ih))
 
+    def test__getitem__(self):
+        ih = IntelHex()
+        # simple cases
+        self.assertEquals(0xFF, ih[0])
+        ih[0] = 1
+        self.assertEquals(1, ih[0])
+        # helper function
+        def getitem(index):
+            return ih[index]
+        # wrong addr type/value for indexing operations
+        self.assertRaisesMsg(TypeError,
+            'Address should be >= 0.',
+            getitem, -1)
+        self.assertRaisesMsg(TypeError,
+            "Address has unsupported type: <type 'str'>",
+            getitem, 'foo')
+        # new object with some data
+        ih = IntelHex()
+        ih[0] = 1
+        ih[1] = 2
+        ih[2] = 3
+        ih[10] = 4
+        # full copy via slicing
+        ih2 = ih[:]
+        self.assertTrue(isinstance(ih2, IntelHex))
+        self.assertEquals({0:1, 1:2, 2:3, 10:4}, ih2.todict())
+        # other slice operations
+        self.assertEquals({}, ih[3:8].todict())
+        self.assertEquals({0:1, 1:2}, ih[0:2].todict())
+        self.assertEquals({0:1, 1:2}, ih[:2].todict())
+        self.assertEquals({2:3, 10:4}, ih[2:].todict())
+        self.assertEquals({0:1, 2:3, 10:4}, ih[::2].todict())
+        self.assertEquals({10:4}, ih[3:11].todict())
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
