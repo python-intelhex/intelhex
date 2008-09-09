@@ -563,10 +563,9 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals(0xFF, ih[0])
         ih[0] = 1
         self.assertEquals(1, ih[0])
-        # helper function
+        # wrong addr type/value for indexing operations
         def getitem(index):
             return ih[index]
-        # wrong addr type/value for indexing operations
         self.assertRaisesMsg(TypeError,
             'Address should be >= 0.',
             getitem, -1)
@@ -590,6 +589,39 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals({2:3, 10:4}, ih[2:].todict())
         self.assertEquals({0:1, 2:3, 10:4}, ih[::2].todict())
         self.assertEquals({10:4}, ih[3:11].todict())
+
+    def test__delitem__(self):
+        ih = IntelHex()
+        ih[0] = 1
+        del ih[0]
+        self.assertEquals({}, ih.todict())
+        # errors
+        def delitem(addr):
+            del ih[addr]
+        self.assertRaises(KeyError, delitem, 1)
+        self.assertRaisesMsg(TypeError,
+            'Address should be >= 0.',
+            delitem, -1)
+        self.assertRaisesMsg(TypeError,
+            "Address has unsupported type: <type 'str'>",
+            delitem, 'foo')
+        # deleting slice
+        del ih[0:1]     # no error here because of slicing
+        #
+        def ihex(size=8):
+            ih = IntelHex()
+            for i in xrange(size):
+                ih[i] = i
+            return ih
+        ih = ihex(8)
+        del ih[:]       # delete all data
+        self.assertEquals({}, ih.todict())
+        ih = ihex(8)
+        del ih[2:6]
+        self.assertEquals({0:0, 1:1, 6:6, 7:7}, ih.todict())
+        ih = ihex(8)
+        del ih[::2]
+        self.assertEquals({1:1, 3:3, 5:5, 7:7}, ih.todict())
 
 
 class TestIntelHexLoadBin(TestIntelHexBase):

@@ -370,7 +370,24 @@ class IntelHex(object):
 
     def __delitem__(self, addr):
         """Delete byte at address."""
-        del self._buf[addr]
+        t = type(addr)
+        if t == int:
+            if addr < 0:
+                raise TypeError('Address should be >= 0.')
+            del self._buf[addr]
+        elif t == slice:
+            addresses = self._buf.keys()
+            if addresses:
+                addresses.sort()
+                start = addr.start or addresses[0]
+                stop = addr.stop or (addresses[-1]+1)
+                step = addr.step or 1
+                for i in xrange(start, stop, step):
+                    x = self._buf.get(i)
+                    if x is not None:
+                        del self._buf[i]
+        else:
+            raise TypeError('Address has unsupported type: %s' % t)
 
     def __len__(self):
         """Return count of bytes with real values."""
