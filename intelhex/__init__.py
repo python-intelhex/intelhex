@@ -344,7 +344,7 @@ class IntelHex(object):
                         if no data found.
         '''
         t = type(addr)
-        if t == int:
+        if t in (int, long):
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             return self._buf.get(addr, self.padding)
@@ -366,12 +366,44 @@ class IntelHex(object):
 
     def __setitem__(self, addr, byte):
         """Set byte at address."""
-        self._buf[addr] = byte
+        t = type(addr)
+        if t in (int, long):
+            if addr < 0:
+                raise TypeError('Address should be >= 0.')
+            self._buf[addr] = byte
+        elif t == slice:
+            addresses = self._buf.keys()
+            if not isinstance(byte, (list, tuple)):
+                raise ValueError('Slice operation expect sequence of bytes')
+            start = addr.start
+            stop = addr.stop
+            step = addr.step or 1
+            if None not in (start, stop):
+                ra = range(start, stop, step)
+                if len(ra) != len(byte):
+                    raise ValueError('Length of bytes sequence does not match '
+                        'address range')
+            elif (start, stop) == (None, None):
+                raise TypeError('Unsupported address range')
+            elif start is None:
+                start = stop - len(byte)
+            elif stop is None:
+                stop = start + len(byte)
+            if start < 0:
+                raise TypeError('start address cannot be negative')
+            if stop < 0:
+                raise TypeError('stop address cannot be negative')
+            j = 0
+            for i in xrange(start, stop, step):
+                self._buf[i] = byte[j]
+                j += 1
+        else:
+            raise TypeError('Address has unsupported type: %s' % t)
 
     def __delitem__(self, addr):
         """Delete byte at address."""
         t = type(addr)
-        if t == int:
+        if t in (int, long):
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             del self._buf[addr]

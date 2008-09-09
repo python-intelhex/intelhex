@@ -563,6 +563,8 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals(0xFF, ih[0])
         ih[0] = 1
         self.assertEquals(1, ih[0])
+        # big address
+        self.assertEquals(0xFF, ih[2**32-1])
         # wrong addr type/value for indexing operations
         def getitem(index):
             return ih[index]
@@ -589,6 +591,53 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals({2:3, 10:4}, ih[2:].todict())
         self.assertEquals({0:1, 2:3, 10:4}, ih[::2].todict())
         self.assertEquals({10:4}, ih[3:11].todict())
+
+    def test__setitem__(self):
+        ih = IntelHex()
+        # simple indexing operation
+        ih[0] = 1
+        self.assertEquals({0:1}, ih.todict())
+        # errors
+        def setitem(a,b):
+            ih[a] = b
+        self.assertRaisesMsg(TypeError,
+            'Address should be >= 0.',
+            setitem, -1, 0)
+        self.assertRaisesMsg(TypeError,
+            "Address has unsupported type: <type 'str'>",
+            setitem, 'foo', 0)
+        # slice operations
+        ih[0:4] = range(4)
+        self.assertEquals({0:0, 1:1, 2:2, 3:3}, ih.todict())
+        ih[0:] = range(5,9)
+        self.assertEquals({0:5, 1:6, 2:7, 3:8}, ih.todict())
+        ih[:4] = range(9,13)
+        self.assertEquals({0:9, 1:10, 2:11, 3:12}, ih.todict())
+        # with step
+        ih = IntelHex()
+        ih[0:8:2] = range(4)
+        self.assertEquals({0:0, 2:1, 4:2, 6:3}, ih.todict())
+        # errors in slice operations
+        # ih[1:2] = 'a'
+        self.assertRaisesMsg(ValueError,
+            'Slice operation expect sequence of bytes',
+            setitem, slice(1,2,None), 'a')
+        # ih[0:1] = [1,2,3]
+        self.assertRaisesMsg(ValueError,
+            'Length of bytes sequence does not match address range',
+            setitem, slice(0,1,None), [1,2,3])
+        # ih[:] = [1,2,3]
+        self.assertRaisesMsg(TypeError,
+            'Unsupported address range',
+            setitem, slice(None,None,None), [1,2,3])
+        # ih[:2] = [1,2,3]
+        self.assertRaisesMsg(TypeError,
+            'start address cannot be negative',
+            setitem, slice(None,2,None), [1,2,3])
+        # ih[0:-3:-1] = [1,2,3]
+        self.assertRaisesMsg(TypeError,
+            'stop address cannot be negative',
+            setitem, slice(0,-3,-1), [1,2,3])
 
     def test__delitem__(self):
         ih = IntelHex()
