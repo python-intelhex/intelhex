@@ -883,6 +883,84 @@ class TestIntelHexDump(TestIntelHexBase):
             sio.getvalue())
 
 
+class TestIntelHexMerge(TestIntelHexBase):
+
+    def test_merge_empty(self):
+        ih1 = IntelHex()
+        ih2 = IntelHex()
+        ih1.merge(ih2)
+        self.assertEquals({}, ih1.todict())
+
+    def test_merge_simple(self):
+        ih1 = IntelHex({0:1, 1:2, 2:3})
+        ih2 = IntelHex({3:4, 4:5, 5:6})
+        ih1.merge(ih2)
+        self.assertEquals({0:1, 1:2, 2:3, 3:4, 4:5, 5:6}, ih1.todict())
+
+    def test_merge_wrong_args(self):
+        ih1 = IntelHex()
+        self.assertRaisesMsg(TypeError, 'other should be IntelHex object',
+            ih1.merge, {0:1})
+        self.assertRaisesMsg(ValueError, "Can't merge itself",
+            ih1.merge, ih1)
+        ih2 = IntelHex()
+        self.assertRaisesMsg(ValueError, "overlap argument should be either "
+            "'error', 'ignore' or 'replace'",
+            ih1.merge, ih2, overlap='spam')
+
+    def test_merge_overlap(self):
+        # error
+        ih1 = IntelHex({0:1})
+        ih2 = IntelHex({0:2})
+        self.assertRaisesMsg(intelhex.AddressOverlapError,
+            'Data overlapped at address 0x0',
+            ih1.merge, ih2, overlap='error')
+        # ignore
+        ih1 = IntelHex({0:1})
+        ih2 = IntelHex({0:2})
+        ih1.merge(ih2, overlap='ignore')
+        self.assertEquals({0:1}, ih1.todict())
+        # replace
+        ih1 = IntelHex({0:1})
+        ih2 = IntelHex({0:2})
+        ih1.merge(ih2, overlap='replace')
+        self.assertEquals({0:2}, ih1.todict())
+
+    def test_merge_start_addr(self):
+        # this, None
+        ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih2 = IntelHex()
+        ih1.merge(ih2)
+        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        # None, other
+        ih1 = IntelHex()
+        ih2 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih1.merge(ih2)
+        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        # this == other: no conflict
+        ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih2 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih1.merge(ih2)
+        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        # this != other: conflict
+        ## overlap=error
+        ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih2 = IntelHex({'start_addr': {'EIP': 0x87654321}})
+        self.assertRaisesMsg(AddressOverlapError,
+            'Starting addresses are different',
+            ih1.merge, ih2, overlap='error')
+        ## overlap=ignore
+        ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih2 = IntelHex({'start_addr': {'EIP': 0x87654321}})
+        ih1.merge(ih2, overlap='ignore')
+        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        ## overlap=replace
+        ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
+        ih2 = IntelHex({'start_addr': {'EIP': 0x87654321}})
+        ih1.merge(ih2, overlap='replace')
+        self.assertEquals({'start_addr': {'EIP': 0x87654321}}, ih1.todict())
+
+
 class TestIntelHex16bit(TestIntelHexBase):
 
     def setUp(self):
