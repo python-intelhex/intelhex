@@ -657,7 +657,7 @@ class IntelHex(object):
                         else:
                             s.append('.')
                     else:
-                        tofile.write(' __')
+                        tofile.write(' --')
                         s.append(' ')
                 tofile.write('  |' + ''.join(s) + '|\n')
 

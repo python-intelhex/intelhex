@@ -854,15 +854,15 @@ class TestIntelHexDump(TestIntelHexBase):
         sio = StringIO()
         ih.dump(sio)
         self.assertEquals(
-            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            '00  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
         ih[16] = 0x56
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(sio)
         self.assertEquals(
-            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n'
-            '10  56 __ __ __ __ __ __ __ __ __ __ __ __ __ 98 __  |V             . |\n',
+            '00  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n'
+            '10  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
             sio.getvalue())
 
     def test_minaddr_not_zero(self):
@@ -872,7 +872,7 @@ class TestIntelHexDump(TestIntelHexBase):
         sio = StringIO()
         ih.dump(sio)
         self.assertEquals(
-            '10  56 __ __ __ __ __ __ __ __ __ __ __ __ __ 98 __  |V             . |\n',
+            '10  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
             sio.getvalue())
 
     def test_start_addr(self):
@@ -884,14 +884,14 @@ class TestIntelHexDump(TestIntelHexBase):
         ih.dump(sio)
         self.assertEquals(
             'CS = 0x1234, IP = 0x5678\n'
-            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            '00  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
         ih.start_addr = {'EIP': 0x12345678}
         sio = StringIO()
         ih.dump(sio)
         self.assertEquals(
             'EIP = 0x12345678\n'
-            '00  12 34 __ __ __ __ __ __ __ __ __ __ __ __ __ __  |.4              |\n',
+            '00  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
 
 
