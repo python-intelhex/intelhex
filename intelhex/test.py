@@ -672,6 +672,18 @@ class TestIntelHex(TestIntelHexBase):
         del ih[::2]
         self.assertEquals({1:1, 3:3, 5:5, 7:7}, ih.todict())
 
+    def test_addresses(self):
+        # empty object
+        ih = IntelHex()
+        self.assertEquals([], ih.addresses())
+        self.assertEquals(None, ih.minaddr())
+        self.assertEquals(None, ih.maxaddr())
+        # normal object
+        ih = IntelHex({1:2, 7:8, 10:0})
+        self.assertEquals([1,7,10], ih.addresses())
+        self.assertEquals(1, ih.minaddr())
+        self.assertEquals(10, ih.maxaddr())
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 

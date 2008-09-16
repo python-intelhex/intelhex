@@ -321,19 +321,29 @@ class IntelHex(object):
             r['start_addr'] = self.start_addr
         return r
 
+    def addresses(self):
+        """Return list of data addresses in sorted order."""
+        aa = self._buf.keys()
+        aa.sort()
+        return aa
+
     def minaddr(self):
-        ''' Get minimal address of HEX content. '''
+        '''Get minimal address of HEX content.
+        Return None if there is no data.
+        '''
         aa = self._buf.keys()
         if aa == []:
-            return 0
+            return None
         else:
             return min(aa)
 
     def maxaddr(self):
-        ''' Get maximal address of HEX content. '''
+        '''Get maximal address of HEX content.
+        Return None if there is no data.
+        '''
         aa = self._buf.keys()
         if aa == []:
-            return 0
+            return None
         else:
             return max(aa)
 
