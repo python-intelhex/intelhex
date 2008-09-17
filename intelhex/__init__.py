@@ -642,7 +642,8 @@ class IntelHex(object):
             maxaddr = addresses[-1]
             startaddr = int(minaddr/16)*16
             endaddr = int(maxaddr/16+1)*16
-            templa = '%%0%dX' % len(str(endaddr))
+            maxdigits = max(len(str(endaddr)), 4)
+            templa = '%%0%dX' % maxdigits
             range16 = range(16)
             for i in xrange(startaddr, endaddr, 16):
                 tofile.write(templa % i)
