@@ -675,7 +675,7 @@ class IntelHex(object):
         @raise  TypeError       if other is not instance of IntelHex
         @raise  ValueError      if other is the same object as this
         @raise  ValueError      if overlap argument has incorrect value
-        @raise  OverlapError    on overlapped data
+        @raise  AddressOverlapError    on overlapped data
         """
         # check args
         if not isinstance(other, IntelHex):
