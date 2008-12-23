@@ -33,8 +33,6 @@
 
 '''Intel HEX file format reader and converter.
 
-This script also may be used as hex2bin convertor utility.
-
 @author     Alexander Belchenko (bialix AT ukr net)
 @version    1.0
 @date       2008/08/19
