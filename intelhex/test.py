@@ -620,7 +620,7 @@ class TestIntelHex(TestIntelHexBase):
         # errors in slice operations
         # ih[1:2] = 'a'
         self.assertRaisesMsg(ValueError,
-            'Slice operation expect sequence of bytes',
+            'Slice operation expects sequence of bytes',
             setitem, slice(1,2,None), 'a')
         # ih[0:1] = [1,2,3]
         self.assertRaisesMsg(ValueError,
