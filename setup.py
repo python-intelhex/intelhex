@@ -53,6 +53,8 @@ setup(name='intelhex',
       scripts=[
         'scripts/bin2hex.py',
         'scripts/hex2bin.py',
+        'scripts/hex2dump.py',
+        'scripts/hexmerge.py',
         ],
       packages=['intelhex'],
       cmdclass=cmdclass,
