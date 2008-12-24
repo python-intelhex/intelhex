@@ -44,7 +44,8 @@ __docformat__ = "javadoc"
 
 from array import array
 from binascii import hexlify, unhexlify
-from bisect import bisect_left, bisect_right
+from bisect import bisect_right
+import os
 
 
 class IntelHex(object):
@@ -974,6 +975,45 @@ class Record(object):
     start_linear_address = staticmethod(start_linear_address)
 
 
+class _BadFileNotation(Exception):
+    """Special error class to use with _get_file_and_addr_range."""
+    pass
+
+def _get_file_and_addr_range(s, _support_drive_letter=None):
+    """Special method for hexmerge.py script to split file notation
+    into 3 parts: (filename, start, end)
+
+    @raise _BadFileNotation  when string cannot be safely split.
+    """
+    if _support_drive_letter is None:
+        _support_drive_letter = (os.name == 'nt')
+    drive = ''
+    if _support_drive_letter:
+        if s[1:2] == ':' and s[0].upper() in ''.join([chr(i) for i in range(ord('A'), ord('Z')+1)]):
+            drive = s[:2]
+            s = s[2:]
+    parts = s.split(':')
+    n = len(parts)
+    if n == 1:
+        fname = parts[0]
+        fstart = None
+        fend = None
+    elif n != 3:
+        raise _BadFileNotation
+    else:
+        fname = parts[0]
+        def ascii_hex_to_int(ascii):
+            if ascii is not None:
+                try:
+                    return int(ascii, 16)
+                except ValueError:
+                    raise _BadFileNotation
+            return ascii
+        fstart = ascii_hex_to_int(parts[1] or None)
+        fend = ascii_hex_to_int(parts[2] or None)
+    return drive+fname, fstart, fend
+
+
 ##
 # IntelHex Errors Hierarchy:
 #
@@ -1020,6 +1060,7 @@ class IntelHexError(Exception):
                 % (self.__class__.__name__, str(e))
 
 class _EndOfFile(IntelHexError):
+    """Used for internal needs only."""
     _fmt = 'EOF record reached -- signal to stop read file'
 
 class HexReaderError(IntelHexError):

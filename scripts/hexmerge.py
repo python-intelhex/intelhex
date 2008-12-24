@@ -132,22 +132,14 @@ def main(args=None):
     res = intelhex.IntelHex()
 
     for f in args:
-        parts = f.rsplit(':', 2)
-        n = len(parts)
-        if n == 1:
-            fname = f
-            fstart = None
-            fend = None
-        elif n != 3:
+        try:
+            fname, fstart, fend = intelhex._get_file_and_addr_range(f)
+        except intelhex._BadFileNotation:
             print >>sys.stderr, 'Bad argument: "%s"' % f
             print >>sys.stderr, USAGE
             return 1
-        else:
-            fname = parts[0]
-            if fname == '-':
-                fname = sys.stdin
-            fstart = parts[1] or None
-            fend = parts[2] or None
+        if fname == '-':
+            fname = sys.stdin
         ih = intelhex.IntelHex(fname)
         if (fstart, fend) != (None, None):
             ih = ih[fstart:fend]
@@ -156,6 +148,7 @@ def main(args=None):
         except intelhex.AddressOverlapError, e:
             print >>sys.stderr, 'Merging:', fname
             print >>sys.stderr, str(e)
+            return 1
 
     if (start, end) != (None, None):
         res = res[start:end]

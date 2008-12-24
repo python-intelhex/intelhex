@@ -1338,6 +1338,43 @@ class TestBuildRecords(TestIntelHexBase):
             intelhex.Record.start_linear_address(0x12345678))
 
 
+class Test_GetFileAndAddrRange(TestIntelHexBase):
+
+    def test_simple(self):
+        self.assertEqual(('filename.hex', None, None),
+            intelhex._get_file_and_addr_range('filename.hex'))
+        self.assertEqual(('f', None, None),
+            intelhex._get_file_and_addr_range('f'))
+        self.assertEqual(('filename.hex', 1, None),
+            intelhex._get_file_and_addr_range('filename.hex:1:'))
+        self.assertEqual(('filename.hex', None, 10),
+            intelhex._get_file_and_addr_range('filename.hex::A'))
+        self.assertEqual(('filename.hex', 1, 10),
+            intelhex._get_file_and_addr_range('filename.hex:1:A'))
+        self.assertEqual(('filename.hex', 1, 10),
+            intelhex._get_file_and_addr_range('filename.hex:0001:000A'))
+
+    def test_bad_notation(self):
+        self.assertRaises(intelhex._BadFileNotation,
+            intelhex._get_file_and_addr_range, 'filename.hex:')
+        self.assertRaises(intelhex._BadFileNotation,
+            intelhex._get_file_and_addr_range, 'filename.hex:::')
+        self.assertRaises(intelhex._BadFileNotation,
+            intelhex._get_file_and_addr_range, 'C:\\filename.hex:', True)
+
+    def test_drive_letter(self):
+        self.assertEqual(('C:\\filename.hex', None, None),
+            intelhex._get_file_and_addr_range('C:\\filename.hex', True))
+        self.assertEqual(('C:\\filename.hex', 1, None),
+            intelhex._get_file_and_addr_range('C:\\filename.hex:1:', True))
+        self.assertEqual(('C:\\filename.hex', None, 10),
+            intelhex._get_file_and_addr_range('C:\\filename.hex::A', True))
+        self.assertEqual(('C:\\filename.hex', 1, 10),
+            intelhex._get_file_and_addr_range('C:\\filename.hex:1:A', True))
+        self.assertEqual(('C:\\filename.hex', 1, 10),
+            intelhex._get_file_and_addr_range('C:\\filename.hex:0001:000A', True))
+
+
 ##
 # MAIN
 if __name__ == '__main__':
