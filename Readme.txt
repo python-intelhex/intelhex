@@ -14,17 +14,19 @@ Python implementation
 
 Introduction
 ------------
-Intel HEX file format widely used in microprocessors and microcontrollers
-area as de-facto standard for representation of code for programming into
+The Intel HEX file format widely used in microprocessors and microcontrollers
+area as the de-facto standard for representation of code for programming
 microelectronic devices.
 
-This work implements HEX (also known as Intel HEX) file format reader
-and convertor to binary form as python script.
+This work implements a HEX (also known as Intel HEX) file format reader
+and convertor to binary form as a python script.
 
-Python package **intelhex** contains implementation of HEX file reader 
-and convertor as IntelHex class. You also may use ``hex2bin.py`` script 
-as handy hex-to-bin convertor.
-
+Python package **intelhex** contains implementation of a HEX file reader 
+and convertor as the IntelHex class.  Also included are some scripts to do
+basic tasks that utilize this package.  The ``bin2hex.py`` script converts
+binary data to HEX, and the ``hex2bin.py`` works the other direction.
+ ``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py``
+merges multiple HEX files into one.
 
 License
 -------
@@ -60,13 +62,15 @@ Example of typical initialization of ``IntelHex`` class::
 	>>> from intelhex import IntelHex
 	>>> ih = IntelHex("foo.hex")
 
-In second line we are create instance of class. Constructor has one optional 
-parameter: name of HEX file or file object. 
-Specified file automatically read and decoded.
+In the second line we are creating an instance of the class. The constructor
+optionally takes the name of the HEX file or a file-like object. If specified,
+the file is automatically read and decoded.
 
-In version 0.9 API slightly changed. Now you can create empty object
-and load data later, and even load data several times (but if addresses
-in those files overlap you get exception ``AddressOverlapError``). E.g.::
+In version 0.9 the API slightly changed. Now you can create an empty object
+and load data later.  You can also load data several times (but if addresses
+in those files overlap you get exception ``AddressOverlapError``). This error
+is only raised when reading from hex files. When reading from other formats,
+without explicitly calling ``merge``, the data will be overwritten. E.g.::
 
 	>>> from intelhex import IntelHex
 	>>> ih = IntelHex()			# create empty object
@@ -78,26 +82,27 @@ NOTE: using IntelHex.fromfile is recommended way.
 
 Access to data by address
 *************************
-You can get or modify some data by address in usual way: via indexing
+You can get or modify some data by address in the usual way: via indexing
 operations::
 
 	>>> print ih[0]			# read data from address 0
 	>>> ih[1] = 0x55		# modify data at address 1
 
 When you try to read from non-existent address you get default data. Default
-data sets via attribute ``.padding`` of class instance.
+data is set via attribute ``.padding`` of class instance.
 
-To obtain adresses limits use methods ``.minaddr()`` and ``.maxaddr()``.
+To obtain address limits use methods ``.minaddr()`` and ``.maxaddr()``.
 
 Access to 16-bit data
 *********************
-When you need to work with 16-bit data stored in 8-bit Intel HEX file you need
-to use class ``IntelHex16bit``. This class derived from IntelHex and has all their
-methods. But some of methods modified to implement 16-bit behaviour.
+When you need to work with 16-bit data stored in 8-bit Intel HEX files you need
+to use class ``IntelHex16bit``. This class is derived from IntelHex and has all 
+its methods. Some of methods have been modified to implement 16-bit behaviour.
+This class assumes the data is in Little Endian byte order.
 
 Convert data to binary form
 ***************************
-Class IntelHex has 3 methods for converting data of IntelHex object
+Class IntelHex has 3 methods for converting data of IntelHex objects
 into binary form:
 
 	* ``tobinarray`` (returns array of unsigned char bytes);
@@ -114,15 +119,16 @@ To write data as binary file you also can use universal method ``tofile``::
 
 	>>> ih.tofile("foo.bin", format='bin')
 
-NOTE: using IntelHex.tofile is recommended way.
+NOTE: using IntelHex.tofile is the recommended way.
 
 Write data to HEX file
 **********************
-You can store data contained in object by method ``.write_hex_file(f)``. Parameter
-``f`` should be filename or file-like object. Also you can use universal
+You can store data contained in object by method ``.write_hex_file(f)``.
+Parameter ``f`` should be filename or file-like object. Also you can use the
+universal tofile.
 
 To convert data of IntelHex object to HEX8 file format without actually saving
-it to disk you can use StringIO file-like object, e.g.::
+it to disk you can use the builtin StringIO file-like object, e.g.::
 
 	>>> from cStringIO import StringIO
 	>>> from intelhex import IntelHex
@@ -134,9 +140,9 @@ it to disk you can use StringIO file-like object, e.g.::
 	>>> hexstr = sio.getvalue()
 	>>> sio.close()
 
-Variable ``hexstr`` will contains string with content of HEX8 file.
+Variable ``hexstr`` will contain a string with the content of a HEX8 file.
 
-To write data as hex file you also can use universal method ``tofile``::
+To write data as a hex file you also can use universal method ``tofile``::
 
 	>>> ih.tofile(sio, format='hex')
 
@@ -148,7 +154,7 @@ Start address
 Some linkers write to produced HEX file information about start address
 (either record 03 or 05). Now IntelHex is able correctly read such records
 and store information internally in ``start_addr`` attribute that itself
-is ``None`` or dictionary with address value(s). 
+is either ``None`` or a dictionary with the address value(s). 
 
 When input HEX file contains record type 03 (Start Segment Address Record),
 ``start_addr`` takes value::
@@ -196,7 +202,7 @@ with additional argument ``write_start_addr``:
 	>>> ih.write_hex_file('out.hex', True)	# as above
 	>>> ih.write_hex_file('out.hex', False)	# don't write start address
 
-When ``start_addr`` is ``None`` or empty dictionary nothing will be written
+When ``start_addr`` is ``None`` or an empty dictionary nothing will be written
 regardless of ``write_start_addr`` argument value.
 
 
@@ -215,7 +221,7 @@ __ http://www.bialix.com/intelhex/api/
 
 Hex-to-Bin convertor
 --------------------
-You can use hex-to-bin convertor in two way: as function ``hex2bin`` (useful
+You can use hex-to-bin convertor in two ways: as function ``hex2bin`` (useful
 for using in other scripts) or as stand-alone script.
 
 Function ``hex2bin``
@@ -273,7 +279,7 @@ Or (equivalent)::
 
 Bin-to-Hex convertor
 --------------------
-You can use bin-to-hex convertor in two way: as function ``bin2hex`` (useful
+You can use bin-to-hex convertor in two ways: as function ``bin2hex`` (useful
 for using in other scripts) or as stand-alone script.
 
 Function ``bin2hex``
@@ -312,3 +318,69 @@ just frontend for `Function bin2hex`_ described above.
     Options:
         -h, --help              this help message.
         --offset=N              offset for loading bin file (default: 0).
+
+Stand-alone script ``hex2dump.py``
+***********************************
+This is a script to dump a hex file to a hexdump format. It is a frontend for
+dump in IntelHex.
+::
+
+    Usage:
+        python hex2dump.py [options] HEXFILE
+
+    Options:
+        -h, --help              this help message.
+        -r, --range=START:END   specify address range for dumping
+                                (ascii hex value).
+                                Range can be in form 'START:' or ':END'.
+
+    Arguments:
+        HEXFILE     name of hex file for processing (use '-' to read
+                    from stdin)
+
+Stand-alone script ``hexmerge.py``
+***********************************
+This is a script to merge two different hex files. It is a frontend for the
+merge function in IntelHex.
+::
+
+    Usage:
+        python hexmerge.py [options] FILES...
+
+    Options:
+        -h, --help              this help message.
+        -o, --output=FILENAME   output file name (emit output to stdout
+                                if option is not specified)
+        -r, --range=START:END   specify address range for output
+                                (ascii hex value).
+                                Range can be in form 'START:' or ':END'.
+        --no-start-addr         Don't write start addr to output file.
+        --overlap=METHOD        What to do when data in files overlapped.
+                                Supported variants:
+                                * error -- stop and show error message (default)
+                                * ignore -- keep data from first file that
+                                            contains data at overlapped address
+                                * replace -- use data from last file that
+                                             contains data at overlapped address
+
+    Arguments:
+        FILES       list of hex files for merging
+                    (use '-' to read content from stdin)
+
+    You can specify address range for each file in the form:
+
+        filename:START:END
+
+    See description of range option above.
+
+    You can omit START or END, so supported variants are:
+
+        filename:START:     read filename and use data starting from START addr
+        filename::END       read filename and use data till END addr
+
+    Use entire file content:
+
+        filename
+    or
+        filename::
+
