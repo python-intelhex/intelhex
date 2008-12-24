@@ -33,8 +33,6 @@
 
 '''Intel HEX file format reader and converter.
 
-This script also may be used as hex2bin convertor utility.
-
 @author     Alexander Belchenko (bialix AT ukr net)
 @version    1.0
 @date       2008/08/19
@@ -53,10 +51,12 @@ class IntelHex(object):
     ''' Intel HEX file reader. '''
 
     def __init__(self, source=None):
-        ''' Constructor.
+        ''' Constructor. If source specified, object will be initialized
+        with the contents of source. Otherwise the object will be empty.
 
         @param  source      source for initialization
-                            (file name of HEX file or file object)
+                            (file name of HEX file, file object, addr dict or
+                             other IntelHex object)
         '''
         #public members
         self.padding = 0x0FF
@@ -172,7 +172,9 @@ class IntelHex(object):
                               }
 
     def loadhex(self, fobj):
-        """Load hex file into internal buffer.
+        """Load hex file into internal buffer. This is not necessary
+        if object was initialized with source set. This will overwrite
+        addresses if object was already initialized.
 
         @param  fobj        file name or file-like object
         """
@@ -198,7 +200,9 @@ class IntelHex(object):
                 fclose()
 
     def loadbin(self, fobj, offset=0):
-        """Load bin file into internal buffer.
+        """Load bin file into internal buffer. Not needed if source set in
+        constructor. This will overwrite addresses without warning
+        if object was already initialized.
 
         @param  fobj        file name or file-like object
         @param  offset      starting address offset
@@ -220,7 +224,8 @@ class IntelHex(object):
                 fclose()
 
     def loadfile(self, fobj, format):
-        """Load data file into internal buffer.
+        """Load data file into internal buffer. Preferred wrapper over
+        loadbin or loadhex.
 
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
@@ -237,7 +242,16 @@ class IntelHex(object):
     fromfile = loadfile
 
     def fromdict(self, dikt):
-        """Load data from dictionary."""
+        """Load data from dictionary. Dictionary should contain int keys
+        representing addresses. Values should be the data to be stored in
+        those addresses in unsigned char form (i.e. not strings).
+        The dictionary may contain the key, ``start_addr``
+        to indicate the starting address of the data.
+
+        The contents of the dict will be merged with this object and will
+        overwrite any conflicts. This is not necessary if the object was
+        initialized with source specified.
+        """
         s = dikt.copy()
         start_addr = s.get('start_addr')
         if s.has_key('start_addr'):
@@ -261,7 +275,8 @@ class IntelHex(object):
         return start, end
 
     def tobinarray(self, start=None, end=None, pad=None):
-        ''' Convert to binary form.
+        ''' Convert this object to binary form as array. If start and end 
+        unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
         @param  pad     fill empty spaces with this value
@@ -284,7 +299,7 @@ class IntelHex(object):
         return bin
 
     def tobinstr(self, start=None, end=None, pad=0xFF):
-        ''' Convert to binary form.
+        ''' Convert to binary form and return as a string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes.
         @param  pad     fill empty spaces with this value
@@ -314,7 +329,10 @@ class IntelHex(object):
             fobj.close()
 
     def todict(self):
-        '''Convert to python dictionary.'''
+        '''Convert to python dictionary.
+
+        @return         dict suitable for initializing another IntelHex object.
+        '''
         r = {}
         r.update(self._buf)
         if self.start_addr:
@@ -322,14 +340,16 @@ class IntelHex(object):
         return r
 
     def addresses(self):
-        """Return list of data addresses in sorted order."""
+        '''Returns all used addresses in sorted order.
+        @return         list of occupied data addresses in sorted order. 
+        '''
         aa = self._buf.keys()
         aa.sort()
         return aa
 
     def minaddr(self):
         '''Get minimal address of HEX content.
-        Return None if there is no data.
+        @return         minimal address or None if no data
         '''
         aa = self._buf.keys()
         if aa == []:
@@ -339,7 +359,7 @@ class IntelHex(object):
 
     def maxaddr(self):
         '''Get maximal address of HEX content.
-        Return None if there is no data.
+        @return         maximal address or None if no data
         '''
         aa = self._buf.keys()
         if aa == []:
@@ -348,7 +368,7 @@ class IntelHex(object):
             return max(aa)
 
     def __getitem__(self, addr):
-        ''' Get byte from address.
+        ''' Get requested byte from address.
         @param  addr    address of byte.
         @return         byte if address exists in HEX file, or self.padding
                         if no data found.
@@ -384,7 +404,7 @@ class IntelHex(object):
         elif t == slice:
             addresses = self._buf.keys()
             if not isinstance(byte, (list, tuple)):
-                raise ValueError('Slice operation expect sequence of bytes')
+                raise ValueError('Slice operation expects sequence of bytes')
             start = addr.start
             stop = addr.stop
             step = addr.step or 1
@@ -441,8 +461,8 @@ class IntelHex(object):
         @param  f                   filename or file-like object for writing
         @param  write_start_addr    enable or disable writing start address
                                     record to file (enabled by default).
-                                    If there is no start address nothing
-                                    will be written.
+                                    If there is no start address in obj, nothing
+                                    will be written regardless of this setting.
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -571,7 +591,7 @@ class IntelHex(object):
             fclose()
 
     def tofile(self, fobj, format):
-        """Write data to hex or bin file.
+        """Write data to hex or bin file. Preferred method over tobin or tohex.
 
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
@@ -585,7 +605,9 @@ class IntelHex(object):
                 ' got %r instead' % format)
 
     def gets(self, addr, length):
-        """Get string of bytes from given address."""
+        """Get string of bytes from given address. If any entries are blank
+        from addr through addr+length, a NotEnoughDataError exception will
+        be raised. Padding is not used."""
         a = array('B', '\0'*length)
         try:
             for i in xrange(length):
@@ -595,13 +617,16 @@ class IntelHex(object):
         return a.tostring()
 
     def puts(self, addr, s):
-        """Put string of bytes at given address."""
+        """Put string of bytes at given address. Will overwrite any previous
+        entries.
+        """
         a = array('B', s)
         for i in xrange(len(s)):
             self._buf[addr+i] = a[i]
 
     def getsz(self, addr):
-        """Get zero-terminated string from given address."""
+        """Get zero-terminated string from given address. Will raise 
+        NotEnoughDataError exception if a hole is encounter before a 0."""
         i = 0
         try:
             while True:
@@ -614,12 +639,18 @@ class IntelHex(object):
         return self.gets(addr, i)
 
     def putsz(self, addr, s):
-        """Put string and append terminated zero at end."""
+        """Put string in object at addr and append terminating zero at end."""
         self.puts(addr, s)
         self._buf[addr+len(s)] = 0
 
     def dump(self, tofile=None):
-        """Dump object content to specified file or to stdout."""
+        """Dump object content to specified file or to stdout if None. Format
+        is a hexdump with some header information at the beginning, addresses
+        on the left, and data on right.
+
+        @param  tofile        file-like object to dump to
+        """
+
         if tofile is None:
             import sys
             tofile = sys.stdout
@@ -716,10 +747,15 @@ class IntelHex16bit(IntelHex):
 
     def __init__(self, source):
         """Construct class from HEX file
-        or from instance of ordinary IntelHex class.
+        or from instance of ordinary IntelHex class. If IntelHex object
+        is passed as source, the original IntelHex object should not be used
+        again because this class will alter it. This class leaves padding
+        alone unless it was precisely 0xFF. In that instance it is sign
+        extended to 0xFFFF.
 
         @param  source  file name of HEX file or file object
-                        or instance of ordinary IntelHex class
+                        or instance of ordinary IntelHex class.
+                        Will also accept dictionary from todict metho.
         """
         if isinstance(source, IntelHex):
             # from ihex8
@@ -736,6 +772,7 @@ class IntelHex16bit(IntelHex):
     def __getitem__(self, addr16):
         """Get 16-bit word from address.
         Raise error if found only one byte from pair.
+        We assume a Little Endian interpretation of the hex file.
 
         @param  addr16  address of word (addr8 = 2 * addr16).
         @return         word if bytes exists in HEX file, or self.padding
@@ -755,13 +792,18 @@ class IntelHex16bit(IntelHex):
         raise BadAccess16bit(address=addr16)
 
     def __setitem__(self, addr16, word):
+        """Sets the address at addr16 to word assuming Little Endian mode.
+        """
         addr_byte = addr16 * 2
         bytes = divmod(word, 256)
         self._buf[addr_byte] = bytes[1]
         self._buf[addr_byte+1] = bytes[0]
 
     def minaddr(self):
-        '''Get minimal address of HEX content in 16-bit mode.'''
+        '''Get minimal address of HEX content in 16-bit mode.
+
+        @return         minimal address used in this object 
+        '''
         aa = self._buf.keys()
         if aa == []:
             return 0
@@ -769,7 +811,10 @@ class IntelHex16bit(IntelHex):
             return min(aa)/2
 
     def maxaddr(self):
-        '''Get maximal address of HEX content in 16-bit mode.'''
+        '''Get maximal address of HEX content in 16-bit mode.
+
+        @return         maximal address used in this object 
+        '''
         aa = self._buf.keys()
         if aa == []:
             return 0
@@ -847,6 +892,13 @@ class Record(object):
     """Helper methods to build valid ihex records."""
 
     def _from_bytes(bytes):
+        """Takes a list of bytes, computes the checksum, and outputs the entire
+        record as a string. bytes should be the hex record without the colon
+        or final checksum.
+
+        @param  bytes   list of byte values so far to pack into record.
+        @return         String representation of one HEX record
+        """
         assert len(bytes) >= 4
         # calculate checksum
         s = (-sum(bytes)) & 0x0FF
@@ -855,9 +907,14 @@ class Record(object):
     _from_bytes = staticmethod(_from_bytes)
 
     def data(offset, bytes):
-        """Return Data record.
+        """Return Data record. This constructs the full record, including
+        the length information, the record type (0x00), the
+        checksum, and the offset.
+
         @param  offset  load offset of first byte.
         @param  bytes   list of byte values to pack into record.
+
+        @return         String representation of one HEX record
         """
         assert 0 <= offset < 65536
         assert 0 < len(bytes) < 256
@@ -866,13 +923,17 @@ class Record(object):
     data = staticmethod(data)
 
     def eof():
-        """Return End of File record."""
+        """Return End of File record as a string.
+        @return         String representation of Intel Hex EOF record 
+        """
         return ':00000001FF'
     eof = staticmethod(eof)
 
     def extended_segment_address(usba):
         """Return Extended Segment Address Record.
-        @param  usba    Upper Segment Base Address.
+        @param  usba     Upper Segment Base Address.
+
+        @return         String representation of Intel Hex USBA record.
         """
         b = [2, 0, 0, 0x02, (usba>>8)&0x0FF, usba&0x0FF]
         return Record._from_bytes(b)
@@ -882,6 +943,8 @@ class Record(object):
         """Return Start Segment Address Record.
         @param  cs      16-bit value for CS register.
         @param  ip      16-bit value for IP register.
+
+        @return         String representation of Intel Hex SSA record.
         """
         b = [4, 0, 0, 0x03, (cs>>8)&0x0FF, cs&0x0FF,
              (ip>>8)&0x0FF, ip&0x0FF]
@@ -891,6 +954,8 @@ class Record(object):
     def extended_linear_address(ulba):
         """Return Extended Linear Address Record.
         @param  ulba    Upper Linear Base Address.
+
+        @return         String representation of Intel Hex ELA record.
         """
         b = [2, 0, 0, 0x04, (ulba>>8)&0x0FF, ulba&0x0FF]
         return Record._from_bytes(b)
@@ -899,6 +964,8 @@ class Record(object):
     def start_linear_address(eip):
         """Return Start Linear Address Record.
         @param  eip     32-bit linear address for the EIP register.
+
+        @return         String representation of Intel Hex SLA record.
         """
         b = [4, 0, 0, 0x05, (eip>>24)&0x0FF, (eip>>16)&0x0FF,
              (eip>>8)&0x0FF, eip&0x0FF]
@@ -935,11 +1002,14 @@ class IntelHexError(Exception):
     _fmt = 'IntelHex base error'   #: format string
 
     def __init__(self, message=None, **kw):
+        """Initialize the Exception with the given message.
+        """
         self.message = message
         for key, value in kw.items():
             setattr(self, key, value)
 
     def __str__(self):
+        """Return the message in this Exception."""
         if self.message:
             return self.message
         try:
