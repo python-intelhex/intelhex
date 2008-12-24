@@ -25,7 +25,7 @@ Python package **intelhex** contains implementation of a HEX file reader
 and convertor as the IntelHex class.  Also included are some scripts to do
 basic tasks that utilize this package.  The ``bin2hex.py`` script converts
 binary data to HEX, and the ``hex2bin.py`` works the other direction.
- ``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py``
+``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py``
 merges multiple HEX files into one.
 
 License
@@ -300,7 +300,7 @@ Bin-to-Hex convertor engine.
 
 
 Stand-alone script ``bin2hex.py``
-**********************************
+*********************************
 You can use bin2hex.py as simple bin-to-hex convertor. This script is 
 just frontend for `Function bin2hex`_ described above.
 ::
@@ -320,7 +320,7 @@ just frontend for `Function bin2hex`_ described above.
         --offset=N              offset for loading bin file (default: 0).
 
 Stand-alone script ``hex2dump.py``
-***********************************
+----------------------------------
 This is a script to dump a hex file to a hexdump format. It is a frontend for
 dump in IntelHex.
 ::
@@ -339,7 +339,7 @@ dump in IntelHex.
                     from stdin)
 
 Stand-alone script ``hexmerge.py``
-***********************************
+----------------------------------
 This is a script to merge two different hex files. It is a frontend for the
 merge function in IntelHex.
 ::
