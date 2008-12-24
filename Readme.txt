@@ -62,13 +62,15 @@ Example of typical initialization of ``IntelHex`` class::
 	>>> from intelhex import IntelHex
 	>>> ih = IntelHex("foo.hex")
 
-In the second line we are create an instance of the class. The constructor
+In the second line we are creating an instance of the class. The constructor
 optionally takes the name of the HEX file or a file-like object. If specified,
 the file is automatically read and decoded.
 
-In version 0.9 ithe API slightly changed. Now you can create an empty object
+In version 0.9 the API slightly changed. Now you can create an empty object
 and load data later.  You can also load data several times (but if addresses
-in those files overlap you get exception ``AddressOverlapError``). E.g.::
+in those files overlap you get exception ``AddressOverlapError``). This error
+is only raised when reading from hex files. When reading from other formats,
+without explicitly calling ``merge``, the data will be overwritten. E.g.::
 
 	>>> from intelhex import IntelHex
 	>>> ih = IntelHex()			# create empty object
@@ -96,6 +98,7 @@ Access to 16-bit data
 When you need to work with 16-bit data stored in 8-bit Intel HEX files you need
 to use class ``IntelHex16bit``. This class is derived from IntelHex and has all 
 its methods. Some of methods have been modified to implement 16-bit behaviour.
+This class assumes the data is in Little Endian byte order.
 
 Convert data to binary form
 ***************************
@@ -121,8 +124,8 @@ NOTE: using IntelHex.tofile is the recommended way.
 Write data to HEX file
 **********************
 You can store data contained in object by method ``.write_hex_file(f)``.
-Parameter ``f`` should be filename or file-like object. Also you can use
-universal newlines.
+Parameter ``f`` should be filename or file-like object. Also you can use the
+universal tofile.
 
 To convert data of IntelHex object to HEX8 file format without actually saving
 it to disk you can use the builtin StringIO file-like object, e.g.::
