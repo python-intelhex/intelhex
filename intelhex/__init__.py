@@ -246,11 +246,11 @@ class IntelHex(object):
         representing addresses. Values should be the data to be stored in
         those addresses in unsigned char form (i.e. not strings).
         The dictionary may contain the key, ``start_addr``
-        to indicate the starting address of the data.
+        to indicate the starting address of the data as described in README.
 
         The contents of the dict will be merged with this object and will
-        overwrite any conflicts. This is not necessary if the object was
-        initialized with source specified.
+        overwrite any conflicts. This function is not necessary if the
+        object was initialized with source specified.
         """
         s = dikt.copy()
         start_addr = s.get('start_addr')
@@ -626,7 +626,8 @@ class IntelHex(object):
 
     def getsz(self, addr):
         """Get zero-terminated string from given address. Will raise 
-        NotEnoughDataError exception if a hole is encounter before a 0."""
+        NotEnoughDataError exception if a hole is encountered before a 0.
+        """
         i = 0
         try:
             while True:
@@ -755,7 +756,7 @@ class IntelHex16bit(IntelHex):
 
         @param  source  file name of HEX file or file object
                         or instance of ordinary IntelHex class.
-                        Will also accept dictionary from todict metho.
+                        Will also accept dictionary from todict method.
         """
         if isinstance(source, IntelHex):
             # from ihex8
@@ -771,7 +772,7 @@ class IntelHex16bit(IntelHex):
 
     def __getitem__(self, addr16):
         """Get 16-bit word from address.
-        Raise error if found only one byte from pair.
+        Raise error if only one byte from the pair is set.
         We assume a Little Endian interpretation of the hex file.
 
         @param  addr16  address of word (addr8 = 2 * addr16).
