@@ -1,0 +1,13 @@
+Author: Alexander Belchenko
+
+Copyright (C) Alexander Belchenko, 2005-2008
+
+Contributors:
+
+* Alexander Belchenko
+* Alex Mueller
+* Enoch H. Wexler
+* Heiko Henkelmann
+* Henrik Maier
+* Nathan P. Stien
+* Zachary Clifford

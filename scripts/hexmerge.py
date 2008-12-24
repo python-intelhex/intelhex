@@ -132,7 +132,7 @@ def main(args=None):
     res = intelhex.IntelHex()
 
     for f in args:
-        parts = f.split(':')
+        parts = f.rsplit(':', 2)
         n = len(parts)
         if n == 1:
             fname = f
