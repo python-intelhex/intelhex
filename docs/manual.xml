@@ -1,0 +1,653 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>Python IntelHex User Manual</title>
+
+    <author>
+      <firstname>Alexander</firstname>
+
+      <surname>Belchenko</surname>
+
+      <affiliation>
+        <orgname></orgname>
+      </affiliation>
+    </author>
+
+    <pubdate></pubdate>
+  </bookinfo>
+
+  <chapter>
+    <title>Introduction</title>
+
+    <section>
+      <title>Contents</title>
+
+      <para>The Intel HEX file format widely used in microprocessors and
+      microcontrollers area as the de-facto standard for representation of
+      code for programming microelectronic devices. </para>
+
+      <para>This work implements a HEX (also known as Intel HEX) file format
+      reader and convertor to binary form as a python script.</para>
+
+      <para>Python package **intelhex** contains an implementation of a HEX
+      file reader and convertor as the IntelHex class. Also included are some
+      scripts to do basic tasks that utilize this package. The ``bin2hex.py``
+      script converts binary data to HEX, and the ``hex2bin.py`` works the
+      other direction. ``hex2dump.py`` converts data from HEX to a hexdump,
+      and ``hexmerge.py`` merges multiple HEX files into one.</para>
+
+      <para>This manual and more information can be found at:</para>
+
+      <para>http://www.bialix.com/intelhex/</para>
+
+      <para>or at the Launchpad.net project page at:</para>
+
+      <para>https://launchpad.net/intelhex/</para>
+
+      <para>The author can be reached at bialix AT ukr net</para>
+    </section>
+
+    <section>
+      <title>License</title>
+
+      <para>The code distributed under the BSD license. See LICENSE.txt in
+      sources archive.</para>
+    </section>
+
+    <section>
+      <title>Installation</title>
+
+      <para>IntelHex may be downloaded from:</para>
+
+      <para>http://www.bialix.com/intelhex/intelhex.zip </para>
+
+      <para>IntelHex is distributed as a standard Python Distutils package.
+      Assuming Python is properly installed on your platform, installation
+      should just require running the following command from the root
+      directory of the archive::</para>
+
+      <para>sudo python setup.py install</para>
+
+      <para>This will install the intelhex package into your system's
+      site-packages directory and place the helper scripts in your Python
+      site-packages binaries directory. After that is done, any other Python
+      scripts or modules should be able to import the package using:</para>
+
+      <para>&gt;&gt;&gt;from intelhex import IntelHex</para>
+
+      <para>The scripts should be in your PATH so that they can be called from
+      anywhere in the file system.</para>
+
+      <para>See the Python distutils website for more information, or try
+      typing, "python setup.py --help" from the root directory of the
+      archive.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Basic API and usage</title>
+
+    <para></para>
+
+    <section>
+      <title>Initializing the class</title>
+
+      <para>Example of typical initialization of ``IntelHex`` class::</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex </para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex("foo.hex")</para>
+
+      <para>In the second line we are creating an instance of the class. The
+      constructor optionally takes data to initialize the class. This can be
+      the name of the HEX file, a file-like object, a dictionary, or another
+      instance of IntelHex. If specified, this source is automatically read
+      and decoded. Because of the flexibility of file-like objects in Python,
+      objects like sys.stdin can be used.</para>
+
+      <para>If the source is another instance of IntelHex, the new object will
+      become a copy of the source. Finally, a Python dictionary may be
+      specified. This dictionary should have keys equal to memory locations
+      and values equal to the data stored in those locations. See the
+      docstrings for more details.</para>
+
+      <para>In version 0.9 the API slightly changed. Now you can create an
+      empty object and load data later. </para>
+    </section>
+
+    <section>
+      <title>Reading data</title>
+
+      <para>Once created, an IntelHex object can be loaded with data. This is
+      only necessary if "source" was unspecified in the constructor. You can
+      also load data several times (but if addresses in those files overlap
+      you get exception ``AddressOverlapError``). This error is only raised
+      when reading from hex files. When reading from other formats, without
+      explicitly calling ``merge``, the data will be overwritten.
+      E.g.::</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex() # create empty object</para>
+
+      <para>&gt;&gt;&gt; ih.loadhex('foo.hex') # load from hex</para>
+
+      <para>&gt;&gt;&gt; ih.loadfile('bar.hex',format='hex') # also load from
+      hex</para>
+
+      <para>&gt;&gt;&gt; ih.fromfile('bar.hex',format='hex') # also load from
+      hex</para>
+
+      <para>NOTE: using IntelHex.fromfile is recommended way.</para>
+
+      <para>All of the above examples will read from HEX files. IntelHex also
+      supports reading straight binary files. For example::</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex() # create empty object</para>
+
+      <para>&gt;&gt;&gt; ih.loadbin('foo.bin') # load from bin</para>
+
+      <para>&gt;&gt;&gt; ih.fromfile('bar.bin',format='bin') # also load from
+      bin</para>
+
+      <para>Finally, data can be loaded from an appropriate Python dictionary.
+      This will permit you to store the data in an IntelHex object to a
+      builtin dictionary and restore the object at a later time. For
+      example::</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex('foo.hex') # create empty object</para>
+
+      <para>&gt;&gt;&gt; pydict = ih.todict() # dump contents to pydict</para>
+
+      <para>...do something with the dictionary...</para>
+
+      <para>&gt;&gt;&gt; newIH = IntelHex(pydict) # recreate object with
+      dict</para>
+
+      <para>&gt;&gt;&gt; another = IntelHex() # make a blank instance</para>
+
+      <para>&gt;&gt;&gt; another.fromdict(pydict) # now another is the same as
+      newIH</para>
+    </section>
+
+    <section>
+      <title>Basic data inspection</title>
+
+      <para>You can get or modify some data by address in the usual way: via
+      Python indexing operations::</para>
+
+      <para>&gt;&gt;&gt; print ih[0] # read data from address 0</para>
+
+      <para>When you need to work with 16-bit data stored in 8-bit Intel HEX
+      files you need to use class ``IntelHex16bit``. This class is derived
+      from IntelHex and has all its methods. Some of methods have been
+      modified to implement 16-bit behaviour.</para>
+
+      <para>This class assumes the data is in Little Endian byte order. The
+      data can be accessed exactly like above, except that data returned will
+      be 16 bits, and the addresses should be word addresses.</para>
+
+      <para>Another useful inspection tool is the dump command. This will
+      output the entire contents of the hex file to stdout or to a specified
+      file like so::</para>
+
+      <para>&gt;&gt;&gt; ih.dump() # dump contents of ih to stdout in tabular
+      hexdump format</para>
+
+      <para>&gt;&gt;&gt; ih.dump(tofile='hexdump.txt') # dump to specified
+      file</para>
+    </section>
+
+    <section>
+      <title>More data inspection</title>
+
+      <para>IntelHex provides some metadata about the hex file it contains. To
+      obtain address limits use methods ``.minaddr()`` and ``.maxaddr()``.
+      These are computed based on the lowest and highest used memory spaces
+      respectively.</para>
+
+      <para>Some linkers write to produced HEX file information about start
+      address (either record 03 or 05). Now IntelHex is able correctly read
+      such records and store information internally in ``start_addr``
+      attribute that itself is either ``None`` or a dictionary with the
+      address value(s).</para>
+
+      <para>When input HEX file contains record type 03 (Start Segment Address
+      Record), ``start_addr`` takes value::</para>
+
+      <para>{'CS': XXX, 'IP': YYY}</para>
+
+      <para>Here:</para>
+
+      <para>* ``XXX`` is value of CS register</para>
+
+      <para>* ``YYY`` is value of IP register</para>
+
+      <para>To obtain or change ``CS`` or ``IP`` value you need to use their
+      names as keys for ``start_addr`` dictionary::</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex('file_with_03.hex')</para>
+
+      <para>&gt;&gt;&gt; print ih.start_addr['CS']</para>
+
+      <para>&gt;&gt;&gt; print ih.start_addr['IP']</para>
+
+      <para>When input HEX file contains record type 05 (Start Linear Address
+      Record), ``start_addr`` takes value::</para>
+
+      <para>{'EIP': ZZZ}</para>
+
+      <para>Here ``ZZZ`` is value of EIP register.</para>
+
+      <para>Example::</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex('file_with_05.hex')</para>
+
+      <para>&gt;&gt;&gt; print ih.start_addr['EIP']</para>
+
+      <para>You can manually set required start address::</para>
+
+      <para>&gt;&gt;&gt; ih.start_addr = {'CS': 0x1234, 'IP': 0x5678}</para>
+
+      <para>&gt;&gt;&gt; ih.start_addr = {'EIP': 0x12345678}</para>
+
+      <para>To delete start address info give value ``None`` or empty
+      dictionary::</para>
+
+      <para>&gt;&gt;&gt; ih.start_addr = None</para>
+
+      <para>&gt;&gt;&gt; ih.start_addr = {}</para>
+
+      <para>When you write data to HEX file you can disable writing start
+      address with additional argument ``write_start_addr``:</para>
+
+      <para>&gt;&gt;&gt; ih.write_hex_file('out.hex') # by default writing
+      start address</para>
+
+      <para>&gt;&gt;&gt; ih.write_hex_file('out.hex', True) # as above</para>
+
+      <para>&gt;&gt;&gt; ih.write_hex_file('out.hex', False) # don't write
+      start address</para>
+
+      <para>When ``start_addr`` is ``None`` or an empty dictionary nothing
+      will be written regardless of ``write_start_addr`` argument
+      value.</para>
+
+      <para>For more information about start address, please see the Intel Hex
+      file format specification.</para>
+
+      <para>Because Intel Hex files do not specify every location in memory,
+      it is necessary to have a padding byte defined. Whenever a read is
+      attempted from an address that is unspecified, the padding byte is
+      returned. This default data is set via attribute ``.padding`` of class
+      instance. This defaults to '0xFF', but it can be changed by the user
+      like so::</para>
+
+      <para>&gt;&gt;&gt; print ih[0] # prints 0xFF because this location is
+      blank</para>
+
+      <para>&gt;&gt;&gt; ih.padding = 0x00 # change padding byte</para>
+
+      <para>&gt;&gt;&gt; print ih[0] # prints 0x00 because this location is
+      blank</para>
+    </section>
+
+    <section>
+      <title>Writing out data</title>
+
+      <para>Data contained in IntelHex can be written out in a few different
+      formats, including HEX, bin, or python dictionaries.</para>
+
+      <para>You can write out HEX data contained in object by method
+      ``.write_hex_file(f)``. Parameter ``f`` should be filename or file-like
+      object. Note that this can include builtins like sys.stdout. Also you
+      can use the universal tofile.</para>
+
+      <para>To convert data of IntelHex object to HEX8 file format without
+      actually saving it to disk you can use the builtin StringIO file-like
+      object, e.g.::</para>
+
+      <para>&gt;&gt;&gt; from cStringIO import StringIO</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex()</para>
+
+      <para>&gt;&gt;&gt; ih[0] = 0x55</para>
+
+      <para>&gt;&gt;&gt; sio = StringIO()</para>
+
+      <para>&gt;&gt;&gt; ih.write_hex_file(sio)</para>
+
+      <para>&gt;&gt;&gt; hexstr = sio.getvalue()</para>
+
+      <para>&gt;&gt;&gt; sio.close()</para>
+
+      <para>Variable ``hexstr`` will contain a string with the content of a
+      HEX8 file.</para>
+
+      <para>To write data as a hex file you also can use universal method
+      ``tofile``::</para>
+
+      <para>&gt;&gt;&gt; ih.tofile(sio, format='hex')</para>
+
+      <para>NOTE: using IntelHex.tofile is recommended way.</para>
+
+      <para>Class IntelHex has 3 methods for converting data of IntelHex
+      objects into binary form:</para>
+
+      <para>* ``tobinarray`` (returns array of unsigned char bytes);</para>
+
+      <para>* ``tobinstr`` (returns string of bytes);</para>
+
+      <para>* ``tobinfile`` (convert content to binary form and write to
+      file).</para>
+
+      <para>Example::</para>
+
+      <para>&gt;&gt;&gt; from intelhex import IntelHex</para>
+
+      <para>&gt;&gt;&gt; ih = IntelHex("foo.hex")</para>
+
+      <para>&gt;&gt;&gt; ih.tobinfile("foo.bin")</para>
+
+      <para>To write data as binary file you also can use universal method
+      ``tofile``::</para>
+
+      <para>&gt;&gt;&gt; ih.tofile("foo.bin", format='bin')</para>
+
+      <para>NOTE: using IntelHex.tofile is the recommended way.</para>
+    </section>
+
+    <section>
+      <title>Merging two hex files</title>
+
+      <para>IntelHex supports merging two different hex files into one. This
+      is done by initializing one IntelHex object with data and calling its
+      merge method::</para>
+
+      <para>&gt;&gt;&gt; original = IntelHex("foo.hex")</para>
+
+      <para>&gt;&gt;&gt; new = IntelHex("bar.hex")</para>
+
+      <para>&gt;&gt;&gt; original.merge(new,overlap='replace')</para>
+
+      <para>Now original will contain foo.hex merged with bar.hex. The overlap
+      parameter specifies what should be done when memory locations in the
+      original object overlap with locations in the new object. It can take
+      three options:</para>
+
+      <para>* error -- stop and raise an exception (default)</para>
+
+      <para>* ignore -- keep data from the original that contains data at
+      overlapped address</para>
+
+      <para>* replace -- use data from the new object that contains data at
+      overlapped address</para>
+    </section>
+
+    <section>
+      <title>Creating Intel Hex files from scratch</title>
+
+      <para>Some facilities are provided for synthesizing Intel Hex files from
+      scratch. These can also be used to modify a hex file in place. Just as
+      you can use indexed reads to retrieve data, you can use indexed writes
+      to modify the file, e.g.::</para>
+
+      <para>&gt;&gt;&gt; ih[1] = 0x55 # modify data at address 1</para>
+
+      <para>A common usage would be to read a hex file with IntelHex, use the
+      above syntax to modify it, and then write out the modified file. The
+      above command can be used on an empty IntelHex object to synthesize a
+      hex file from scratch.</para>
+
+      <para>Another important feature helps work with C strings via
+      putsz/getsz, e.g.::</para>
+
+      <para>&gt;&gt;&gt; ih.putsz(0x100,"A string")</para>
+
+      <para>This places "A string" followed by a terminating NULL in address
+      0x100. The getsz method similarly retrieves a null terminated string
+      from a specified address like so::</para>
+
+      <para>&gt;&gt;&gt; ih.getsz(0x100)</para>
+
+      <para>This should retrieve the "A string" we stored earlier.</para>
+
+      <para>Additionally, puts/gets can be used to retrieve strings of
+      specific length from the hex file like so:</para>
+
+      <para>&gt;&gt;&gt; ih.puts(0x100,"data")</para>
+
+      <para>&gt;&gt;&gt; ih.gets(0x100,4)</para>
+
+      <para>The second command should retrieve the characters 'd','a','t','a'.
+      These methods do not use terminating NULLs, so the data need not be
+      interpreted as a string. One usage of these commands comes from the
+      Python struct module. This module allows the programmer to specify a C
+      struct, and it will allow conversion between the variables and a packed
+      string representation for use with puts/gets. For example, suppose we
+      need to deal with a struct containing a char, a short, and a
+      float::</para>
+
+      <para>&gt;&gt;&gt;import struct</para>
+
+      <para>&gt;&gt;&gt;formatstring = 'chf' # see Python docs for full list
+      of valid struct formats</para>
+
+      <para>&gt;&gt;&gt;ih.puts(0x10,struct.pack(formatstring,'a',24,18.6))
+      #put data in hex file</para>
+
+      <para>&gt;&gt;&gt;(mychar,myshort,myfloat) =
+      struct.unpack(formatstring,ih.gets(0x10,7)</para>
+
+      <para>Now mychar,myshort, and myfloat should contain the original data
+      (assuming sizeof(float) = 4 on this platform, otherwise the size may be
+      wrong)</para>
+    </section>
+
+    <section>
+      <title>Handling errors</title>
+
+      <para>Many of the methods in IntelHex throw Python exceptions during
+      error conditions. These can be caught and handled using try...except
+      blocks like so:</para>
+
+      <para>&gt;&gt;&gt;try:</para>
+
+      <para>... mystring = ih.gets(0x20,20)</para>
+
+      <para>&gt;&gt;&gt;except NotEnoughDataError:</para>
+
+      <para>... print "There was not enough data at that location"</para>
+
+      <para>See the API docs for information about errors raised by IntelHex.
+      They are all subclasses of IntelHexError, so the except block above
+      could be used to catch all of them. If your application has a way to
+      gracefully handle these exceptions, they should be caught. Otherwise,
+      Python will exit with a descriptive error message about the uncaught
+      exception.</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Convenience Scripts</title>
+
+    <para>When IntelHex is installed and added to the system path, some
+    scripts are available for usage. Each one is meant to be operated from the
+    command line. They provide help if called incorrectly.</para>
+
+    <section>
+      <title>Script hex2bin.py</title>
+
+      <para>You can use hex2bin.py as handy hex-to-bin converter. This script
+      is just front end for `Function hex2bin`_ described above. ::</para>
+
+      <para>Usage:</para>
+
+      <para>python hex2bin.py [options] INFILE [OUTFILE]</para>
+
+      <para>Arguments:</para>
+
+      <para>INFILE name of hex file for processing.</para>
+
+      <para>OUTFILE name of output file. If omitted then output will be
+      writing to stdout.</para>
+
+      <para>Options:</para>
+
+      <para>-h, --help this help message.</para>
+
+      <para>-p, --pad=FF pad byte for empty spaces (hex value).</para>
+
+      <para>-r, --range=START:END specify address range for writing output
+      (hex value). Range can be in form 'START:' or ':END'.</para>
+
+      <para>-l, --length=NNNN,</para>
+
+      <para>-s, --size=NNNN size of output (decimal value).</para>
+
+      <para>Per example, converting content of foo.hex to foo.bin addresses
+      from 0 to FF::</para>
+
+      <para>$ python hex2bin.py -r 0000:00FF foo.hex</para>
+
+      <para>Or (equivalent)::</para>
+
+      <para>$ python hex2bin.py -r 0000: -s 256 foo.hex</para>
+    </section>
+
+    <section>
+      <title>Script bin2hex.py</title>
+
+      <para>You can use bin2hex.py as simple bin-to-hex convertor. This script
+      is just front end for `Function bin2hex`_ described above. ::</para>
+
+      <para>Usage:</para>
+
+      <para>python bin2hex.py [options] INFILE [OUTFILE]</para>
+
+      <para>Arguments:</para>
+
+      <para>INFILE name of bin file for processing. Use '-' for reading from
+      stdin.</para>
+
+      <para>OUTFILE name of output file. If omitted then output will be
+      writing to stdout.</para>
+
+      <para>Options:</para>
+
+      <para>-h, --help this help message.</para>
+
+      <para>--offset=N offset for loading bin file (default: 0).</para>
+    </section>
+
+    <section>
+      <title>Script hex2dump.py</title>
+
+      <para>This is a script to dump a hex file to a hexdump format. It is a
+      front end for dump in IntelHex. ::</para>
+
+      <para>Usage:</para>
+
+      <para>python hex2dump.py [options] HEXFILE</para>
+
+      <para>Options:</para>
+
+      <para>-h, --help this help message.</para>
+
+      <para>-r, --range=START:END specify address range for dumping (ascii hex
+      value). Range can be in form 'START:' or ':END'.</para>
+
+      <para>Arguments:</para>
+
+      <para>HEXFILE name of hex file for processing (use '-' to read from
+      stdin)</para>
+    </section>
+
+    <section>
+      <title>Script hexmerge.py</title>
+
+      <para>This is a script to merge two different hex files. It is a front
+      end for the merge function in IntelHex. ::</para>
+
+      <para>Usage:</para>
+
+      <para>python hexmerge.py [options] FILES...</para>
+
+      <para>Options:</para>
+
+      <para>-h, --help this help message.</para>
+
+      <para>-o, --output=FILENAME output file name (emit output to stdout if
+      option is not specified)</para>
+
+      <para>-r, --range=START:END specify address range for output (ascii hex
+      value). Range can be in form 'START:' or ':END'.</para>
+
+      <para>--no-start-addr Don't write start addr to output file.</para>
+
+      <para>--overlap=METHOD What to do when data in files overlapped.
+      Supported variants:</para>
+
+      <para>* error -- stop and show error message (default)</para>
+
+      <para>* ignore -- keep data from first file that contains data at
+      overlapped address</para>
+
+      <para>* replace -- use data from last file that contains data at
+      overlapped address</para>
+
+      <para>Arguments:</para>
+
+      <para>FILES list of hex files for merging (use '-' to read content from
+      stdin)</para>
+
+      <para>You can specify address range for each file in the form:</para>
+
+      <para>filename:START:END</para>
+
+      <para>See description of range option above.</para>
+
+      <para>You can omit START or END, so supported variants are:</para>
+
+      <para>filename:START: read filename and use data starting from START
+      addr</para>
+
+      <para>filename::END read filename and use data till END addr</para>
+
+      <para>Use entire file content:</para>
+
+      <para>filename</para>
+
+      <para>or</para>
+
+      <para>filename::</para>
+    </section>
+  </chapter>
+
+  <chapter>
+    <title>Embedding into other projects</title>
+
+    <para>IntelHex should be easy to embed in other projects. The directory
+    "intelhex" containing __init__.py can be directly placed in a depending
+    project and used directly. From that project the same import statements
+    described above can be used to make the library work. From other projects
+    the import statement would change to:</para>
+
+    <para>&gt;&gt;&gt;from myproject.intelhex import IntelHex</para>
+
+    <para>Alternatively, the IntelHex package can be installed into the
+    site-packages directory and used as a system package.</para>
+
+    <para>In either case, IntelHex is distributed with a BSD-style license.
+    This permits you to use it in any way you see fit, provided that the
+    package is appropriately credited.</para>
+  </chapter>
+</book>
