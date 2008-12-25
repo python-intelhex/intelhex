@@ -35,19 +35,11 @@
 
 """Setup script for IntelHex."""
 
-from distutils.core import setup
-
-cmdclass = {}
-
-try:
-    from extras.test import test
-except ImportError:
-    pass
-else:
-    cmdclass['test'] = test
+from distutils.core import Command, setup
 
 
-setup(name='intelhex',
+METADATA = dict(
+      name='intelhex',
       version='1.0',
 
       scripts=[
@@ -57,7 +49,6 @@ setup(name='intelhex',
         'scripts/hexmerge.py',
         ],
       packages=['intelhex'],
-      cmdclass=cmdclass,
 
       author='Alexander Belchenko',
       author_email='bialix@ukr.net',
@@ -80,3 +71,39 @@ setup(name='intelhex',
       ],
 )
 
+
+class test(Command):
+    description = "unittest for intelhex"
+    user_options = []
+    boolean_options = []
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        import sys
+        import unittest
+        import intelhex.test
+        verbosity = 1
+        if self.verbose:
+            verbosity = 2
+        suite = unittest.TestSuite()
+        loader = unittest.TestLoader()
+        suite.addTest(loader.loadTestsFromModule(intelhex.test))
+        runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity)
+        result = runner.run(suite)
+        if result.errors or result.failures:
+            return 1
+
+
+def main():
+    metadata = METADATA.copy()
+    metadata['cmdclass'] = {'test': test}
+    setup(**metadata)
+
+
+if __name__ == '__main__':
+    main()
