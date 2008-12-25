@@ -129,7 +129,14 @@ def main(args=None):
         print >>sys.stderr, USAGE
         return 1
 
+    # TODO: move actual merge code into intelhex package as helper function
+    #       and write couple of tests for it.
     res = intelhex.IntelHex()
+
+    def end_addr_inclusive(addr):
+        if addr is not None:
+            return addr + 1
+        return addr
 
     for f in args:
         try:
@@ -142,7 +149,7 @@ def main(args=None):
             fname = sys.stdin
         ih = intelhex.IntelHex(fname)
         if (fstart, fend) != (None, None):
-            ih = ih[fstart:fend+1]      # fend+1 - because addr is inclusive
+            ih = ih[fstart:end_addr_inclusive(fend)]
         try:
             res.merge(ih, overlap)
         except intelhex.AddressOverlapError, e:
@@ -151,7 +158,7 @@ def main(args=None):
             return 1
 
     if (start, end) != (None, None):
-        res = res[start:end+1]          # end+1 - because addr is inclusive
+        res = res[start:end_addr_inclusive(end)]
     if output is None:
         output = sys.stdout
     res.write_hex_file(output, write_start_addr)
