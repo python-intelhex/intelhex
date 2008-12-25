@@ -44,7 +44,7 @@ Options:
     -o, --output=FILENAME   output file name (emit output to stdout
                             if option is not specified)
     -r, --range=START:END   specify address range for output
-                            (ascii hex value).
+                            (ascii hex value). Both values are inclusive.
                             Range can be in form 'START:' or ':END'.
     --no-start-addr         Don't write start addr to output file.
     --overlap=METHOD        What to do when data in files overlapped.
@@ -111,7 +111,7 @@ def main(args=None):
                         start = int(l[0], 16)
                     if l[1] != '':
                         end = int(l[1], 16)
-                except:
+                except (ValueError, IndexError):
                     raise getopt.GetoptError('Bad range value(s)')
             elif o == '--no-start-addr':
                 write_start_addr = False
@@ -142,7 +142,7 @@ def main(args=None):
             fname = sys.stdin
         ih = intelhex.IntelHex(fname)
         if (fstart, fend) != (None, None):
-            ih = ih[fstart:fend]
+            ih = ih[fstart:fend+1]      # fend+1 - because addr is inclusive
         try:
             res.merge(ih, overlap)
         except intelhex.AddressOverlapError, e:
@@ -151,13 +151,10 @@ def main(args=None):
             return 1
 
     if (start, end) != (None, None):
-        res = res[start:end]
-
+        res = res[start:end+1]          # end+1 - because addr is inclusive
     if output is None:
         output = sys.stdout
-
     res.write_hex_file(output, write_start_addr)
-
     return 0
 
 
