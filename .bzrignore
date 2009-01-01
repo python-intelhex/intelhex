@@ -4,5 +4,5 @@
 ./docs/manual/.build/html/*
 ./MANIFEST
 ./README.html
-api
+./api
 Readme.html

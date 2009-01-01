@@ -20,7 +20,7 @@ README.html: README.txt
 	rst2html.py README.txt README.html
 
 epydoc:
-	epydoc.py -v intelhex
+	epydoc.py -o api -v intelhex
 
 wininst:
 	python setup.py bdist_wininst -d.
