@@ -1,0 +1,24 @@
+Merging two hex files
+*********************
+IntelHex supports merging two different hex files into one. 
+This is done by initializing one IntelHex object with data 
+and calling its merge method::
+
+    >>> original = IntelHex("foo.hex")
+    >>> new = IntelHex("bar.hex")
+    >>> original.merge(new, overlap='replace')
+
+Now original will contain foo.hex merged with bar.hex. 
+The overlap parameter specifies what should be done when memory 
+locations in the original object overlap with locations in the new object. 
+It can take three options:
+
+* error -- stop and raise an exception (default)
+* ignore -- keep data from the original that contains data at overlapped address
+* replace -- use data from the new object that contains data at overlapped address
+
+You can merge only part of other hex file by using slice index notation::
+
+    >>> original = IntelHex("foo.hex")
+    >>> new = IntelHex("bar.hex")
+    >>> original.merge(new[0x0F:0x3F])

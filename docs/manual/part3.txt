@@ -1,0 +1,12 @@
+Convenience Scripts
+-------------------
+
+When IntelHex is installed and added to the system path, 
+some scripts are available for usage. 
+Each one is meant to be operated from the command line. 
+They provide help if called incorrectly.
+
+.. toctree::
+   :glob:
+   
+   part3-*

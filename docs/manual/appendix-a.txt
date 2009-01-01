@@ -1,5 +1,5 @@
-IntelHex Errors Hierarchy
-=========================
+Appendix A. IntelHex Errors Hierarchy
+-------------------------------------
 
 * ``IntelHexError`` - base error
 

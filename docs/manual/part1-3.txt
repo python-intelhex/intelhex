@@ -1,0 +1,25 @@
+Installation
+************
+IntelHex may be downloaded from:
+
+http://www.bialix.com/intelhex/intelhex.zip
+
+IntelHex is distributed as a standard Python Distutils package. 
+Assuming Python is properly installed on your platform, 
+installation should just require running the following command 
+from the root directory of the archive::
+
+    sudo python setup.py install
+
+This will install the intelhex package into your system's site-packages 
+directory and place the helper scripts in your Python site-packages 
+binaries directory. After that is done, any other Python scripts or modules 
+should be able to import the package using::
+
+    >>> from intelhex import IntelHex
+
+The scripts should be in your PATH so that they can be called from anywhere 
+in the file system.
+
+See the Python distutils website for more information, or try typing, 
+``python setup.py --help`` from the root directory of the archive.

@@ -1,0 +1,4 @@
+License
+*******
+The code distributed under the BSD license. 
+See LICENSE.txt in sources archive.

@@ -1,0 +1,23 @@
+About
+*****
+The Intel HEX file format widely used in microprocessors and microcontrollers 
+area as the de-facto standard for representation of code for programming 
+microelectronic devices.
+
+This work implements a HEX (also known as Intel HEX) file format reader 
+and convertor to binary form as a python script.
+
+Python package **intelhex** contains an implementation of a HEX file reader 
+and convertor as the IntelHex class. Also included are some scripts 
+to do basic tasks that utilize this package. The ``bin2hex.py`` script 
+converts binary data to HEX, and the ``hex2bin.py`` works the other direction. 
+``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py`` 
+merges multiple HEX files into one.
+
+This manual and more information can be found at:
+
+http://www.bialix.com/intelhex/
+
+or at the Launchpad.net project page at:
+
+https://launchpad.net/intelhex/

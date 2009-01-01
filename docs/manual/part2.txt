@@ -1,0 +1,7 @@
+Basic API and usage
+-------------------
+
+.. toctree::
+   :glob:
+
+   part2-*

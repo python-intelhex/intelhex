@@ -1,0 +1,17 @@
+Handling errors
+***************
+Many of the methods in IntelHex throw Python exceptions during error conditions. 
+These can be caught and handled using try...except blocks like so::
+
+    >>> try:
+    ...     mystring = ih.gets(0x20,20)
+    >>> except intelhex.NotEnoughDataError:
+    ...     print "There was not enough data at that location"
+
+See the API docs for information about errors raised by IntelHex. 
+They are all subclasses of IntelHexError, so the except block above could be used 
+to catch all of them. If your application has a way to gracefully handle these 
+exceptions, they should be caught. Otherwise, Python will exit with a descriptive 
+error message about the uncaught exception.
+
+See `Appendix A <appendix-a.html>`_ for error classes hierarchy.

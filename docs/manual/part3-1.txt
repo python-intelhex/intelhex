@@ -1,0 +1,31 @@
+Script ``hex2bin.py``
+*********************
+You can use ``hex2bin.py`` as handy hex-to-bin converter. 
+This script is just front end for function ``hex2bin`` from intelhex package.
+::
+
+        Usage:
+            python hex2bin.py [options] INFILE [OUTFILE]
+        
+        Arguments:
+            INFILE      name of hex file for processing.
+            OUTFILE     name of output file. If omitted then output
+                        will be writing to stdout.
+
+
+	Options:
+	    -h, --help		    this help message.
+	    -p, --pad=FF	    pad byte for empty spaces (hex value).
+	    -r, --range=START:END   specify address range for writing output
+				    (hex value).
+				    Range can be in form 'START:' or ':END'.
+	    -l, --length=NNNN,
+	    -s, --size=NNNN	    size of output (decimal value).
+
+Per example, converting content of foo.hex to foo.bin addresses from 0 to FF::
+
+	$ python hex2bin.py -r 0000:00FF foo.hex
+
+Or (equivalent)::
+
+	$ python hex2bin.py -r 0000: -s 256 foo.hex

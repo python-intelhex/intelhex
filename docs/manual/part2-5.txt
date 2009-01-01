@@ -1,0 +1,45 @@
+Writing out data
+****************
+Data contained in IntelHex can be written out in a few different formats, 
+including HEX, bin, or python dictionaries.
+
+You can write out HEX data contained in object by method ``.write_hex_file(f)``. 
+Parameter ``f`` should be filename or file-like object. 
+Note that this can include builtins like sys.stdout. 
+Also you can use the universal tofile.
+
+To convert data of IntelHex object to HEX8 file format without actually saving it 
+to disk you can use the builtin StringIO file-like object, e.g.::
+
+    >>> from cStringIO import StringIO
+    >>> from intelhex import IntelHex
+    >>> ih = IntelHex()
+    >>> ih[0] = 0x55
+    >>> sio = StringIO()
+    >>> ih.write_hex_file(sio)
+    >>> hexstr = sio.getvalue()
+    >>> sio.close()
+
+Variable ``hexstr`` will contain a string with the content of a HEX8 file.
+
+To write data as a hex file you also can use universal method ``tofile``::
+
+    >>> ih.tofile(sio, format='hex')
+
+NOTE: using IntelHex.tofile is recommended way.
+
+Class IntelHex has 3 methods for converting data of IntelHex objects into binary form:
+
+* ``tobinarray`` (returns array of unsigned char bytes);
+* ``tobinstr`` (returns string of bytes);
+* ``tobinfile`` (convert content to binary form and write to file).
+
+Example::
+
+    >>> from intelhex import IntelHex
+    >>> ih = IntelHex("foo.hex")
+    >>> ih.tobinfile("foo.bin")
+
+To write data as binary file you also can use universal method ``tofile``::
+
+    >>> ih.tofile("foo.bin", format='bin')

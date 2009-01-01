@@ -1,0 +1,21 @@
+Initializing the class
+**********************
+Example of typical initialization of ``IntelHex`` class::
+
+>>> from intelhex import IntelHex
+>>> ih = IntelHex("foo.hex")
+
+In the second line we are creating an instance of the class. 
+The constructor optionally takes data to initialize the class. 
+This can be the name of the HEX file, a file-like object, a dictionary, 
+or another instance of IntelHex. If specified, this source is automatically 
+read and decoded. Because of the flexibility of file-like objects in Python, 
+objects like sys.stdin can be used.
+
+If the source is another instance of IntelHex, the new object will become 
+a copy of the source. Finally, a Python dictionary may be specified. 
+This dictionary should have keys equal to memory locations and values equal 
+to the data stored in those locations. See the docstrings for more details.
+
+In version 0.9 the API slightly changed. 
+Now you can create an empty object and load data later.

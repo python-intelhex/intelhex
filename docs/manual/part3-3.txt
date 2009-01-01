@@ -1,0 +1,18 @@
+Script ``hex2dump.py``
+***********************
+This is a script to dump a hex file to a hexdump format. It is a frontend for
+``dump`` function in ``IntelHex`` class.
+::
+
+    Usage:
+        python hex2dump.py [options] HEXFILE
+
+    Options:
+        -h, --help              this help message.
+        -r, --range=START:END   specify address range for dumping
+                                (ascii hex value).
+                                Range can be in form 'START:' or ':END'.
+
+    Arguments:
+        HEXFILE     name of hex file for processing (use '-' to read
+                    from stdin)

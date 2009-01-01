@@ -1,0 +1,41 @@
+Reading data
+************
+Once created, an IntelHex object can be loaded with data. 
+This is only necessary if "source" was unspecified in the constructor. 
+You can also load data several times (but if addresses in those files overlap 
+you get exception ``AddressOverlapError``). This error is only raised when 
+reading from hex files. When reading from other formats, without explicitly 
+calling ``merge``, the data will be overwritten. E.g.::
+
+    >>> from intelhex import IntelHex
+    >>> ih = IntelHex()                     # create empty object
+    >>> ih.loadhex('foo.hex')               # load from hex
+    >>> ih.loadfile('bar.hex',format='hex') # also load from hex
+    >>> ih.fromfile('bar.hex',format='hex') # also load from hex
+
+NOTE: using ``IntelHex.fromfile`` is recommended way.
+
+All of the above examples will read from HEX files. 
+IntelHex also supports reading straight binary files. For example::
+
+    >>> from intelhex import IntelHex
+    >>> ih = IntelHex()                     # create empty object
+    >>> ih.loadbin('foo.bin')               # load from bin
+    >>> ih.fromfile('bar.bin',format='bin') # also load from bin
+
+Finally, data can be loaded from an appropriate Python dictionary. 
+This will permit you to store the data in an IntelHex object 
+to a builtin dictionary and restore the object at a later time. 
+For example::
+
+    >>> from intelhex import IntelHex
+    >>> ih = IntelHex('foo.hex') # create empty object
+    >>> pydict = ih.todict()     # dump contents to pydict
+
+...do something with the dictionary...
+
+::
+
+   >>> newIH = IntelHex(pydict) # recreate object with dict
+   >>> another = IntelHex()     # make a blank instance
+   >>> another.fromdict(pydict) # now another is the same as newIH

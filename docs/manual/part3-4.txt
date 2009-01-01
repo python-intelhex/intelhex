@@ -1,0 +1,45 @@
+Script ``hexmerge.py``
+**********************************
+This is a script to merge two different hex files. It is a frontend for the
+``merge`` function in ``IntelHex`` class.
+::
+
+    Usage:
+        python hexmerge.py [options] FILES...
+
+    Options:
+        -h, --help              this help message.
+        -o, --output=FILENAME   output file name (emit output to stdout
+                                if option is not specified)
+        -r, --range=START:END   specify address range for output
+                                (ascii hex value).
+                                Range can be in form 'START:' or ':END'.
+        --no-start-addr         Don't write start addr to output file.
+        --overlap=METHOD        What to do when data in files overlapped.
+                                Supported variants:
+                                * error -- stop and show error message (default)
+                                * ignore -- keep data from first file that
+                                            contains data at overlapped address
+                                * replace -- use data from last file that
+                                             contains data at overlapped address
+
+    Arguments:
+        FILES       list of hex files for merging
+                    (use '-' to read content from stdin)
+
+    You can specify address range for each file in the form:
+
+        filename:START:END
+
+    See description of range option above.
+
+    You can omit START or END, so supported variants are:
+
+        filename:START:     read filename and use data starting from START addr
+        filename::END       read filename and use data till END addr
+
+    Use entire file content:
+
+        filename
+    or
+        filename::

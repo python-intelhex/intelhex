@@ -1,0 +1,11 @@
+:mod:`intelhex` package
+-----------------------------------
+
+.. module:: intelhex
+   :platform: OS-independent
+   :synopsis: Intel HEX file format reader and converter.
+
+.. class:: IntelHex(source)
+
+Full API documentation available at 
+http://bialix.com/intelhex/api/index.html

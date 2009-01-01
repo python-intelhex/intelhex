@@ -1,0 +1,73 @@
+More data inspection
+********************
+IntelHex provides some metadata about the hex file it contains. 
+To obtain address limits use methods ``.minaddr()`` and ``.maxaddr()``. 
+These are computed based on the lowest and highest used memory spaces 
+respectively.
+
+Some linkers write to produced HEX file information about start address 
+(either record 03 or 05). IntelHex is able correctly read such records 
+and store information internally in ``start_addr`` attribute that itself 
+is either ``None`` or a dictionary with the address value(s).
+
+When input HEX file contains record type 03 (Start Segment Address Record), 
+``start_addr`` takes value::
+
+    {'CS': XXX, 'IP': YYY}
+
+Here:
+
+* ``XXX`` is value of CS register
+* ``YYY`` is value of IP register
+
+To obtain or change ``CS`` or ``IP`` value you need to use their names as keys 
+for ``start_addr`` dictionary::
+
+    >>> ih = IntelHex('file_with_03.hex')
+    >>> print ih.start_addr['CS']
+    >>> print ih.start_addr['IP']
+
+When input HEX file contains record type 05 (Start Linear Address Record), 
+``start_addr`` takes value::
+
+    {'EIP': ZZZ}
+
+Here ``ZZZ`` is value of EIP register.
+
+Example::
+
+    >>> ih = IntelHex('file_with_05.hex')
+    >>> print ih.start_addr['EIP']
+
+You can manually set required start address::
+
+    >>> ih.start_addr = {'CS': 0x1234, 'IP': 0x5678}
+    >>> ih.start_addr = {'EIP': 0x12345678}
+
+To delete start address info give value ``None`` or empty dictionary::
+
+    >>> ih.start_addr = None
+    >>> ih.start_addr = {}
+
+When you write data to HEX file you can disable writing start address 
+with additional argument ``write_start_addr``::
+
+    >>> ih.write_hex_file('out.hex') # by default writing start address
+    >>> ih.write_hex_file('out.hex', True) # as above
+    >>> ih.write_hex_file('out.hex', False) # don't write start address
+
+When ``start_addr`` is ``None`` or an empty dictionary nothing will be written 
+regardless of ``write_start_addr`` argument value.
+
+For more information about start address, please see the Intel Hex file format 
+specification.
+
+Because Intel Hex files do not specify every location in memory, 
+it is necessary to have a padding byte defined. Whenever a read is attempted 
+from an address that is unspecified, the padding byte is returned. 
+This default data is set via attribute ``.padding`` of class instance. 
+This defaults to '0xFF', but it can be changed by the user like so::
+
+    >>> print ih[0]       # prints 0xFF because this location is blank
+    >>> ih.padding = 0x00 # change padding byte
+    >>> print ih[0]       # prints 0x00 because this location is blank
