@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2008, Alexander Belchenko
+# Copyright (c) 2005-2009, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,6 @@
 
 @author     Alexander Belchenko (bialix AT ukr net)
 @version    1.0
-@date       2008/08/19
 '''
 
 
