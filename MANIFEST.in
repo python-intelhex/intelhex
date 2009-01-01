@@ -1,1 +1,4 @@
-include *.txt
+include AUTHORS.txt
+include LICENSE.txt
+include NEWS.txt
+include README.txt
