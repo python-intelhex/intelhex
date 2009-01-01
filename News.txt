@@ -1,6 +1,11 @@
 NEWS
 ====
 
+* 2009/01/01 v.1.0
+
+    - Improved API, better performance
+    - New User Manual (Zachary Clifford)
+
 * 2007/06/16 v.0.9.0 (New API release)
 
     - New API for IntelHex16bit
