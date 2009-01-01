@@ -9,3 +9,21 @@
 
 Full API documentation available at 
 http://bialix.com/intelhex/api/index.html
+
+
+Embedding into other projects
+*****************************
+IntelHex should be easy to embed in other projects. 
+The directory ``intelhex`` containing ``__init__.py`` can be directly placed 
+in a depending project and used directly. From that project the same import 
+statements described above can be used to make the library work. 
+From other projects the import statement would change to::
+
+    >>> from myproject.intelhex import IntelHex
+
+Alternatively, the IntelHex package can be installed into the site-packages 
+directory and used as a system package.
+
+In either case, IntelHex is distributed with a BSD-style license. 
+This permits you to use it in any way you see fit, provided that the package 
+is appropriately credited.
