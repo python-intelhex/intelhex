@@ -2,7 +2,7 @@ Installation
 ************
 IntelHex may be downloaded from:
 
-http://www.bialix.com/intelhex/intelhex.zip
+http://www.bialix.com/intelhex/intelhex-1.0.zip
 
 IntelHex is distributed as a standard Python Distutils package. 
 Assuming Python is properly installed on your platform, 

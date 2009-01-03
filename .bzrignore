@@ -1,8 +1,8 @@
+./api
 ./build
 ./dist
+./docs/manual.html
 ./docs/manual/.build/doctrees/*
 ./docs/manual/.build/html/*
+./intelhex-*
 ./MANIFEST
-./README.html
-./api
-Readme.html

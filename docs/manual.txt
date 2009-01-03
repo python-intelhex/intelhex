@@ -1,0 +1,62 @@
+---------------------------
+Python IntelHex User Manual
+---------------------------
+
+:Version: 1.0
+
+.. contents::
+.. sectnum::
+
+Introduction
+------------
+.. include:: manual/part1-1.txt
+.. include:: manual/part1-2.txt
+.. include:: manual/part1-3.txt
+
+Basic API and usage
+-------------------
+.. include:: manual/part2-1.txt
+.. include:: manual/part2-2.txt
+.. include:: manual/part2-3.txt
+.. include:: manual/part2-4.txt
+.. include:: manual/part2-5.txt
+.. include:: manual/part2-6.txt
+.. include:: manual/part2-7.txt
+.. include:: manual/part2-8.txt
+
+Convenience Scripts
+-------------------
+When IntelHex is installed and added to the system path, 
+some scripts are available for usage. 
+Each one is meant to be operated from the command line. 
+They provide help if called incorrectly.
+
+.. include:: manual/part3-1.txt
+.. include:: manual/part3-2.txt
+.. include:: manual/part3-3.txt
+.. include:: manual/part3-4.txt
+
+``intelhex`` package
+--------------------
+Full API documentation available at 
+http://bialix.com/intelhex/api/index.html
+
+Embedding into other projects
+*****************************
+IntelHex should be easy to embed in other projects. 
+The directory ``intelhex`` containing ``__init__.py`` can be directly placed 
+in a depending project and used directly. From that project the same import 
+statements described above can be used to make the library work. 
+From other projects the import statement would change to::
+
+    >>> from myproject.intelhex import IntelHex
+
+Alternatively, the IntelHex package can be installed into the site-packages 
+directory and used as a system package.
+
+In either case, IntelHex is distributed with a BSD-style license. 
+This permits you to use it in any way you see fit, provided that the package 
+is appropriately credited.
+
+
+.. include:: manual/appendix-a.txt
