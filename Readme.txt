@@ -7,8 +7,8 @@ Python implementation
 
 Author: Alexander Belchenko
 Contact: bialix AT ukr net
-Date: 2009-01-01
-Version: 1.0
+Date: 2009-03-12
+Version: 1.1
 
 Introduction
 ------------

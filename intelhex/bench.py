@@ -1,5 +1,5 @@
 #!/usr/bin/python
-# (c) Alexander Belchenko, 2007
+# (c) Alexander Belchenko, 2007, 2009
 
 """Benchmarking.
 

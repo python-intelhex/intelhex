@@ -1,6 +1,11 @@
 NEWS
 ====
 
+* 2009/03/12 v.1.1
+
+    - Fixed bug with writing hex files with small chains of bytes
+    - Improved Python 2.6 compatibility
+
 * 2009/01/01 v.1.0
 
     - Improved API, better performance
