@@ -118,7 +118,7 @@ class bench(Command):
             self.read = self.write = True
 
     def run(self):
-        from _bench import Measure
+        from intelhex.bench import Measure
         m = Measure(self.repeat, self.read, self.write)
         m.measure_all()
         m.print_report()
