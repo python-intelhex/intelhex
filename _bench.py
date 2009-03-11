@@ -143,81 +143,135 @@ def get_1M():
     return get_test_data(1000000, 0, 0)
 
 
-def measure(data, n):
-    """Do measuring of read and write operations.
-    @param  data:   3-tuple from get_test_data
-    @param  n:      repeat n times
-    @return:        (time readhex, time writehex)
-    """
-    _, hexstr, ih = data
-    tread = run_readtest_N_times(intelhex.IntelHex, hexstr, n)[0]
-    twrite = run_writetest_N_times(ih.write_hex_file, n)[0]
-    return tread, twrite
+class Measure(object):
+    """Measure execution time helper."""
 
-def print_report(results):
-    base_title, base_times, base_n = results[0]
-    base_read, base_write = base_times
-    read_report = ['%-10s\t%7.3f' % (base_title, base_read)]
-    write_report = ['%-10s\t%7.3f' % (base_title, base_write)]
+    data_set = [
+        # (data name, getter)
+        ('base 10K', get_base_10K),     # first should be base numbers
+        ('100K', get_100K),
+        ('1M', get_1M),
+        ('100K+100K', get_100K_100K),
+        ('0+100K', get_0_100K),
+        ]
 
-    for item in results[1:]:
-        cur_title, cur_times, cur_n = item
-        cur_read, cur_write = cur_times
-        qread = time_coef(cur_read, cur_n,
-                          base_read, base_n)
-        qwrite = time_coef(cur_write, cur_n,
-                           base_write, base_n)
-        read_report.append('%-10s\t%7.3f\t%7.3f' % (cur_title,
-                                                   cur_read,
-                                                   qread))
-        write_report.append('%-10s\t%7.3f\t%7.3f' % (cur_title,
-                                                    cur_write,
-                                                    qwrite))
+    def __init__(self, n=3, read=True, write=True):
+        self.n = n
+        self.read = read
+        self.write = write
+        self.results = []
 
-    print 'Read operation:'
-    print '\n'.join(read_report)
-    print
-    print 'Write operation:'
-    print '\n'.join(write_report)
-    print
+    def measure_one(self, data):
+        """Do measuring of read and write operations.
+        @param  data:   3-tuple from get_test_data
+        @param  n:      repeat n times
+        @return:        (time readhex, time writehex)
+        """
+        _unused, hexstr, ih = data
+        tread, twrite = 0.0, 0.0
+        if self.read:
+            tread = run_readtest_N_times(intelhex.IntelHex, hexstr, self.n)[0]
+        if self.write:
+            twrite = run_writetest_N_times(ih.write_hex_file, self.n)[0]
+        return tread, twrite
+
+    def measure_all(self):
+        for name, getter in self.data_set:
+            data = getter()
+            times = self.measure_one(data)
+            self.results.append((name, times, data[0]))
+
+    def print_report(self, to_file=None):
+        if to_file is None:
+            to_file = sys.stdout
+
+        base_title, base_times, base_n = self.results[0]
+        base_read, base_write = base_times
+        read_report = ['%-10s\t%7.3f' % (base_title, base_read)]
+        write_report = ['%-10s\t%7.3f' % (base_title, base_write)]
+
+        for item in self.results[1:]:
+            cur_title, cur_times, cur_n = item
+            cur_read, cur_write = cur_times
+            if self.read:
+                qread = time_coef(cur_read, cur_n,
+                                  base_read, base_n)
+                read_report.append('%-10s\t%7.3f\t%7.3f' % (cur_title,
+                                                           cur_read,
+                                                           qread))
+            if self.write:
+                qwrite = time_coef(cur_write, cur_n,
+                                   base_write, base_n)
+                write_report.append('%-10s\t%7.3f\t%7.3f' % (cur_title,
+                                                            cur_write,
+                                                            qwrite))
+        if self.read:
+            to_file.write('Read operation:\n')
+            to_file.write('\n'.join(read_report))
+            to_file.write('\n\n')
+        if self.write:
+            to_file.write('Write operation:\n')
+            to_file.write('\n'.join(write_report))
+            to_file.write('\n\n')
+
+
+HELP = """\
+Usage: python _bench.py [OPTIONS]
+
+Options:
+    -h      this help
+    -n N    repeat tests N times
+    -r      run only tests for read operation
+    -w      run only tests for write operation
+
+If option -r or -w is not specified then all tests will be run.
+"""
+
 
 def main(argv=None):
     """Main function to run benchmarks.
     @param  argv:   command-line arguments.
     @return:        exit code (0 is OK).
     """
-    # number of repeat
-    n = 3
+    import getopt
 
-    results = []
+    # default values
+    test_read = None
+    test_write = None
+    n = 3       # number of repeat
 
-    # get base numbers
-    base_10K = get_base_10K()
-    base_times = measure(base_10K, n)
-    results.append(('base 10K', base_times, base_10K[0]))
+    if argv is None:
+        argv = sys.argv[1:]
 
-    # 100K
-    data_100K = get_100K()
-    time_100K = measure(data_100K, n)
-    results.append(('100K', time_100K, data_100K[0]))
+    try:
+        opts, args = getopt.getopt(argv, 'hn:rw', [])
 
-    # 1M
-    data_1M = get_1M()
-    time_1M = measure(data_1M, n)
-    results.append(('1M', time_1M, data_1M[0]))
+        for o,a in opts:
+            if o == '-h':
+                print HELP
+                return 0
+            elif o == '-n':
+                n = int(a)
+            elif o == '-r':
+                test_read = True
+            elif o == '-w':
+                test_write = True
 
-    # 100K + 100K
-    data_100K_100K = get_100K_100K()
-    time_100K_100K = measure(data_100K_100K, n)
-    results.append(('100K+100K', time_100K_100K, data_100K_100K[0]))
+        if args:
+            raise getopt.GetoptError('Arguments are not used.')
+    except getopt.GetoptError, msg:
+        print str(msg)
+        return 1
 
-    # 0 + 100K
-    data_0_100K = get_0_100K()
-    time_0_100K = measure(data_0_100K, n)
-    results.append(('0+100K', time_0_100K, data_0_100K[0]))
+    if (test_read, test_write) == (None, None):
+        test_read = test_write = True
 
-    print_report(results)
+    m = Measure(n, test_read, test_write)
+    m.measure_all()
+    m.print_report()
+
     return 0
+
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
