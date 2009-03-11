@@ -1069,8 +1069,8 @@ class TestIntelHexErrors(TestIntelHexBase):
 
     def test_IntelHexError_message(self):
         self.assertEqualExc('IntelHex custom error message',
-            IntelHexError(message='IntelHex custom error message'))
-        self.assertEqualExc('IntelHex base error', IntelHexError(message=''))
+            IntelHexError(msg='IntelHex custom error message'))
+        self.assertEqualExc('IntelHex base error', IntelHexError(msg=''))
 
     def test_HexReaderError(self):
         self.assertEqualExc('Hex reader base error', HexReaderError())

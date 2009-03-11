@@ -644,7 +644,7 @@ class IntelHex(object):
                     break
                 i += 1
         except KeyError:
-            raise NotEnoughDataError(message=('Bad access at 0x%X: '
+            raise NotEnoughDataError(msg=('Bad access at 0x%X: '
                 'not enough data to read zero-terminated string') % addr)
         return self.gets(addr, i)
 
@@ -1050,17 +1050,17 @@ class IntelHexError(Exception):
 
     _fmt = 'IntelHex base error'   #: format string
 
-    def __init__(self, message=None, **kw):
+    def __init__(self, msg=None, **kw):
         """Initialize the Exception with the given message.
         """
-        self.message = message
+        self.msg = msg
         for key, value in kw.items():
             setattr(self, key, value)
 
     def __str__(self):
         """Return the message in this Exception."""
-        if self.message:
-            return self.message
+        if self.msg:
+            return self.msg
         try:
             return self._fmt % self.__dict__
         except (NameError, ValueError, KeyError), e:
