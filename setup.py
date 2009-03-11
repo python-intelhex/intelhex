@@ -99,9 +99,37 @@ class test(Command):
             return 1
 
 
+class bench(Command):
+    description = "benchmarks for read/write HEX"
+    user_options = [
+        ('repeat', 'n', 'repeat tests N times'),
+        ('read', 'r', 'run only tests for read operation'),
+        ('write', 'w', 'run only tests for write operation'),
+        ]
+    boolean_options = ['read', 'write']
+
+    def initialize_options(self):
+        self.repeat = 3
+        self.read = None
+        self.write = None
+
+    def finalize_options(self):
+        if not self.read and not self.write:
+            self.read = self.write = True
+
+    def run(self):
+        from intelhex.bench import Measure
+        m = Measure(self.repeat, self.read, self.write)
+        m.measure_all()
+        m.print_report()
+
+
 def main():
     metadata = METADATA.copy()
-    metadata['cmdclass'] = {'test': test}
+    metadata['cmdclass'] = {
+        'test': test,
+        'bench': bench,
+        }
     setup(**metadata)
 
 
