@@ -275,3 +275,83 @@ def main(argv=None):
 
 if __name__ == '__main__':
     sys.exit(main(sys.argv[1:]))
+
+
+"""
+
+Some Results
+************
+
+
+21/04/2007 revno.40
+Python 2.5 @ Windows XP, Intel Celeron M CPU 430 @ 1.73GHz
+
+Read operation:
+base 10K  	  0.031
+100K      	  0.360	  1.161
+1M        	  3.500	  1.129
+100K+100K 	  0.719	  1.160
+0+100K    	  0.360	  1.161
+
+Write operation:
+base 10K  	  0.031
+100K      	  0.297	  0.958
+1M        	  2.953	  0.953
+100K+100K 	  1.328	  2.142
+0+100K    	  0.312	  1.006
+
+
+21/04/2007 revno.46
+Python 2.5 @ Windows XP, Intel Celeron M CPU 430 @ 1.73GHz
+
+Read operation:
+base 10K  	  0.016
+100K      	  0.203	  1.269
+1M        	  2.000	  1.250
+100K+100K 	  0.422	  1.319
+0+100K    	  0.203	  1.269
+
+Write operation:
+base 10K  	  0.031
+100K      	  0.297	  0.958
+1M        	  2.969	  0.958
+100K+100K 	  1.328	  2.142
+0+100K    	  0.312	  1.006
+
+
+22/04/2007 revno.48
+Python 2.5 @ Windows XP, Intel Celeron M CPU 430 @ 1.73GHz
+
+Read operation:
+base 10K  	  0.016
+100K      	  0.187	  1.169
+1M        	  1.891	  1.182
+100K+100K 	  0.406	  1.269
+0+100K    	  0.188	  1.175
+
+Write operation:
+base 10K  	  0.031
+100K      	  0.296	  0.955
+1M        	  2.969	  0.958
+100K+100K 	  1.328	  2.142
+0+100K    	  0.312	  1.006
+
+
+19/08/2008 revno.72
+Python 2.5.2 @ Windows XP, Intel Celeron M CPU 430 @ 1.73GHz
+
+Read operation:
+base 10K          0.016
+100K              0.171   1.069
+1M                1.734   1.084
+100K+100K         0.375   1.172
+0+100K            0.172   1.075
+
+Write operation:
+base 10K          0.016
+100K              0.156   0.975
+1M                1.532   0.957
+100K+100K         0.344   1.075
+0+100K            0.156   0.975
+
+"""
