@@ -120,7 +120,7 @@ def get_test_data(n1, offset, n2):
         addr += 1
     # make hex file
     sio = StringIO()
-    ih.writefile(sio)
+    ih.write_hex_file(sio)
     hexstr = sio.getvalue()
     sio.close()
     #
@@ -151,7 +151,7 @@ def measure(data, n):
     """
     _, hexstr, ih = data
     tread = run_readtest_N_times(intelhex.IntelHex, hexstr, n)[0]
-    twrite = run_writetest_N_times(ih.writefile, n)[0]
+    twrite = run_writetest_N_times(ih.write_hex_file, n)[0]
     return tread, twrite
 
 def print_report(results):
