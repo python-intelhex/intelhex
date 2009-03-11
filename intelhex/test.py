@@ -344,6 +344,12 @@ hex_simple = """\
 :00000001FF
 """
 
+hex_bug_lp_341051 = """\
+:020FEC00E4E738
+:040FF00022E122E1F7
+:00000001FF
+"""
+
 
 ##
 # Test cases
@@ -488,6 +494,14 @@ class TestIntelHex(TestIntelHexBase):
         s = sio.getvalue()
         sio.close()
         self.assertEqualWrittenData(hex_simple, s)
+
+    def test_write_hex_bug_341051(self):
+        ih = intelhex.IntelHex(StringIO(hex_bug_lp_341051))
+        sio = StringIO()
+        ih.tofile(sio, format='hex')
+        s = sio.getvalue()
+        sio.close()
+        self.assertEqualWrittenData(hex_bug_lp_341051, s)
 
     def test_write_hex_first_extended_linear_address(self):
         ih = IntelHex({0x20000: 0x01})

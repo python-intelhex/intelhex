@@ -560,17 +560,26 @@ class IntelHex(object):
                                           cur_ix,
                                           min(cur_ix+chain_len+1, addr_len))
                         chain_len = ix - cur_ix     # real chain_len
+                        # there could be small holes in the chain
+                        # but we will catch them by try-except later
+                        # so for big continuous files we will work
+                        # at maximum possible speed
                     else:
                         chain_len = 1               # real chain_len
 
                     bin = array('B', '\0'*(5+chain_len))
-                    bin[0] = chain_len
                     bytes = divmod(low_addr, 256)
                     bin[1] = bytes[0]   # msb of low_addr
                     bin[2] = bytes[1]   # lsb of low_addr
                     bin[3] = 0          # rectype
-                    for i in xrange(chain_len):
-                        bin[4+i] = self._buf[cur_addr+i]
+                    try:    # if there is small holes we'll catch them
+                        for i in range(chain_len):
+                            bin[4+i] = self._buf[cur_addr+i]
+                    except KeyError:
+                        # we catch a hole so we should shrink the chain
+                        chain_len = i
+                        bin = bin[:5+i]
+                    bin[0] = chain_len
                     bin[4+chain_len] = (-sum(bin)) & 0x0FF    # chksum
                     fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
 
