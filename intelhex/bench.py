@@ -92,7 +92,7 @@ def time_coef(tc, nc, tb, nb):
     @param  nc:     current test data size
     @param  tb:     base test time
     @param  nb:     base test data size
-    @reutrn:        time coef.
+    @return:        time coef.
     """
     tc = float(tc)
     nc = float(nc)
@@ -164,7 +164,6 @@ class Measure(object):
     def measure_one(self, data):
         """Do measuring of read and write operations.
         @param  data:   3-tuple from get_test_data
-        @param  n:      repeat n times
         @return:        (time readhex, time writehex)
         """
         _unused, hexstr, ih = data
