@@ -278,7 +278,7 @@ class IntelHex(object):
         ''' Convert this object to binary form as array. If start and end 
         unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
-        @param  end     end address of output bytes.
+        @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
         @return         array of unsigned char data.
@@ -301,7 +301,7 @@ class IntelHex(object):
     def tobinstr(self, start=None, end=None, pad=0xFF):
         ''' Convert to binary form and return as a string.
         @param  start   start address of output bytes.
-        @param  end     end address of output bytes.
+        @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
         @return         string of binary data.
@@ -313,7 +313,7 @@ class IntelHex(object):
 
         @param  fobj    file name or file object for writing output bytes.
         @param  start   start address of output bytes.
-        @param  end     end address of output bytes.
+        @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
         '''
@@ -841,7 +841,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     @param  fin     input hex file (filename or file-like object)
     @param  fout    output bin file (filename or file-like object)
     @param  start   start of address range (optional)
-    @param  end     end of address range (optional)
+    @param  end     end of address range (inclusive; optional)
     @param  size    size of resulting file (in bytes) (optional)
     @param  pad     padding byte (optional)
     """
