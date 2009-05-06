@@ -288,7 +288,7 @@ class IntelHex(object):
 
         bin = array('B')
 
-        if self._buf == {}:
+        if self._buf == {} and None in (start, end):
             return bin
 
         start, end = self._get_start_end(start, end)

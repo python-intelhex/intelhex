@@ -451,6 +451,13 @@ class TestIntelHex(TestIntelHexBase):
         finally:
             os.remove(fname)
 
+    def test_tobinarray_empty(self):
+        ih = IntelHex()
+        self.assertEqual(array.array('B', []), ih.tobinarray(pad=0xFF))
+        self.assertEqual(array.array('B', []), ih.tobinarray(start=0,pad=0xFF))
+        self.assertEqual(array.array('B', []), ih.tobinarray(end=2,pad=0xFF))
+        self.assertEqual(array.array('B', [255,255,255]), ih.tobinarray(0,2,pad=0xFF))
+
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
