@@ -654,9 +654,9 @@ class IntelHex(object):
         self._buf[addr+len(s)] = 0
 
     def dump(self, tofile=None):
-        """Dump object content to specified file or to stdout if None. Format
-        is a hexdump with some header information at the beginning, addresses
-        on the left, and data on right.
+        """Dump object content to specified file object or to stdout if None.
+        Format is a hexdump with some header information at the beginning,
+        addresses on the left, and data on right.
 
         @param  tofile        file-like object to dump to
         """

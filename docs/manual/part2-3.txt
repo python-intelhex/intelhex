@@ -15,7 +15,11 @@ The data can be accessed exactly like above, except that data returned will be
 16 bits, and the addresses should be word addresses.
 
 Another useful inspection tool is the dump command. This will output 
-the entire contents of the hex file to stdout or to a specified file like so::
+the entire contents of the hex file to stdout or to a specified file object
+like so::
 
     >>> ih.dump() # dump contents of ih to stdout in tabular hexdump format
-    >>> ih.dump(tofile='hexdump.txt') # dump to specified file
+
+    >>> f = open('hexdump.txt', 'w') # open file for writing
+    >>> ih.dump(f)                   # dump to file object
+    >>> f.close()                    # close file
