@@ -64,6 +64,8 @@ from intelhex import IntelHex, \
                      Record
 
 
+__docformat__ = 'restructuredtext'
+
 ##
 # Data for tests
 
@@ -366,7 +368,8 @@ class TestIntelHexBase(unittest.TestCase):
         Borrowed from Ned Batchelder Blog.
         See: http://www.nedbatchelder.com/blog/200609.html#e20060905T064418
 
-        Typical usage:
+        Typical usage::
+
             self.assertRaisesMsg(MyException, "Exception message",
                                  my_function, (arg1, arg2))
         """
