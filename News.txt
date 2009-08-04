@@ -5,7 +5,7 @@ NEWS
 
     - Fixed bug 372620: tobinarray on empty file should return pad bytes 
       when address range explicitly specified.
-    - Improved docstrings: explicitly say that `end' param of to-* methods 
+    - Improved docstrings: explicitly say that 'end' param of to-* methods 
       is always inclusive. (see bug #372625 for details).
     - Improved documentation on ih.dump(tofile).
 
