@@ -1,6 +1,14 @@
 NEWS
 ====
 
+* 2009/08/04 v.1.2
+
+    - Fixed bug 372620: tobinarray on empty file should return pad bytes 
+      when address range explicitly specified.
+    - Improved docstrings: explicitly say that `end' param of to-* methods 
+      is always inclusive. (see bug #372625 for details).
+    - Improved documentation on ih.dump(tofile).
+
 * 2009/03/12 v.1.1
 
     - Fixed bug with writing hex files with small chains of bytes
