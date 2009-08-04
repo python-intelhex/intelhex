@@ -4,8 +4,9 @@ all:
 	@echo  test - run unittest
 	@echo  epydoc - run epydoc to create API documentation
 	@echo  wininst - Windows installer for Python
+	@echo  docs - build docs with ReST and Sphinx
 
-.PHONY: clean test epydoc wininst
+.PHONY: clean test epydoc wininst docs
 
 clean:
 	python setup.py clean -a
@@ -18,3 +19,7 @@ epydoc:
 
 wininst:
 	python setup.py bdist_wininst -d.
+
+docs:
+	rst2html.py docs/manual.txt docs/manual.html
+	make -C docs/manual html
