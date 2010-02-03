@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008, Alexander Belchenko
+# Copyright (c) 2008, 2010 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,12 +35,15 @@
 
 """Show content of hex file as hexdump."""
 
+VERSION = '1.3'
+
 USAGE = '''hex2dump: show content of hex file as hexdump.
 Usage:
     python hex2dump.py [options] HEXFILE
 
 Options:
     -h, --help              this help message.
+    -v, --version           version info.
     -r, --range=START:END   specify address range for dumping
                             (ascii hex value).
                             Range can be in form 'START:' or ':END'.
@@ -77,11 +80,14 @@ def main(argv=None):
     end = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hp:r:",
-                                  ["help", "range="])
+        opts, args = getopt.getopt(sys.argv[1:], "hvp:r:",
+                                  ["help", "version", "range="])
         for o, a in opts:
             if o in ("-h", "--help"):
                 print USAGE
+                return 0
+            elif o in ("-v", "--version"):
+                print VERSION
                 return 0
             elif o in ("-r", "--range"):
                 try:

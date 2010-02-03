@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008, Alexander Belchenko
+# Copyright (c) 2008, 2010 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,6 +35,8 @@
 
 '''Intel HEX file format bin2hex convertor utility.'''
 
+VERSION = '1.3'
+
 if __name__ == '__main__':
     import getopt
     import os
@@ -55,18 +57,22 @@ Arguments:
 
 Options:
     -h, --help              this help message.
+    -v, --version           version info.
     --offset=N              offset for loading bin file (default: 0).
 '''
 
     offset = 0
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "h",
-                                  ["help", "offset="])
+        opts, args = getopt.getopt(sys.argv[1:], "hv",
+                                  ["help", "version", "offset="])
 
         for o, a in opts:
             if o in ("-h", "--help"):
                 print usage
+                sys.exit(0)
+            elif o in ("-v", "--version"):
+                print VERSION
                 sys.exit(0)
             elif o in ("--offset"):
                 base = 10

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2005-2008, Alexander Belchenko
+# Copyright (c) 2005-2008, 2010 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,6 +35,8 @@
 
 '''Intel HEX file format hex2bin convertor utility.'''
 
+VERSION = '1.3'
+
 if __name__ == '__main__':
     import getopt
     import os
@@ -53,6 +55,7 @@ Arguments:
 
 Options:
     -h, --help              this help message.
+    -v, --version           version info.
     -p, --pad=FF            pad byte for empty spaces (ascii hex value).
     -r, --range=START:END   specify address range for writing output
                             (ascii hex value).
@@ -67,13 +70,16 @@ Options:
     size = None
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hp:r:l:s:",
-                                  ["help", "pad=", "range=",
+        opts, args = getopt.getopt(sys.argv[1:], "hvp:r:l:s:",
+                                  ["help", "version", "pad=", "range=",
                                    "length=", "size="])
 
         for o, a in opts:
             if o in ("-h", "--help"):
                 print usage
+                sys.exit(0)
+            elif o in ("-v", "--version"):
+                print VERSION
                 sys.exit(0)
             elif o in ("-p", "--pad"):
                 try:

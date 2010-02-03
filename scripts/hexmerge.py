@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008, Alexander Belchenko
+# Copyright (c) 2008, 2010 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,12 +35,15 @@
 
 """Merge content of several hex files into one file."""
 
+VERSION = '1.3'
+
 USAGE = '''hexmerge: merge content of hex files.
 Usage:
     python hexmerge.py [options] FILES...
 
 Options:
     -h, --help              this help message.
+    -v, --version           version info.
     -o, --output=FILENAME   output file name (emit output to stdout
                             if option is not specified)
     -r, --range=START:END   specify address range for output
@@ -93,14 +96,18 @@ def main(args=None):
     if args is None:
         args = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(args, 'ho:r:',
-                                       ['--help', '--output=', '--range=',
-                                        '--no-start-addr', '--overlap=',
+        opts, args = getopt.gnu_getopt(args, 'hvo:r:',
+                                       ['help', 'version',
+                                        'output=', 'range=',
+                                        'no-start-addr', 'overlap=',
                                        ])
 
         for o,a in opts:
             if o in ('-h', '--help'):
                 print USAGE
+                return 0
+            elif o in ('-v', '--version'):
+                print VERSION
                 return 0
             elif o in ('-o', '--output'):
                 output = a
