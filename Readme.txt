@@ -7,8 +7,8 @@ Python implementation
 
 Author: Alexander Belchenko
 Contact: bialix AT ukr net
-Date: 2009-03-12
-Version: 1.1
+Date: 2010-09-17
+Version: 1.3
 
 Introduction
 ------------
@@ -32,7 +32,7 @@ The code distributed under BSD license. See LICENSE.txt in sources archive.
 
 Download
 --------
-http://www.bialix.com/intelhex/intelhex-1.0.zip
+https://launchpad.net/intelhex/+download
 
 Install
 -------
@@ -48,7 +48,7 @@ There is bug tracker and source code history browser. I use Bazaar version
 control system for development of intelhex.
     
 Bzr (Bazaar version-control system) itself is here: 
-http://bazaar-vcs.org
+http://bazaar.canonical.com
 
 Documentation
 -------------

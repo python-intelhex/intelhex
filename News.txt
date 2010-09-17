@@ -11,7 +11,7 @@ NEWS
 
 * 2009/03/12 v.1.1
 
-    - Fixed bug with writing hex files with small chains of bytes
+    - Fixed bug in writing hex files with small chains of bytes
     - Improved Python 2.6 compatibility
 
 * 2009/01/01 v.1.0
@@ -33,7 +33,7 @@ NEWS
 * 2007/04/22 v.0.9.devel (New API pre-release)
 
     - New API
-    - Performance improvemenets: read hex file now ~45% faster
+    - Performance improvements: read hex file now ~45% faster
 
 * 2007/02/26 v.0.8.5 (BugFix Release)
 
