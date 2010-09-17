@@ -694,7 +694,7 @@ class IntelHex(object):
                     x = self._buf.get(i+j)
                     if x is not None:
                         tofile.write(' %02X' % x)
-                        if 32 <= x < 128:
+                        if 32 <= x < 127:   # GNU less does not like 0x7F (128 decimal) so we'd better show it as dot
                             s.append(chr(x))
                         else:
                             s.append('.')
