@@ -5,6 +5,7 @@ NEWS
 
     - hex2dump: show 0x7F character as dot for better compatibility 
       with GNU less utility.
+    - tobinarray, tobinfile, tobinstr: added size parameter. (Bug #408748)
 
 * 2009/08/04 v.1.2
 
