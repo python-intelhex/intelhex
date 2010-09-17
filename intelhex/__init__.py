@@ -263,24 +263,39 @@ class IntelHex(object):
         if start_addr is not None:
             self.start_addr = start_addr
 
-    def _get_start_end(self, start=None, end=None):
+    def _get_start_end(self, start=None, end=None, size=None):
         """Return default values for start and end if they are None
         """
-        if start is None:
-            start = min(self._buf.keys())
-        if end is None:
-            end = max(self._buf.keys())
-        if start > end:
-            start, end = end, start
+        if size is not None:
+            if None not in (start, end):
+                raise ValueError("tobinarray: you can't use start,end and size"
+                                 " arguments in the same time")
+            if (start, end) == (None, None):
+                start = min(self._buf.keys())
+            if start is not None:
+                end = start + size - 1
+            else:
+                start = end - size + 1
+                if start < 0:
+                    raise ValueError("tobinarray: invalid size (%d) "
+                                     "for given end address (%d)" % (size,end))
+        else:
+            if start is None:
+                start = min(self._buf.keys())
+            if end is None:
+                end = max(self._buf.keys())
+            if start > end:
+                start, end = end, start
         return start, end
 
-    def tobinarray(self, start=None, end=None, pad=None):
+    def tobinarray(self, start=None, end=None, pad=None, size=None):
         ''' Convert this object to binary form as array. If start and end 
         unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
+        @param  size    size of the block, used with start or end parameter.
         @return         array of unsigned char data.
         '''
         if pad is None:
@@ -291,7 +306,10 @@ class IntelHex(object):
         if self._buf == {} and None in (start, end):
             return bin
 
-        start, end = self._get_start_end(start, end)
+        if size is not None and size <= 0:
+            raise ValueError("tobinarray: wrong value for size")
+
+        start, end = self._get_start_end(start, end, size)
 
         for i in xrange(start, end+1):
             bin.append(self._buf.get(i, pad))

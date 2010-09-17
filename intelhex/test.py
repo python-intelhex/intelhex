@@ -461,6 +461,21 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual(array.array('B', []), ih.tobinarray(end=2,pad=0xFF))
         self.assertEqual(array.array('B', [255,255,255]), ih.tobinarray(0,2,pad=0xFF))
 
+    def test_tobinarray_with_size(self):
+        ih = IntelHex(self.f)
+        self.assertEqual(array.array('B', [2, 5, 162, 229, 118, 36, 106, 248]),
+                         ih.tobinarray(size=8))   # from addr 0
+        self.assertEqual(array.array('B', [120, 103, 48, 7, 2, 120, 106, 228]),
+                         ih.tobinarray(start=12, size=8))
+        self.assertEqual(array.array('B', [2, 5, 162, 229, 118, 36, 106, 248]),
+                         ih.tobinarray(end=7, size=8))   # addr: 0..7, 8 bytes
+        self.assertEqual(array.array('B', [120, 103, 48, 7, 2, 120, 106, 228]),
+                         ih.tobinarray(end=19, size=8))  # addr: 12..19, 8 bytes
+        self.assertRaises(ValueError, ih.tobinarray, start=0, end=7, size=8)
+        self.assertRaises(ValueError, ih.tobinarray, end=3, size=8)
+        self.assertRaises(ValueError, ih.tobinarray, size=0)
+        self.assertRaises(ValueError, ih.tobinarray, size=-1)
+
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
