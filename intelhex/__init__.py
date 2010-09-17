@@ -316,17 +316,18 @@ class IntelHex(object):
 
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=0xFF):
+    def tobinstr(self, start=None, end=None, pad=0xFF, size=None):
         ''' Convert to binary form and return as a string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
+        @param  size    size of the block, used with start or end parameter.
         @return         string of binary data.
         '''
-        return self.tobinarray(start, end, pad).tostring()
+        return self.tobinarray(start, end, pad, size).tostring()
 
-    def tobinfile(self, fobj, start=None, end=None, pad=0xFF):
+    def tobinfile(self, fobj, start=None, end=None, pad=0xFF, size=None):
         '''Convert to binary and write to file.
 
         @param  fobj    file name or file object for writing output bytes.
@@ -334,6 +335,7 @@ class IntelHex(object):
         @param  end     end address of output bytes (inclusive).
         @param  pad     fill empty spaces with this value
                         (if None used self.padding).
+        @param  size    size of the block, used with start or end parameter.
         '''
         if getattr(fobj, "write", None) is None:
             fobj = file(fobj, "wb")
@@ -341,7 +343,7 @@ class IntelHex(object):
         else:
             close_fd = False
 
-        fobj.write(self.tobinstr(start, end, pad))
+        fobj.write(self.tobinstr(start, end, pad, size))
 
         if close_fd:
             fobj.close()
