@@ -107,7 +107,12 @@ def main(argv=None):
         print USAGE
         return 2
 
-    return hex2dump(args[0], start, end)
+    try:
+        return hex2dump(args[0], start, end)
+    except IOError, e:
+        import errno
+        if e.errno not in (0, errno.EPIPE):
+            raise
 
 
 if __name__ == '__main__':
