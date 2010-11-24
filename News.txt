@@ -1,11 +1,12 @@
 NEWS
 ====
 
-* YYYY/MM/DD v.1.3 (NOT RELEASED YET)
+* 2010/11/24 v.1.3
 
     - hex2dump: show 0x7F character as dot for better compatibility 
       with GNU less utility.
     - tobinarray, tobinfile, tobinstr: added size parameter. (Bug #408748)
+    - fixed error in hexmerge.py script. (#676023)
 
 * 2009/08/04 v.1.2
 

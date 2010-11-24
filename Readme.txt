@@ -7,24 +7,24 @@ Python implementation
 
 Author: Alexander Belchenko
 Contact: bialix AT ukr net
-Date: 2010-09-17
+Date: 2010-11-24
 Version: 1.3
 
 Introduction
 ------------
-The Intel HEX file format widely used in microprocessors and microcontrollers
-area as the de-facto standard for representation of code for programming
+The Intel HEX file format widely used in microprocessors and microcontrollers 
+area as the de-facto standard for representation of code for programming 
 microelectronic devices.
 
-This work implements a HEX (also known as Intel HEX) file format reader
-and convertor to binary form as a python script.
+This work implements an **intelhex** Python library to read, write, 
+create from scratch and manipulate data from HEX (also known as Intel HEX) 
+file format. These operations are provided by ``IntelHex`` class.
 
-Python package **intelhex** contains implementation of a HEX file reader 
-and convertor as the IntelHex class.  Also included are some scripts to do
-basic tasks that utilize this package.  The ``bin2hex.py`` script converts
-binary data to HEX, and the ``hex2bin.py`` works the other direction.
-``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py``
-merges multiple HEX files into one.
+The distribution package also includes several convenience Python scripts
+to do basic tasks that utilize this library. The ``bin2hex.py`` script 
+converts binary data to HEX, and the ``hex2bin.py`` works the other direction. 
+``hex2dump.py`` converts data from HEX to a hexdump which is useful for
+inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
 
 License
 -------
