@@ -40,6 +40,20 @@ Example::
     >>> ih = IntelHex("foo.hex")
     >>> ih.tobinfile("foo.bin")
 
-To write data as binary file you also can use universal method ``tofile``::
+Also you can use universal method ``tofile`` to write data as binary file::
 
     >>> ih.tofile("foo.bin", format='bin')
+
+
+Writing data in chunks
+~~~~~~~~~~~~~~~~~~~~~~
+If you need to get binary data from IntelHex as series of chunks then you can
+pass to ``tobinarray``/``tobinstr`` methods either start/end addresses
+or start address and required size of the chunk. This could be useful if
+you're creating chip programmer or bootloader.
+::
+
+      EEPROM_SIZE = 8192  # 8K bytes
+      BLOCK_SIZE = 128    # 128 bytes
+      for addr in range(0, EEPROM_SIZE, BLOCK_SIZE):
+          eeprom.i2c_write(addr, ih.tobinarray(start=addr, size=BLOCK_SIZE))
