@@ -4,15 +4,15 @@ The Intel HEX file format widely used in microprocessors and microcontrollers
 area as the de-facto standard for representation of code for programming 
 microelectronic devices.
 
-This work implements a HEX (also known as Intel HEX) file format reader 
-and convertor to binary form as a python script.
+This work implements an **intelhex** Python library to read, write, 
+create from scratch and manipulate data from HEX (also known as Intel HEX) 
+file format. These operations are provided by ``IntelHex`` class.
 
-Python package **intelhex** contains an implementation of a HEX file reader 
-and convertor as the IntelHex class. Also included are some scripts 
-to do basic tasks that utilize this package. The ``bin2hex.py`` script 
+The distribution package also includes several convenience Python scripts
+to do basic tasks that utilize this library. The ``bin2hex.py`` script 
 converts binary data to HEX, and the ``hex2bin.py`` works the other direction. 
-``hex2dump.py`` converts data from HEX to a hexdump, and ``hexmerge.py`` 
-merges multiple HEX files into one.
+``hex2dump.py`` converts data from HEX to a hexdump which is useful for
+inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
 
 This manual and more information can be found at:
 
@@ -21,3 +21,14 @@ http://www.bialix.com/intelhex/
 or at the Launchpad.net project page at:
 
 https://launchpad.net/intelhex/
+
+
+Motivation
+~~~~~~~~~~
+This work was partially inspired by SRecord_ software in that moment
+when I've stuck with its limitations and unintuitive behavior.
+
+So I've made this library and related tools which gives me 
+full control over data and HEX file creation.
+
+.. _SRecord: http://srecord.sourceforge.net/
