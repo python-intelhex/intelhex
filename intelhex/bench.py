@@ -247,7 +247,7 @@ def main(argv=None):
 
         for o,a in opts:
             if o == '-h':
-                print HELP
+                print(HELP)
                 return 0
             elif o == '-n':
                 n = int(a)
@@ -259,7 +259,8 @@ def main(argv=None):
         if args:
             raise getopt.GetoptError('Arguments are not used.')
     except getopt.GetoptError, msg:
-        print str(msg)
+        txt = str(msg)
+        print(txt)
         return 1
 
     if (test_read, test_write) == (None, None):
