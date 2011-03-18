@@ -69,10 +69,10 @@ Options:
 
         for o, a in opts:
             if o in ("-h", "--help"):
-                print usage
+                print(usage)
                 sys.exit(0)
             elif o in ("-v", "--version"):
-                print VERSION
+                print(VERSION)
                 sys.exit(0)
             elif o in ("--offset"):
                 base = 10
@@ -81,17 +81,17 @@ Options:
                 try:
                     offset = int(a, base)
                 except:
-                    raise getopt.GetoptError, 'Bad offset value'
+                    raise getopt.GetoptError('Bad offset value')
 
         if not args:
-            raise getopt.GetoptError, 'Input file is not specified'
+            raise getopt.GetoptError('Input file is not specified')
 
         if len(args) > 2:
-            raise getopt.GetoptError, 'Too many arguments'
+            raise getopt.GetoptError('Too many arguments')
 
     except getopt.GetoptError, msg:
-        print 'ERROR:', msg
-        print usage
+        print('ERROR: '+msg)
+        print(usage)
         sys.exit(2)
 
     def force_stream_binary(stream):
@@ -110,7 +110,7 @@ Options:
         fin = sys.stdin
         force_stream_binary(fin)
     elif not os.path.isfile(fin):
-        print "ERROR: File not found: %s" % fin
+        print("ERROR: File not found: %s" % fin)
         sys.exit(1)
 
     if len(args) == 2:

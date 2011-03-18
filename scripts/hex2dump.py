@@ -84,10 +84,10 @@ def main(argv=None):
                                   ["help", "version", "range="])
         for o, a in opts:
             if o in ("-h", "--help"):
-                print USAGE
+                print(USAGE)
                 return 0
             elif o in ("-v", "--version"):
-                print VERSION
+                print(VERSION)
                 return 0
             elif o in ("-r", "--range"):
                 try:
@@ -97,14 +97,14 @@ def main(argv=None):
                     if l[1] != '':
                         end = int(l[1], 16)
                 except:
-                    raise getopt.GetoptError, 'Bad range value(s)'
+                    raise getopt.GetoptError('Bad range value(s)')
         if not args:
-            raise getopt.GetoptError, 'Hex file is not specified'
+            raise getopt.GetoptError('Hex file is not specified')
         if len(args) > 1:
-            raise getopt.GetoptError, 'Too many arguments'
+            raise getopt.GetoptError('Too many arguments')
     except getopt.GetoptError, msg:
-        print 'ERROR:', msg
-        print USAGE
+        print('ERROR: '+msg)
+        print(USAGE)
         return 2
 
     try:

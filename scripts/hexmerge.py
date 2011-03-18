@@ -104,10 +104,10 @@ def main(args=None):
 
         for o,a in opts:
             if o in ('-h', '--help'):
-                print USAGE
+                print(USAGE)
                 return 0
             elif o in ('-v', '--version'):
-                print VERSION
+                print(VERSION)
                 return 0
             elif o in ('-o', '--output'):
                 output = a
@@ -132,8 +132,8 @@ def main(args=None):
             raise getopt.GetoptError('You should specify file list')
 
     except getopt.GetoptError, e:
-        print >>sys.stderr, str(e)
-        print >>sys.stderr, USAGE
+        sys.stderr.write(str(e)+"\n")
+        sys.stderr.write(USAGE+"\n")
         return 1
 
     # TODO: move actual merge code into intelhex package as helper function
@@ -149,8 +149,8 @@ def main(args=None):
         try:
             fname, fstart, fend = intelhex._get_file_and_addr_range(f)
         except intelhex._BadFileNotation:
-            print >>sys.stderr, 'Bad argument: "%s"' % f
-            print >>sys.stderr, USAGE
+            sys.stderr.write('Bad argument: "%s"\n' % f)
+            sys.stderr.write(USAGE+"\n")
             return 1
         if fname == '-':
             fname = sys.stdin
@@ -160,8 +160,8 @@ def main(args=None):
         try:
             res.merge(ih, overlap)
         except intelhex.AddressOverlapError, e:
-            print >>sys.stderr, 'Merging:', fname
-            print >>sys.stderr, str(e)
+            sys.stderr.write('Merging: '+fname+"\n")
+            sys.stderr.write(str(e)+"\n")
             return 1
 
     if (start, end) != (None, None):
