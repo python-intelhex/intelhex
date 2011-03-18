@@ -41,8 +41,8 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = u'IntelHex'
-copyright = u'2005-2010, Alexander Belchenko'
+project = 'IntelHex'
+copyright = '2005-2010, Alexander Belchenko'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -168,8 +168,8 @@ htmlhelp_basename = 'IntelHexdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'IntelHex.tex', ur'IntelHex Documentation',
-   ur'Alexander Belchenko', 'manual'),
+  ('index', 'IntelHex.tex', 'IntelHex Documentation',
+   'Alexander Belchenko', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
