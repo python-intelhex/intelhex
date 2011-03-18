@@ -90,7 +90,8 @@ Options:
             raise getopt.GetoptError('Too many arguments')
 
     except getopt.GetoptError, msg:
-        print('ERROR: '+msg)
+        txt = 'ERROR: '+msg    # that's required to get not-so-dumb result from 2to3 tool
+        print(txt)
         print(usage)
         sys.exit(2)
 
@@ -110,7 +111,8 @@ Options:
         fin = sys.stdin
         force_stream_binary(fin)
     elif not os.path.isfile(fin):
-        print("ERROR: File not found: %s" % fin)
+        txt = "ERROR: File not found: %s" % fin   # that's required to get not-so-dumb result from 2to3 tool
+        print(txt)
         sys.exit(1)
 
     if len(args) == 2:

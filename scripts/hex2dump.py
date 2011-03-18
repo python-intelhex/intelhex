@@ -103,7 +103,8 @@ def main(argv=None):
         if len(args) > 1:
             raise getopt.GetoptError('Too many arguments')
     except getopt.GetoptError, msg:
-        print('ERROR: '+msg)
+        txt = 'ERROR: '+msg  # that's required to get not-so-dumb result from 2to3 tool
+        print(txt)
         print(USAGE)
         return 2
 
