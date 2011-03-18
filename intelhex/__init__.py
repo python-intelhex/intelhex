@@ -560,7 +560,7 @@ class IntelHex(object):
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
                     bin[3] = 4      # rectyp
-                    high_ofs = int(cur_addr/65536)
+                    high_ofs = int(cur_addr>>16)
                     bytes = divmod(high_ofs, 256)
                     bin[4] = bytes[0]   # msb of high_ofs
                     bin[5] = bytes[1]   # lsb of high_ofs
@@ -610,7 +610,7 @@ class IntelHex(object):
                     else:
                         cur_addr = maxaddr + 1
                         break
-                    high_addr = int(cur_addr/65536)
+                    high_addr = int(cur_addr>>16)
                     if high_addr > high_ofs:
                         break
 
@@ -701,8 +701,8 @@ class IntelHex(object):
             addresses.sort()
             minaddr = addresses[0]
             maxaddr = addresses[-1]
-            startaddr = int(minaddr/16)*16
-            endaddr = int(maxaddr/16+1)*16
+            startaddr = int(minaddr>>4)*16
+            endaddr = int((maxaddr>>4)+1)*16
             maxdigits = max(len(str(endaddr)), 4)
             templa = '%%0%dX' % maxdigits
             range16 = range(16)
@@ -838,7 +838,7 @@ class IntelHex16bit(IntelHex):
         if aa == []:
             return 0
         else:
-            return min(aa)/2
+            return min(aa)>>1
 
     def maxaddr(self):
         '''Get maximal address of HEX content in 16-bit mode.
@@ -849,7 +849,7 @@ class IntelHex16bit(IntelHex):
         if aa == []:
             return 0
         else:
-            return max(aa)/2
+            return max(aa)>>1
 
 #/class IntelHex16bit
 
