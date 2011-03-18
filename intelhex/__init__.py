@@ -254,7 +254,7 @@ class IntelHex(object):
         """
         s = dikt.copy()
         start_addr = s.get('start_addr')
-        if s.has_key('start_addr'):
+        if start_addr is not None:
             del s['start_addr']
         for k in s.keys():
             if type(k) not in (int, long) or k < 0:
