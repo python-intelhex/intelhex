@@ -1,3 +1,5 @@
+PYTHON := python
+
 all:
 	@echo Available targets:
 	@echo  clean - clean build directory
@@ -9,16 +11,16 @@ all:
 .PHONY: clean test epydoc wininst docs
 
 clean:
-	python setup.py clean -a
+	$(PYTHON) setup.py clean -a
 
 test:
-	python setup.py test -q
+	$(PYTHON) setup.py test -q
 
 epydoc:
 	epydoc.py -o api -v intelhex
 
 wininst:
-	python setup.py bdist_wininst -d.
+	$(PYTHON) setup.py bdist_wininst -d.
 
 docs:
 	rst2html.py docs/manual.txt docs/manual.html
