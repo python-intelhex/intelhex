@@ -6,3 +6,4 @@
 ./docs/manual/.build/html/*
 ./intelhex-*
 ./MANIFEST
+__pycache__
