@@ -868,7 +868,8 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     try:
         h = IntelHex(fin)
     except HexReaderError, e:
-        print "ERROR: bad HEX file: %s" % str(e)
+        txt = "ERROR: bad HEX file: %s" % str(e)
+        print(txt)
         return 1
 
     # start, end, size
@@ -886,7 +887,8 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
     try:
         h.tobinfile(fout, start, end, pad)
     except IOError, e:
-        print "ERROR: Could not write to file: %s: %s" % (fout, str(e))
+        txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
+        print(txt)
         return 1
 
     return 0
@@ -905,13 +907,15 @@ def bin2hex(fin, fout, offset=0):
     try:
         h.loadbin(fin, offset)
     except IOError, e:
-        print 'ERROR: unable to load bin file:', str(e)
+        txt = 'ERROR: unable to load bin file:', str(e)
+        print(txt)
         return 1
 
     try:
         h.tofile(fout, format='hex')
     except IOError, e:
-        print "ERROR: Could not write to file: %s: %s" % (fout, str(e))
+        txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
+        print(txt)
         return 1
 
     return 0
@@ -1085,7 +1089,7 @@ class IntelHexError(Exception):
             return self._fmt % self.__dict__
         except (NameError, ValueError, KeyError), e:
             return 'Unprintable exception %s: %s' \
-                % (self.__class__.__name__, str(e))
+                % (repr(e), str(e))
 
 class _EndOfFile(IntelHexError):
     """Used for internal needs only."""
