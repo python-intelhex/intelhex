@@ -1346,6 +1346,24 @@ class TestHex2Bin(unittest.TestCase):
                              "%x (%x != %x)" % (addr, expected, actual))
 
 
+class TestDiffDumps(unittest.TestCase):
+
+    def test_simple(self):
+        ih1 = IntelHex({1:0x30, 20:0x31, 40:0x33})
+        ih2 = IntelHex({1:0x30, 20:0x32, 40:0x33})
+        sio = StringIO()
+        intelhex.diff_dumps(ih1, ih2, sio)
+        result = sio.getvalue()
+        self.assertEquals("""\
+--- a \n+++ b \n
+@@ -1,3 +1,3 @@
+ 0000  -- 30 -- -- -- -- -- -- -- -- -- -- -- -- -- --  | 0              |
+-0010  -- -- -- -- 31 -- -- -- -- -- -- -- -- -- -- --  |    1           |
++0010  -- -- -- -- 32 -- -- -- -- -- -- -- -- -- -- --  |    2           |
+ 0020  -- -- -- -- -- -- -- -- 33 -- -- -- -- -- -- --  |        3       |
+""", result)
+
+
 class TestBuildRecords(TestIntelHexBase):
 
     def test__from_bytes(self):

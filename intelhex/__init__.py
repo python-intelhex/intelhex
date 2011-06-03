@@ -45,6 +45,7 @@ from array import array
 from binascii import hexlify, unhexlify
 from bisect import bisect_right
 import os
+import sys
 
 
 class IntelHex(object):
@@ -682,7 +683,6 @@ class IntelHex(object):
         """
 
         if tofile is None:
-            import sys
             tofile = sys.stdout
         # start addr possibly
         if self.start_addr is not None:
@@ -920,6 +920,24 @@ def bin2hex(fin, fout, offset=0):
 
     return 0
 #/def bin2hex
+
+
+def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
+    def prepare_lines(ih):
+        from cStringIO import StringIO
+        sio = StringIO()
+        ih.dump(sio)
+        dump = sio.getvalue()
+        lines = dump.splitlines()
+        return lines
+    a = prepare_lines(ih1)
+    b = prepare_lines(ih2)
+    import difflib
+    result = list(difflib.unified_diff(a, b, fromfile=name1, tofile=name2, n=n_context, lineterm=''))
+    if tofile is None:
+        tofile = sys.stdout
+    output = '\n'.join(result)+'\n'
+    tofile.write(output)
 
 
 class Record(object):
