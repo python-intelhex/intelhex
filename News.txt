@@ -6,7 +6,7 @@ NEWS
     - New feature: compare 2 hex files using hex dump
       as string representation. Feature available as
       worker function diff_dumps() and as command-line
-      utility hexdiff.py.
+      utility hexdiff.py (#627924).
     - Changes in the codebase suggested by 2to3 tool to make
       some compatibility with Python3 (work in progress).
 
