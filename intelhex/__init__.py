@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2010, Alexander Belchenko
+# Copyright (c) 2005-2011, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -34,7 +34,7 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (bialix AT ukr net)
-@version    1.3
+@version    1.4
 '''
 
 
