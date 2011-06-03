@@ -923,6 +923,16 @@ def bin2hex(fin, fout, offset=0):
 
 
 def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
+    """Diff 2 IntelHex objects and produce unified diff output for their
+    hex dumps.
+
+    @param ih1        first IntelHex object to compare
+    @param ih2        second IntelHex object to compare
+    @param tofile     file-like object to write output
+    @param name1      name of the first hex file to show in the diff header
+    @param name2      name of the first hex file to show in the diff header
+    @param n_context  number of context lines in the unidiff output
+    """
     def prepare_lines(ih):
         from cStringIO import StringIO
         sio = StringIO()
