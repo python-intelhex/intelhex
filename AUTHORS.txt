@@ -1,6 +1,6 @@
 Author: Alexander Belchenko
 
-Copyright (C) Alexander Belchenko, 2005-2010
+Copyright (C) Alexander Belchenko, 2005-2011
 
 Contributors:
 

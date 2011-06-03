@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008-2010, Alexander Belchenko
+# Copyright (c) 2008-2011, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -40,7 +40,7 @@ from distutils.core import Command, setup
 
 METADATA = dict(
       name='intelhex',
-      version='1.3',
+      version='1.4',
 
       scripts=[
         'scripts/bin2hex.py',
