@@ -2,7 +2,7 @@
 Python IntelHex User Manual
 ---------------------------
 
-:Version: 1.3
+:Version: 1.4
 
 .. contents::
 .. sectnum::
@@ -35,6 +35,7 @@ They provide help if called incorrectly.
 .. include:: manual/part3-2.txt
 .. include:: manual/part3-3.txt
 .. include:: manual/part3-4.txt
+.. include:: manual/part3-5.txt
 
 ``intelhex`` package
 --------------------

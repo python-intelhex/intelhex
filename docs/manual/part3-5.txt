@@ -1,0 +1,19 @@
+Script ``hexdiff.py``
+*********************
+This is a script to diff context of two hex files. 
+
+To create human-readable diff this utility converts
+both hex files to hex dumps first, 
+and then utility compares those hex dumps and
+produces unified diff output for changes.
+
+::
+
+    hexdiff: diff dumps of 2 hex files.
+    
+    Usage:
+        python hexdiff.py [options] FILE1 FILE2
+    
+    Options:
+        -h, --help              this help message.
+        -v, --version           version info.
