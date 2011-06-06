@@ -46,6 +46,7 @@ METADATA = dict(
         'scripts/bin2hex.py',
         'scripts/hex2bin.py',
         'scripts/hex2dump.py',
+        'scripts/hexdiff.py',
         'scripts/hexmerge.py',
         ],
       packages=['intelhex'],
