@@ -217,9 +217,7 @@ class IntelHex(object):
             fclose = None
 
         try:
-            for b in array('B', fread()):
-                self._buf[offset] = b
-                offset += 1
+            self.frombytes(array('B', fread()), offset=offset)
         finally:
             if fclose:
                 fclose()
@@ -263,6 +261,14 @@ class IntelHex(object):
         self._buf.update(s)
         if start_addr is not None:
             self.start_addr = start_addr
+
+    def frombytes(self, bytes, offset=0):
+        """Load data from array or list of bytes.
+        Similar to loadbin() method but works directly with iterable bytes.
+        """
+        for b in bytes:
+            self._buf[offset] = b
+            offset += 1
 
     def _get_start_end(self, start=None, end=None, size=None):
         """Return default values for start and end if they are None
