@@ -44,7 +44,9 @@ __docformat__ = "javadoc"
 from array import array
 from binascii import hexlify, unhexlify
 from bisect import bisect_right
-import os
+import os, sys
+
+from compat import asbytes, asstr
 
 
 class IntelHex(object):
@@ -96,7 +98,7 @@ class IntelHex(object):
         if s[0] == ':':
             try:
                 bin = array('B', unhexlify(s[1:]))
-            except TypeError:
+            except (TypeError, ValueError):
                 # this might be raised by unhexlify when odd hexascii digits
                 raise HexRecordError(line=line)
             length = len(bin)
@@ -179,7 +181,7 @@ class IntelHex(object):
         @param  fobj        file name or file-like object
         """
         if getattr(fobj, "read", None) is None:
-            fobj = file(fobj, "r")
+            fobj = open(fobj, "r")
             fclose = fobj.close
         else:
             fclose = None
@@ -216,7 +218,7 @@ class IntelHex(object):
             fclose = None
 
         try:
-            for b in array('B', fread()):
+            for b in array('B', asbytes(fread())):
                 self._buf[offset] = b
                 offset += 1
         finally:
@@ -325,7 +327,7 @@ class IntelHex(object):
         @param  size    size of the block, used with start or end parameter.
         @return         string of binary data.
         '''
-        return self.tobinarray(start, end, pad, size).tostring()
+        return asstr(self.tobinarray(start, end, pad, size).tostring())
 
     def tobinfile(self, fobj, start=None, end=None, pad=0xFF, size=None):
         '''Convert to binary and write to file.
@@ -497,13 +499,18 @@ class IntelHex(object):
         # timeit shows that using hexstr.translate(table)
         # is faster than hexstr.upper():
         # 0.452ms vs. 0.652ms (translate vs. upper)
-        table = ''.join(chr(i).upper() for  i in range(256))
+        if sys.version_info[0] >= 3:
+            table = bytes(range(256)).upper()
+        else:
+            table = ''.join(chr(i).upper() for  i in range(256))
+
+
 
         # start address record if any
         if self.start_addr and write_start_addr:
             keys = self.start_addr.keys()
             keys.sort()
-            bin = array('B', '\0'*9)
+            bin = array('B', asbytes('\0'*9))
             if keys == ['CS','IP']:
                 # Start Segment Address Record
                 bin[0] = 4      # reclen
@@ -517,7 +524,9 @@ class IntelHex(object):
                 bin[6] = (ip >> 8) & 0x0FF
                 bin[7] = ip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
+                fwrite(':' +
+                       asstr(hexlify(bin.tostring()).translate(table)) +
+                       '\n')
             elif keys == ['EIP']:
                 # Start Linear Address Record
                 bin[0] = 4      # reclen
@@ -530,7 +539,9 @@ class IntelHex(object):
                 bin[6] = (eip >> 8) & 0x0FF
                 bin[7] = eip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
+                fwrite(':' +
+                       asstr(hexlify(bin.tostring()).translate(table)) +
+                       '\n')
             else:
                 if fclose:
                     fclose()
@@ -543,7 +554,7 @@ class IntelHex(object):
         if addr_len:
             minaddr = addresses[0]
             maxaddr = addresses[-1]
-    
+
             if maxaddr > 65535:
                 need_offset_record = True
             else:
@@ -555,17 +566,19 @@ class IntelHex(object):
 
             while cur_addr <= maxaddr:
                 if need_offset_record:
-                    bin = array('B', '\0'*7)
+                    bin = array('B', asbytes('\0'*7))
                     bin[0] = 2      # reclen
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
                     bin[3] = 4      # rectyp
                     high_ofs = int(cur_addr>>16)
-                    bytes = divmod(high_ofs, 256)
-                    bin[4] = bytes[0]   # msb of high_ofs
-                    bin[5] = bytes[1]   # lsb of high_ofs
+                    b = divmod(high_ofs, 256)
+                    bin[4] = b[0]   # msb of high_ofs
+                    bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
-                    fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
+                    fwrite(':' +
+                           asstr(hexlify(bin.tostring()).translate(table)) +
+                           '\n')
 
                 while True:
                     # produce one record
@@ -587,10 +600,10 @@ class IntelHex(object):
                     else:
                         chain_len = 1               # real chain_len
 
-                    bin = array('B', '\0'*(5+chain_len))
-                    bytes = divmod(low_addr, 256)
-                    bin[1] = bytes[0]   # msb of low_addr
-                    bin[2] = bytes[1]   # lsb of low_addr
+                    bin = array('B', asbytes('\0'*(5+chain_len)))
+                    b = divmod(low_addr, 256)
+                    bin[1] = b[0]   # msb of low_addr
+                    bin[2] = b[1]   # lsb of low_addr
                     bin[3] = 0          # rectype
                     try:    # if there is small holes we'll catch them
                         for i in range(chain_len):
@@ -601,7 +614,9 @@ class IntelHex(object):
                         bin = bin[:5+i]
                     bin[0] = chain_len
                     bin[4+chain_len] = (-sum(bin)) & 0x0FF    # chksum
-                    fwrite(':' + hexlify(bin.tostring()).translate(table) + '\n')
+                    fwrite(':' +
+                           asstr(hexlify(bin.tostring()).translate(table)) +
+                           '\n')
 
                     # adjust cur_addr/cur_ix
                     cur_ix += chain_len
@@ -637,20 +652,20 @@ class IntelHex(object):
         """Get string of bytes from given address. If any entries are blank
         from addr through addr+length, a NotEnoughDataError exception will
         be raised. Padding is not used."""
-        a = array('B', '\0'*length)
+        a = array('B', asbytes('\0'*length))
         try:
             for i in xrange(length):
                 a[i] = self._buf[addr+i]
         except KeyError:
             raise NotEnoughDataError(address=addr, length=length)
-        return a.tostring()
+        return asstr(a.tostring())
 
     def puts(self, addr, s):
         """Put string of bytes at given address. Will overwrite any previous
         entries.
         """
-        a = array('B', s)
-        for i in xrange(len(s)):
+        a = array('B', asbytes(s))
+        for i in xrange(len(a)):
             self._buf[addr+i] = a[i]
 
     def getsz(self, addr):
@@ -682,7 +697,6 @@ class IntelHex(object):
         """
 
         if tofile is None:
-            import sys
             tofile = sys.stdout
         # start addr possibly
         if self.start_addr is not None:
@@ -825,14 +839,14 @@ class IntelHex16bit(IntelHex):
         """Sets the address at addr16 to word assuming Little Endian mode.
         """
         addr_byte = addr16 * 2
-        bytes = divmod(word, 256)
-        self._buf[addr_byte] = bytes[1]
-        self._buf[addr_byte+1] = bytes[0]
+        b = divmod(word, 256)
+        self._buf[addr_byte] = b[1]
+        self._buf[addr_byte+1] = b[0]
 
     def minaddr(self):
         '''Get minimal address of HEX content in 16-bit mode.
 
-        @return         minimal address used in this object 
+        @return         minimal address used in this object
         '''
         aa = self._buf.keys()
         if aa == []:
@@ -937,7 +951,7 @@ class Record(object):
         # calculate checksum
         s = (-sum(bytes)) & 0x0FF
         bin = array('B', bytes + [s])
-        return ':' + hexlify(bin.tostring()).upper()
+        return ':' + asstr(hexlify(bin.tostring())).upper()
     _from_bytes = staticmethod(_from_bytes)
 
     def data(offset, bytes):

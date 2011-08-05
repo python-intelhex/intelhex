@@ -1,6 +1,11 @@
 NEWS
 ====
 
+* NOT RELEASED
+
+    - Python 3 compatibility changes. (Thanks to Bernhard Leiner)
+
+
 * 2010/11/24 v.1.3
 
     - hex2dump: show 0x7F character as dot for better compatibility 

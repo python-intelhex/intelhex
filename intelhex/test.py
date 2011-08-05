@@ -42,6 +42,7 @@ import sys
 import tempfile
 import unittest
 
+from compat import asbytes, asstr
 import intelhex
 from intelhex import IntelHex, \
                      IntelHexError, \
@@ -443,7 +444,7 @@ class TestIntelHex(TestIntelHexBase):
         os.close(handle)
         try:
             self.assertTrue(isinstance(fname, unicode))
-            f = file(fname, 'w')
+            f = open(fname, 'w')
             try:
                 f.write(hex8)
             finally:
@@ -479,7 +480,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
-        s2 = bin8.tostring()
+        s2 = asstr(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile(self):
@@ -488,14 +489,14 @@ class TestIntelHex(TestIntelHexBase):
         ih.tobinfile(sio)
         s1 = sio.getvalue()
         sio.close()
-        s2 = bin8.tostring()
+        s2 = asstr(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
         # new API: .tofile universal method
         sio = StringIO()
         ih.tofile(sio, format='bin')
         s1 = sio.getvalue()
         sio.close()
-        s2 = bin8.tostring()
+        s2 = asstr(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_write_empty_hexfile(self):
@@ -611,7 +612,7 @@ class TestIntelHex(TestIntelHexBase):
             'Address should be >= 0.',
             getitem, -1)
         self.assertRaisesMsg(TypeError,
-            "Address has unsupported type: <type 'str'>",
+            "Address has unsupported type: %s" % type('foo'),
             getitem, 'foo')
         # new object with some data
         ih = IntelHex()
@@ -643,7 +644,7 @@ class TestIntelHex(TestIntelHexBase):
             'Address should be >= 0.',
             setitem, -1, 0)
         self.assertRaisesMsg(TypeError,
-            "Address has unsupported type: <type 'str'>",
+            "Address has unsupported type: %s" % type('foo'),
             setitem, 'foo', 0)
         # slice operations
         ih[0:4] = range(4)
@@ -691,7 +692,7 @@ class TestIntelHex(TestIntelHexBase):
             'Address should be >= 0.',
             delitem, -1)
         self.assertRaisesMsg(TypeError,
-            "Address has unsupported type: <type 'str'>",
+            "Address has unsupported type: %s" % type('foo'),
             delitem, 'foo')
         # deleting slice
         del ih[0:1]     # no error here because of slicing
@@ -1337,7 +1338,7 @@ class TestHex2Bin(unittest.TestCase):
 
     def test_hex2bin(self):
         ih = hex2bin(self.fin, self.fout)
-        data = array.array('B', self.fout.getvalue())
+        data = array.array('B', asbytes(self.fout.getvalue()))
         for addr in xrange(len(bin8)):
             expected = bin8[addr]
             actual = data[addr]
