@@ -97,7 +97,7 @@ class IntelHex(object):
 
         if s[0] == ':':
             try:
-                bin = array('B', unhexlify(s[1:]))
+                bin = array('B', unhexlify(asbytes(s[1:])))
             except (TypeError, ValueError):
                 # this might be raised by unhexlify when odd hexascii digits
                 raise HexRecordError(line=line)
