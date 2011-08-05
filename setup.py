@@ -35,8 +35,8 @@
 
 """Setup script for IntelHex."""
 
+import sys
 from distutils.core import Command, setup
-
 
 METADATA = dict(
       name='intelhex',
@@ -85,7 +85,6 @@ class test(Command):
         pass
 
     def run(self):
-        import sys
         import unittest
         import intelhex.test
         verbosity = 1
@@ -131,6 +130,10 @@ def main():
         'test': test,
         'bench': bench,
         }
+    if sys.version_info[0] >= 3:
+        from distutils.command.build_py import build_py_2to3
+        metadata['cmdclass']['build_py'] = build_py_2to3
+
     setup(**metadata)
 
 

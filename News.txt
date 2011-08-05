@@ -1,14 +1,15 @@
 NEWS
 ====
 
-* 2011/06/03 v.1.4
+* 2011/08/05 v.1.4 NOT RELEASED YET
 
     - New feature: compare 2 hex files using hex dump
       as string representation. Feature available as
       worker function diff_dumps() and as command-line
       utility hexdiff.py (#627924).
     - Changes in the codebase suggested by 2to3 tool to make
-      some compatibility with Python3 (work in progress).
+      some compatibility with Python3. 
+      (Thanks to Bernhard Leiner for his help)
 
 * 2010/11/24 v.1.3
 
