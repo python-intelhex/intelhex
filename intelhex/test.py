@@ -1355,15 +1355,19 @@ class TestDiffDumps(unittest.TestCase):
         sio = StringIO()
         intelhex.diff_dumps(ih1, ih2, sio)
         result = sio.getvalue()
-        self.assertEquals((
-            "--- a \n"
-            "+++ b \n"
+        extra = ' '
+        if sys.version_info[0] >= 3:
+            extra = ''
+        shouldbe = (
+            "--- a%(extra)s\n"
+            "+++ b%(extra)s\n"
             "@@ -1,3 +1,3 @@\n"
             " 0000  -- 30 -- -- -- -- -- -- -- -- -- -- -- -- -- --  | 0              |\n"
             "-0010  -- -- -- -- 31 -- -- -- -- -- -- -- -- -- -- --  |    1           |\n"
             "+0010  -- -- -- -- 32 -- -- -- -- -- -- -- -- -- -- --  |    2           |\n"
             " 0020  -- -- -- -- -- -- -- -- 33 -- -- -- -- -- -- --  |        3       |\n"
-            ), result)
+            ) % dict(extra=extra)
+        self.assertEquals(shouldbe, result)
 
 
 class TestBuildRecords(TestIntelHexBase):
