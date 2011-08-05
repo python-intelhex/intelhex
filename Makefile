@@ -8,8 +8,9 @@ all:
 	@echo  wininst - Windows installer for Python
 	@echo  docs - build docs with ReST and Sphinx
 	@echo  2to3 - convert source code using 2to3 converter
+	@echo  3to2 - convert sources back after 2to3 (bzr revert)
 
-.PHONY: clean test epydoc wininst docs 2to3
+.PHONY: clean test epydoc wininst docs 2to3 3to2
 
 clean:
 	$(PYTHON) setup.py clean -a
@@ -33,3 +34,6 @@ docs:
 	$(PYTHON) tools/2to3.py --no-diff --write --nobackups scripts
 	python tools/crlf.py scripts/bin2hex.py scripts/hex2bin.py scripts/hex2dump.py \
 		scripts/hexdiff.py scripts/hexmerge.py
+
+3to2:
+	bzr revert --no-backup intelhex scripts 
