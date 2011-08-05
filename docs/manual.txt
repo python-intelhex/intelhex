@@ -12,6 +12,7 @@ Introduction
 .. include:: manual/part1-1.txt
 .. include:: manual/part1-2.txt
 .. include:: manual/part1-3.txt
+.. include:: manual/part1-4.txt
 
 Basic API and usage
 -------------------

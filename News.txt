@@ -7,8 +7,10 @@ NEWS
       as string representation. Feature available as
       worker function diff_dumps() and as command-line
       utility hexdiff.py (#627924).
-    - Changes in the codebase suggested by 2to3 tool to make
-      some compatibility with Python3. 
+    - Changes in the codebase suggested by 2to3 tool to provide
+      compatibility with Python3. Now sources can be successfully
+      converted to Python3 with 2to3 utility. 
+      See Python 3 notes in README.txt and documentation.
       (Thanks to Bernhard Leiner for his help)
 
 * 2010/11/24 v.1.3
