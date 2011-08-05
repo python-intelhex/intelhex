@@ -133,6 +133,8 @@ def main():
     if sys.version_info[0] >= 3:
         from distutils.command.build_py import build_py_2to3
         metadata['cmdclass']['build_py'] = build_py_2to3
+        from distutils.command.build_scripts import build_scripts_2to3
+        metadata['cmdclass']['build_scripts'] = build_scripts_2to3
 
     setup(**metadata)
 
