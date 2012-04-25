@@ -1073,6 +1073,13 @@ class TestIntelHex16bit(TestIntelHexBase):
         self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
                          "Written hex file does not equal with original")
 
+    def test_bug_988148(self):
+        # see https://bugs.launchpad.net/intelhex/+bug/988148
+        ih = intelhex.IntelHex16bit(intelhex.IntelHex())
+        ih[0] = 25
+        sio = StringIO()
+        ih.write_hex_file(sio)
+
     def test_setitem(self):
         ih = intelhex.IntelHex16bit(self.f)
 

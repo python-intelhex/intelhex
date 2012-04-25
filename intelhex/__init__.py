@@ -811,6 +811,7 @@ class IntelHex16bit(IntelHex):
         if isinstance(source, IntelHex):
             # from ihex8
             self.padding = source.padding
+            self.start_addr = source.start_addr
             # private members
             self._buf = source._buf
             self._offset = source._offset

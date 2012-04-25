@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* 2011/08/05 v.1.4 NOT RELEASED YET
+* 2012/04/25 v.1.4 NOT RELEASED YET
 
     - New feature: compare 2 hex files using hex dump
       as string representation. Feature available as
@@ -12,6 +12,8 @@ NEWS
       converted to Python3 with 2to3 utility. 
       See Python 3 notes in README.txt and documentation.
       (Thanks to Bernhard Leiner for his help)
+    - Fixed bug #988148: IntelHex16bit should copy all public attributes
+      from source IntelHex 8-bit object. (Thanks to Morgan McClure)
 
 * 2010/11/24 v.1.3
 
