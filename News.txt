@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* 2012/04/25 v.1.4 NOT RELEASED YET
+* 2012/04/25 v.1.4
 
     - New feature: compare 2 hex files using hex dump
       as string representation. Feature available as
