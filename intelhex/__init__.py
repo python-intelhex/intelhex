@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2011, Alexander Belchenko
+# Copyright (c) 2005-2012, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
