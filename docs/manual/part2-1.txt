@@ -16,6 +16,3 @@ If the source is another instance of IntelHex, the new object will become
 a copy of the source. Finally, a Python dictionary may be specified. 
 This dictionary should have keys equal to memory locations and values equal 
 to the data stored in those locations. See the docstrings for more details.
-
-In version 0.9 the API slightly changed. 
-Now you can create an empty object and load data later.

@@ -1,6 +1,6 @@
 Author: Alexander Belchenko
 
-Copyright (C) Alexander Belchenko, 2005-2011
+Copyright (C) Alexander Belchenko, 2005-2012
 
 Contributors:
 
@@ -10,5 +10,6 @@ Contributors:
 * Enoch H. Wexler
 * Heiko Henkelmann
 * Henrik Maier
+* Morgan McClure
 * Nathan P. Stien
 * Zachary Clifford

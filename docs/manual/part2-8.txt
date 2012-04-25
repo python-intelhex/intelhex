@@ -6,7 +6,7 @@ These can be caught and handled using try...except blocks like so::
     >>> try:
     ...     mystring = ih.gets(0x20,20)
     >>> except intelhex.NotEnoughDataError:
-    ...     print "There was not enough data at that location"
+    ...     print "There is not enough data at that location"
 
 See the API docs for information about errors raised by IntelHex. 
 They are all subclasses of IntelHexError, so the except block above could be used 
