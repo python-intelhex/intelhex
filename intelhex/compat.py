@@ -31,11 +31,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Compatibility functions for python 2 and 3
+'''Compatibility functions for python 2 and 3.
 
-@author     Bernhard Leiner (bleiner@gmail.com)
+@author     Bernhard Leiner (bleiner AT gmail com)
 @version    1.0
 '''
+
+__docformat__ = "javadoc"
+
 
 import sys
 
