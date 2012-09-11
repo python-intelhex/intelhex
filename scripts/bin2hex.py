@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008, 2010, 2011 Alexander Belchenko
+# Copyright (c) 2008,2010,2011,2012 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -90,7 +90,7 @@ Options:
             raise getopt.GetoptError('Too many arguments')
 
     except getopt.GetoptError, msg:
-        txt = 'ERROR: '+msg    # that's required to get not-so-dumb result from 2to3 tool
+        txt = 'ERROR: '+str(msg)    # that's required to get not-so-dumb result from 2to3 tool
         print(txt)
         print(usage)
         sys.exit(2)
