@@ -34,7 +34,7 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (bialix AT ukr net)
-@version    1.4
+@version    1.4.1
 '''
 
 

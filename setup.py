@@ -40,7 +40,7 @@ from distutils.core import Command, setup
 
 METADATA = dict(
       name='intelhex',
-      version='1.4',
+      version='1.4.1',
 
       scripts=[
         'scripts/bin2hex.py',

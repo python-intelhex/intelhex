@@ -35,7 +35,7 @@
 
 '''Intel HEX file format bin2hex convertor utility.'''
 
-VERSION = '1.4'
+VERSION = '1.4.1'
 
 if __name__ == '__main__':
     import getopt

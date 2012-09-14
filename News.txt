@@ -1,6 +1,11 @@
 NEWS
 ====
 
+* yyyy/mm/dd v.1.4.1
+
+    - Fixed bug: wrong getopt error handling in some scripts.
+      (Thanks to Andy Mozhevilov for bug report)
+
 * 2012/04/25 v.1.4
 
     - New feature: compare 2 hex files using hex dump

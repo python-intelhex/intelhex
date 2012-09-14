@@ -35,7 +35,7 @@
 
 """Merge content of several hex files into one file."""
 
-VERSION = '1.4'
+VERSION = '1.4.1'
 
 USAGE = '''hexmerge: merge content of hex files.
 Usage:
