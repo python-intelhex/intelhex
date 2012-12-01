@@ -325,7 +325,7 @@ class IntelHex(object):
 
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=0xFF, size=None):
+    def tobinstr(self, start=None, end=None, pad=None, size=None):
         ''' Convert to binary form and return as a string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
@@ -336,7 +336,7 @@ class IntelHex(object):
         '''
         return asstr(self.tobinarray(start, end, pad, size).tostring())
 
-    def tobinfile(self, fobj, start=None, end=None, pad=0xFF, size=None):
+    def tobinfile(self, fobj, start=None, end=None, pad=None, size=None):
         '''Convert to binary and write to file.
 
         @param  fobj    file name or file object for writing output bytes.

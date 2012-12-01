@@ -3,6 +3,10 @@ NEWS
 
 * yyyy/mm/dd v.1.4.1
 
+    - API changes: Functions tobinstr/tobinfile: 
+      default value of pad should be None (was 0xFF) 
+      to allow value of IntelHex.padding used 
+      if no explicit pad specified. (changed to None now)
     - Fixed bug: wrong getopt error handling in some scripts.
       (Thanks to Andy Mozhevilov for bug report)
 
