@@ -431,7 +431,6 @@ class IntelHex(object):
                 raise TypeError('Address should be >= 0.')
             self._buf[addr] = byte
         elif t == slice:
-            addresses = self._buf.keys()
             if not isinstance(byte, (list, tuple)):
                 raise ValueError('Slice operation expects sequence of bytes')
             start = addr.start
