@@ -1363,7 +1363,7 @@ class TestDiffDumps(unittest.TestCase):
         intelhex.diff_dumps(ih1, ih2, sio)
         result = sio.getvalue()
         extra = ' '
-        if sys.version_info[0] >= 3:
+        if sys.version_info[0] >= 3 or sys.version >= '2.7':
             extra = ''
         shouldbe = (
             "--- a%(extra)s\n"
