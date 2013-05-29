@@ -9,6 +9,7 @@ NEWS
       if no explicit pad specified. (changed to None now)
     - Fixed bug: wrong getopt error handling in some scripts.
       (Thanks to Andy Mozhevilov for bug report)
+    - PEP-8 style improvements. (Thanks to Stefan Schmitt)
 
 * 2012/04/25 v.1.4
 

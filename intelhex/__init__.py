@@ -743,31 +743,32 @@ class IntelHex(object):
                         s.append(' ')
                 tofile.write('  |' + ''.join(s) + '|\n')
 
-    def merge(this, other, overlap='error'):
-        """Merge content of other IntelHex object to this object.
+    def merge(self, other, overlap='error'):
+        """Merge content of other IntelHex object into current object (self).
         @param  other   other IntelHex object.
         @param  overlap action on overlap of data or starting addr:
                         - error: raising OverlapError;
-                        - ignore: ignore other data and keep this data
+                        - ignore: ignore other data and keep current data
                                   in overlapping region;
-                        - replace: replace this data with other data
+                        - replace: replace data with other data
                                   in overlapping region.
 
         @raise  TypeError       if other is not instance of IntelHex
-        @raise  ValueError      if other is the same object as this
+        @raise  ValueError      if other is the same object as self 
+                                (it can't merge itself)
         @raise  ValueError      if overlap argument has incorrect value
         @raise  AddressOverlapError    on overlapped data
         """
         # check args
         if not isinstance(other, IntelHex):
             raise TypeError('other should be IntelHex object')
-        if other is this:
+        if other is self:
             raise ValueError("Can't merge itself")
         if overlap not in ('error', 'ignore', 'replace'):
             raise ValueError("overlap argument should be either "
                 "'error', 'ignore' or 'replace'")
         # merge data
-        this_buf = this._buf
+        this_buf = self._buf
         other_buf = other._buf
         for i in other_buf:
             if i in this_buf:
@@ -778,17 +779,17 @@ class IntelHex(object):
                     continue
             this_buf[i] = other_buf[i]
         # merge start_addr
-        if this.start_addr != other.start_addr:
-            if this.start_addr is None:     # set start addr from other
-                this.start_addr = other.start_addr
-            elif other.start_addr is None:  # keep this start addr
+        if self.start_addr != other.start_addr:
+            if self.start_addr is None:     # set start addr from other
+                self.start_addr = other.start_addr
+            elif other.start_addr is None:  # keep existing start addr
                 pass
             else:                           # conflict
                 if overlap == 'error':
                     raise AddressOverlapError(
                         'Starting addresses are different')
                 elif overlap == 'replace':
-                    this.start_addr = other.start_addr
+                    self.start_addr = other.start_addr
 #/IntelHex
 
 

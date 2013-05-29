@@ -1,6 +1,6 @@
 Author: Alexander Belchenko
 
-Copyright (C) Alexander Belchenko, 2005-2012
+Copyright (C) Alexander Belchenko, 2005-2013
 
 Contributors:
 
@@ -12,4 +12,5 @@ Contributors:
 * Henrik Maier
 * Morgan McClure
 * Nathan P. Stien
+* Stefan Schmitt
 * Zachary Clifford
