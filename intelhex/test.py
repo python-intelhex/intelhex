@@ -724,6 +724,21 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEquals(1, ih.minaddr())
         self.assertEquals(10, ih.maxaddr())
 
+    def test__get_start_end(self):
+        # test for private method _get_start_end
+        # for empty object
+        ih = IntelHex()
+        self.assertRaises(intelhex.EmptyIntelHexError, ih._get_start_end)
+        self.assertRaises(intelhex.EmptyIntelHexError, ih._get_start_end, size=10)
+        self.assertEquals((0,9), ih._get_start_end(start=0, size=10))
+        self.assertEquals((1,10), ih._get_start_end(end=10, size=10))
+        # normal object
+        ih = IntelHex({1:2, 7:8, 10:0})
+        self.assertEquals((1,10), ih._get_start_end())
+        self.assertEquals((1,10), ih._get_start_end(size=10))        
+        self.assertEquals((0,9), ih._get_start_end(start=0, size=10))
+        self.assertEquals((1,10), ih._get_start_end(end=10, size=10))
+
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 

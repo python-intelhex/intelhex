@@ -273,14 +273,18 @@ class IntelHex(object):
             offset += 1
 
     def _get_start_end(self, start=None, end=None, size=None):
-        """Return default values for start and end if they are None
+        """Return default values for start and end if they are None.
+        If this IntelHex object is empty then it's error to
+        invoke this method with both start and end as None. 
         """
+        if (start,end) == (None,None) and self._buf == {}:
+            raise EmptyIntelHexError
         if size is not None:
             if None not in (start, end):
                 raise ValueError("tobinarray: you can't use start,end and size"
                                  " arguments in the same time")
             if (start, end) == (None, None):
-                start = min(self._buf.keys())
+                start = self.minaddr()
             if start is not None:
                 end = start + size - 1
             else:
@@ -290,9 +294,9 @@ class IntelHex(object):
                                      "for given end address (%d)" % (size,end))
         else:
             if start is None:
-                start = min(self._buf.keys())
+                start = self.minaddr()
             if end is None:
-                end = max(self._buf.keys())
+                end = self.maxaddr()
             if start > end:
                 start, end = end, start
         return start, end
@@ -1118,6 +1122,7 @@ def _get_file_and_addr_range(s, _support_drive_letter=None):
 #       _EndOfFile  - it's not real error, used internally by hex reader as signal that EOF record found
 #       BadAccess16bit - not enough data to read 16 bit value (deprecated, see NotEnoughDataError)
 #       NotEnoughDataError - not enough data to read N contiguous bytes
+#       EmptyIntelHexError - requested operation cannot be performed with empty object
 
 class IntelHexError(Exception):
     '''Base Exception class for IntelHex module'''
@@ -1203,3 +1208,6 @@ class NotEnoughDataError(IntelHexError):
 
 class BadAccess16bit(NotEnoughDataError):
     _fmt = 'Bad access at 0x%(address)X: not enough data to read 16 bit value'
+
+class EmptyIntelHexError(IntelHexError):
+    _fmt = "Requested operation cannot be executed with empty object"
