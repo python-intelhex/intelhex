@@ -798,7 +798,7 @@ class IntelHex(object):
 
 
 class IntelHex16bit(IntelHex):
-    """Access to data as 16-bit words."""
+    """Access to data as 16-bit words. Intended to use with Microchip HEX files."""
 
     def __init__(self, source):
         """Construct class from HEX file
