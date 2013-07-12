@@ -1045,6 +1045,11 @@ class TestIntelHex16bit(TestIntelHexBase):
         ih = intelhex.IntelHex(self.f)
         ih16 = intelhex.IntelHex16bit(ih)
 
+    def test_default_padding(self):
+        ih16 = intelhex.IntelHex16bit()
+        self.assertEqual(0x0FFFF, ih16.padding)
+        self.assertEqual(0x0FFFF, ih16[0])
+
     def test_minaddr(self):
         ih = intelhex.IntelHex16bit(self.f)
         addr = ih.minaddr()
@@ -1104,6 +1109,17 @@ class TestIntelHex16bit(TestIntelHexBase):
 
         self.assertNotEqual(old, ih[0],
                             "Setting new value to internal buffer failed")
+
+    def test_tobinarray(self):
+        ih = intelhex.IntelHex16bit()
+        ih[0] = 0x1234
+        ih[1] = 0x5678
+        self.assertEqual(array.array('H', [0x1234,0x5678,0xFFFF]),
+                         ih.tobinarray(start=0, end=2))
+        # change padding
+        ih.padding = 0x3FFF
+        self.assertEqual(array.array('H', [0x1234,0x5678,0x3FFF]),
+                         ih.tobinarray(start=0, end=2))
 #/class TestIntelHex16bit
 
 

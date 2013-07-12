@@ -16,6 +16,8 @@ NEWS
     - Fixed bug: wrong getopt error handling in some scripts.
       (Thanks to Andy Mozhevilov for bug report)
     - PEP-8 style improvements. (Thanks to Stefan Schmitt)
+    - IntelHex16bit.tobinarray method returns array of unsigned short
+      (words) values. (Feature request from Stefan Schmitt)
 
 * 2012/04/25 v.1.4
 

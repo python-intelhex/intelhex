@@ -67,7 +67,7 @@ class IntelHex(object):
                             (file name of HEX file, file object, addr dict or
                              other IntelHex object)
         '''
-        #public members
+        # public members
         self.padding = 0x0FF
         # Start Address
         self.start_addr = None
@@ -842,7 +842,7 @@ class IntelHex(object):
 class IntelHex16bit(IntelHex):
     """Access to data as 16-bit words. Intended to use with Microchip HEX files."""
 
-    def __init__(self, source):
+    def __init__(self, source=None):
         """Construct class from HEX file
         or from instance of ordinary IntelHex class. If IntelHex object
         is passed as source, the original IntelHex object should not be used
@@ -861,6 +861,9 @@ class IntelHex16bit(IntelHex):
             # private members
             self._buf = source._buf
             self._offset = source._offset
+        elif isinstance(source, dict):
+            raise IntelHexError("IntelHex16bit does not support initialization from dictionary yet.\n"
+                                "Patches are welcome.")
         else:
             IntelHex.__init__(self, source)
 
@@ -918,6 +921,31 @@ class IntelHex16bit(IntelHex):
             return 0
         else:
             return max(aa)>>1
+
+    def tobinarray(self, start=None, end=None, size=None):
+        '''Convert this object to binary form as array (of 2-bytes word data).
+        If start and end unspecified, they will be inferred from the data.
+        @param  start   start address of output data.
+        @param  end     end address of output data (inclusive).
+        @param  size    size of the block (number of words),
+                        used with start or end parameter.
+        @return         array of unsigned short (uint16_t) data.
+        '''
+        bin = array('H')
+
+        if self._buf == {} and None in (start, end):
+            return bin
+
+        if size is not None and size <= 0:
+            raise ValueError("tobinarray: wrong value for size")
+
+        start, end = self._get_start_end(start, end, size)
+
+        for addr in xrange(start, end+1):
+            bin.append(self[addr])
+
+        return bin
+
 
 #/class IntelHex16bit
 
