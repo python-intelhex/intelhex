@@ -50,7 +50,7 @@ Writing data in chunks
 If you need to get binary data from IntelHex as series of chunks then you can
 pass to ``tobinarray``/``tobinstr`` methods either start/end addresses
 or start address and required size of the chunk. This could be useful if
-you're creating chip programmer or bootloader.
+you're creating Eeprom/Flash IC programmer or bootloader.
 ::
 
       EEPROM_SIZE = 8192  # 8K bytes

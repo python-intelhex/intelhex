@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2012, Alexander Belchenko
+# Copyright (c) 2005-2013, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -33,8 +33,8 @@
 
 '''Intel HEX file format reader and converter.
 
-@author     Alexander Belchenko (bialix AT ukr net)
-@version    1.4.1
+@author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
+@version    1.5
 '''
 
 
@@ -48,6 +48,12 @@ import os
 import sys
 
 from compat import asbytes, asstr
+
+
+class _DeprecatedParam(object):
+    pass
+
+_DEPRECATED = _DeprecatedParam()
 
 
 class IntelHex(object):
@@ -301,16 +307,29 @@ class IntelHex(object):
                 start, end = end, start
         return start, end
 
-    def tobinarray(self, start=None, end=None, pad=None, size=None):
+    def tobinarray(self, start=None, end=None, pad=_DEPRECATED, size=None):
         ''' Convert this object to binary form as array. If start and end 
         unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
-        @param  pad     fill empty spaces with this value
-                        (if None used self.padding).
+        @param  pad     [DEPRECATED PARAMETER, please use self.padding instead]
+                        fill empty spaces with this value
+                        (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
         @return         array of unsigned char data.
         '''
+        if not isinstance(pad, _DeprecatedParam):
+            print "IntelHex.tobinarray: 'pad' parameter is deprecated."
+            if pad is not None:
+                print "Please, use IntelHex.padding attribute instead."
+            else:
+                print "Please, don't pass it explicitly."
+                print "Use syntax like this: ih.tobinarray(start=xxx, end=yyy, size=zzz)"
+        else:
+            pad = None
+        return self._tobinarray_really(start, end, pad, size)
+
+    def _tobinarray_really(self, start, end, pad, size):
         if pad is None:
             pad = self.padding
 
@@ -329,34 +348,57 @@ class IntelHex(object):
 
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=None, size=None):
+    def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None):
         ''' Convert to binary form and return as a string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
-        @param  pad     fill empty spaces with this value
-                        (if None used self.padding).
+        @param  pad     [DEPRECATED PARAMETER, please use self.padding instead]
+                        fill empty spaces with this value
+                        (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
         @return         string of binary data.
         '''
-        return asstr(self.tobinarray(start, end, pad, size).tostring())
+        if not isinstance(pad, _DeprecatedParam):
+            print "IntelHex.tobinstr: 'pad' parameter is deprecated."
+            if pad is not None:
+                print "Please, use IntelHex.padding attribute instead."
+            else:
+                print "Please, don't pass it explicitly."
+                print "Use syntax like this: ih.tobinstr(start=xxx, end=yyy, size=zzz)"
+        else:
+            pad = None
+        return self._tobinstr_really(start, end, pad, size)
 
-    def tobinfile(self, fobj, start=None, end=None, pad=None, size=None):
+    def _tobinstr_really(self, start, end, pad, size):
+        return asstr(self._tobinarray_really(start, end, pad, size).tostring())
+
+    def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None):
         '''Convert to binary and write to file.
 
         @param  fobj    file name or file object for writing output bytes.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
-        @param  pad     fill empty spaces with this value
-                        (if None used self.padding).
+        @param  pad     [DEPRECATED PARAMETER, please use self.padding instead]
+                        fill empty spaces with this value
+                        (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
         '''
+        if not isinstance(pad, _DeprecatedParam):
+            print "IntelHex.tobinfile: 'pad' parameter is deprecated."
+            if pad is not None:
+                print "Please, use IntelHex.padding attribute instead."
+            else:
+                print "Please, don't pass it explicitly."
+                print "Use syntax like this: ih.tobinfile(start=xxx, end=yyy, size=zzz)"
+        else:
+            pad = None
         if getattr(fobj, "write", None) is None:
             fobj = file(fobj, "wb")
             close_fd = True
         else:
             close_fd = False
 
-        fobj.write(self.tobinstr(start, end, pad, size))
+        fobj.write(self._tobinstr_really(start, end, pad, size))
 
         if close_fd:
             fobj.close()
@@ -880,7 +922,7 @@ class IntelHex16bit(IntelHex):
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -911,7 +953,10 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=0xFF):
                 start = 0
 
     try:
-        h.tobinfile(fout, start, end, pad)
+        if pad is not None:
+            # using .padding attribute rather than pad argument to function call
+            h.padding = pad
+        h.tobinfile(fout, start, end)
     except IOError, e:
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
         print(txt)

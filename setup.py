@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008-2012, Alexander Belchenko
+# Copyright (c) 2008-2013, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -40,7 +40,7 @@ from distutils.core import Command, setup
 
 METADATA = dict(
       name='intelhex',
-      version='1.4.1',
+      version='1.5',
 
       scripts=[
         'scripts/bin2hex.py',
@@ -52,7 +52,7 @@ METADATA = dict(
       packages=['intelhex'],
 
       author='Alexander Belchenko',
-      author_email='bialix@ukr.net',
+      author_email='alexander.belchenko@gmail.com',
       url='http://www.bialix.com/intelhex/',
 
       description='Intel HEX file format reader and convertor',

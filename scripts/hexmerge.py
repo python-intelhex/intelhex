@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008, 2010, 2011 Alexander Belchenko
+# Copyright (c) 2008,2010,2011,2013 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 """Merge content of several hex files into one file."""
 
-VERSION = '1.4.1'
+VERSION = '1.5'
 
 USAGE = '''hexmerge: merge content of hex files.
 Usage:

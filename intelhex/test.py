@@ -457,10 +457,11 @@ class TestIntelHex(TestIntelHexBase):
 
     def test_tobinarray_empty(self):
         ih = IntelHex()
-        self.assertEqual(array.array('B', []), ih.tobinarray(pad=0xFF))
-        self.assertEqual(array.array('B', []), ih.tobinarray(start=0,pad=0xFF))
-        self.assertEqual(array.array('B', []), ih.tobinarray(end=2,pad=0xFF))
-        self.assertEqual(array.array('B', [255,255,255]), ih.tobinarray(0,2,pad=0xFF))
+        ih.padding = 0xFF   # set-up explicit padding value and don't use pad parameter
+        self.assertEqual(array.array('B', []), ih.tobinarray())
+        self.assertEqual(array.array('B', []), ih.tobinarray(start=0))
+        self.assertEqual(array.array('B', []), ih.tobinarray(end=2))
+        self.assertEqual(array.array('B', [255,255,255]), ih.tobinarray(0,2))
 
     def test_tobinarray_with_size(self):
         ih = IntelHex(self.f)

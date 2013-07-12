@@ -6,9 +6,9 @@ Python implementation
 ---------------------
 
 Author: Alexander Belchenko
-Contact: bialix AT ukr net
-Date: 2012-09-11
-Version: 1.4.1
+Contact: alexander dot belchenko at gmail dot com
+Date: yyyy-mm-dd
+Version: 1.5
 
 Introduction
 ------------

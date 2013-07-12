@@ -1,12 +1,18 @@
 NEWS
 ====
 
-* yyyy/mm/dd v.1.4.1
+* yyyy/mm/dd v.1.5
 
-    - API changes: Functions tobinstr/tobinfile: 
-      default value of pad should be None (was 0xFF) 
+    - API changes: Functions tobinarray/tobinstr/tobinfile:
+      pad parameter is deprecated and will be removed in
+      future releases. Use IntelHex.padding attribute instead,
+      and don't pass pad as None explicitly please.
+      If you need to use size parameter, then use syntax like that:
+          ih.tobinarray(start=xxx, size=yyy)
+    - API changes: Functions tobinarray/tobinstr/tobinfile:
+      default value of pad is None now (was 0xFF) 
       to allow value of IntelHex.padding used 
-      if no explicit pad specified. (changed to None now)
+      if no explicit pad specified.
     - Fixed bug: wrong getopt error handling in some scripts.
       (Thanks to Andy Mozhevilov for bug report)
     - PEP-8 style improvements. (Thanks to Stefan Schmitt)
