@@ -218,7 +218,7 @@ class IntelHex(object):
         """
         fread = getattr(fobj, "read", None)
         if fread is None:
-            f = file(fobj, "rb")
+            f = open(fobj, "rb")
             fread = f.read
             fclose = f.close
         else:
@@ -393,7 +393,7 @@ class IntelHex(object):
         else:
             pad = None
         if getattr(fobj, "write", None) is None:
-            fobj = file(fobj, "wb")
+            fobj = open(fobj, "wb")
             close_fd = True
         else:
             close_fd = False
@@ -543,7 +543,7 @@ class IntelHex(object):
             fobj = f
             fclose = None
         else:
-            fobj = file(f, 'w')
+            fobj = open(f, 'w')
             fwrite = fobj.write
             fclose = fobj.close
 

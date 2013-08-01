@@ -18,6 +18,8 @@ NEWS
     - PEP-8 style improvements. (Thanks to Stefan Schmitt)
     - IntelHex16bit.tobinarray method returns array of unsigned short
       (words) values. (Feature request from Stefan Schmitt)
+    - Improved Python 3 compatibility (don't use old file() function).
+      (Thanks to Luis Panadero Guardeño for bug report)
 
 * 2012/04/25 v.1.4
 
