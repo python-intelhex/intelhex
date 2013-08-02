@@ -13,6 +13,8 @@ to do basic tasks that utilize this library. The ``bin2hex.py`` script
 converts binary data to HEX, and the ``hex2bin.py`` works the other direction. 
 ``hex2dump.py`` converts data from HEX to a hexdump which is useful for
 inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
+In addition you can try to inspect differences between 2 HEX files with
+``hexdiff.py`` utility which uses dump output similar to ``hex2dump.py``.
 
 This manual and more information can be found at:
 

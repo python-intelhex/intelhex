@@ -1,7 +1,7 @@
 Script ``hex2bin.py``
 *********************
 You can use ``hex2bin.py`` as handy hex-to-bin converter. 
-This script is just front end for function ``hex2bin`` from intelhex package.
+This script is just a frontend for function ``hex2bin`` from intelhex package.
 ::
 
         Usage:

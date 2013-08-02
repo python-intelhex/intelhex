@@ -10,6 +10,11 @@ you need to use class ``IntelHex16bit``. This class is derived from IntelHex
 and has all its methods. Some of methods have been modified to implement 
 16-bit behaviour.
 
+**NOTE:** ``IntelHex16bit`` class despite its name **can't handle** real HEX16 
+files. Initially ``IntelHex16bit`` has been created as helper class to work with
+HEX files for Microchip's PIC16 family firmware. It may or may not work for
+your purpose.
+
 This class assumes the data is in Little Endian byte order. 
 The data can be accessed exactly like above, except that data returned will be 
 16 bits, and the addresses should be word addresses.

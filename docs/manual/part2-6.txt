@@ -13,9 +13,9 @@ The overlap parameter specifies what should be done when memory
 locations in the original object overlap with locations in the new object. 
 It can take three options:
 
-* error -- stop and raise an exception (default)
-* ignore -- keep data from the original that contains data at overlapped address
-* replace -- use data from the new object that contains data at overlapped address
+* ``error`` - stop and raise an exception (default)
+* ``ignore`` - keep data from the original that contains data at overlapped address
+* ``replace`` - use data from the new object that contains data at overlapped address
 
 You can merge only part of other hex file by using slice index notation::
 

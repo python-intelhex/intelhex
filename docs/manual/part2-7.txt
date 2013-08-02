@@ -11,18 +11,18 @@ A common usage would be to read a hex file with IntelHex, use the above syntax
 to modify it, and then write out the modified file. The above command can be used 
 on an empty IntelHex object to synthesize a hex file from scratch.
 
-Another important feature helps work with C strings via putsz/getsz, e.g.::
+Another important feature helps work with C strings via ``putsz``/``getsz``, e.g.::
 
     >>> ih.putsz(0x100,"A string")
 
-This places "A string" followed by a terminating NULL in address 0x100. 
-The getsz method similarly retrieves a null terminated string from a specified address like so::
+This places "A string" followed by a terminating NULL character in address 0x100. 
+The ``getsz`` method similarly retrieves a null terminated string from a specified address like so::
 
     >>> ih.getsz(0x100)
 
 This should retrieve the "A string" we stored earlier.
 
-Additionally, puts/gets can be used to retrieve strings of specific length 
+Additionally, ``puts``/``gets`` can be used to retrieve strings of specific length 
 from the hex file like so::
 
     >>> ih.puts(0x100,"data")
@@ -30,16 +30,17 @@ from the hex file like so::
 
 The second command should retrieve the characters 'd','a','t','a'. 
 These methods do not use terminating NULLs, so the data need not be interpreted as a string. 
-One usage of these commands comes from the Python struct module. 
+One usage of these commands comes from the Python ``struct`` module. 
 This module allows the programmer to specify a C struct, and it will allow conversion 
-between the variables and a packed string representation for use with puts/gets. 
+between the variables and a packed string representation for use with
+``puts``/``gets``. 
 For example, suppose we need to deal with a struct containing a char, a short, and a float::
 
     >>> import struct
     >>> formatstring = 'chf' # see Python docs for full list of valid struct formats
-    >>> ih.puts(0x10, struct.pack(formatstring,'a',24,18.6)) #put data in hex file
+    >>> ih.puts(0x10, struct.pack(formatstring,'a',24,18.6)) # put data in hex file
     >>> (mychar,myshort,myfloat) = struct.unpack(formatstring, ih.gets(0x10,7)
 
 Now ``mychar``, ``myshort``, and ``myfloat`` should contain the original data 
-(assuming sizeof(float) = 4 on this platform, otherwise the size may be
+(assuming ``sizeof(float) = 4`` on this platform, otherwise the size may be
 wrong).

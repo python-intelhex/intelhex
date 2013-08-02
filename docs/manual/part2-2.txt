@@ -13,7 +13,7 @@ calling ``merge``, the data will be overwritten. E.g.::
     >>> ih.loadfile('bar.hex',format='hex') # also load from hex
     >>> ih.fromfile('bar.hex',format='hex') # also load from hex
 
-NOTE: using ``IntelHex.fromfile`` is recommended way.
+**NOTE**: using ``IntelHex.fromfile`` is recommended way.
 
 All of the above examples will read from HEX files. 
 IntelHex also supports reading straight binary files. For example::
@@ -22,6 +22,8 @@ IntelHex also supports reading straight binary files. For example::
     >>> ih = IntelHex()                     # create empty object
     >>> ih.loadbin('foo.bin')               # load from bin
     >>> ih.fromfile('bar.bin',format='bin') # also load from bin
+    >>> ih.loadbin('baz.bin',offset=0x1000) # load binary data and place them
+    >>>                                     # starting with specified offset
 
 Finally, data can be loaded from an appropriate Python dictionary. 
 This will permit you to store the data in an IntelHex object 

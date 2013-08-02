@@ -25,3 +25,5 @@ Appendix A. IntelHex Errors Hierarchy
         * ``InvalidStartAddressValueError``     - invalid value of start addr record
 
   * ``BadAccess16bit`` - not enough data to read 16 bit value
+  * ``NotEnoughDataError`` - not enough data to read N contiguous bytes
+  * ``EmptyIntelHexError`` - requested operation cannot be performed with empty object

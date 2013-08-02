@@ -26,9 +26,10 @@ To write data as a hex file you also can use universal method ``tofile``::
 
     >>> ih.tofile(sio, format='hex')
 
-NOTE: using IntelHex.tofile is recommended way.
+**NOTE:** using IntelHex.tofile is recommended way.
 
-Class IntelHex has 3 methods for converting data of IntelHex objects into binary form:
+Class IntelHex has several methods for converting data of IntelHex objects 
+into binary form:
 
 * ``tobinarray`` (returns array of unsigned char bytes);
 * ``tobinstr`` (returns string of bytes);
