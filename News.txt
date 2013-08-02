@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* yyyy/mm/dd v.1.5
+* 2013/08/02 v.1.5
 
     - API changes: Functions tobinarray/tobinstr/tobinfile:
       pad parameter is deprecated and will be removed in

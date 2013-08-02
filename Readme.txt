@@ -7,7 +7,7 @@ Python implementation
 
 Author: Alexander Belchenko
 Contact: alexander dot belchenko at gmail dot com
-Date: yyyy-mm-dd
+Date: 2013/08/02
 Version: 1.5
 
 Introduction
