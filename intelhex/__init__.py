@@ -449,7 +449,7 @@ class IntelHex(object):
                         if no data found.
         '''
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             return self._buf.get(addr, self.padding)
@@ -472,7 +472,7 @@ class IntelHex(object):
     def __setitem__(self, addr, byte):
         """Set byte at address."""
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             self._buf[addr] = byte
@@ -507,7 +507,7 @@ class IntelHex(object):
     def __delitem__(self, addr):
         """Delete byte at address."""
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             del self._buf[addr]
