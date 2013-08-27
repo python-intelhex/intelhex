@@ -58,6 +58,8 @@ if sys.version_info[0] >= 3:
     StrType = str
     IntTypes = (int,)
 
+    range_g = range     # range generator
+
 else:
     # Python 2
     asbytes = str
@@ -65,3 +67,5 @@ else:
 
     StrType = basestring
     IntTypes = (int, long)
+
+    range_g = xrange    # range generator
