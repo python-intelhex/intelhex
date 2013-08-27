@@ -56,6 +56,7 @@ if sys.version_info[0] >= 3:
         return s.decode('latin1')
 
     StrType = str
+    IntTypes = (int,)
 
 else:
     # Python 2
@@ -63,3 +64,4 @@ else:
     asstr = str
 
     StrType = basestring
+    IntTypes = (int, long)
