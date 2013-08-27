@@ -34,7 +34,7 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
-@version    1.5
+@version    1.5.1
 '''
 
 
@@ -47,7 +47,7 @@ from bisect import bisect_right
 import os
 import sys
 
-from compat import asbytes, asstr
+from compat import asbytes, asstr, StrType
 
 
 class _DeprecatedParam(object):
@@ -77,7 +77,7 @@ class IntelHex(object):
         self._offset = 0
 
         if source is not None:
-            if isinstance(source, basestring) or getattr(source, "read", None):
+            if isinstance(source, StrType) or getattr(source, "read", None):
                 # load hex file
                 self.loadhex(source)
             elif isinstance(source, dict):
