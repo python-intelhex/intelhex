@@ -1,6 +1,10 @@
 #!/usr/bin/python
 # (c) Alexander Belchenko, 2007, 2009
 
+# [2013/08] NOTE: This file is keeping for historical reasons.
+# It may or may not work actually with current version of intelhex,
+# and most likely it requires some fixes here and there.
+
 """Benchmarking.
 
 Run each test 3 times and get median value.
