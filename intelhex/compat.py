@@ -59,6 +59,8 @@ if sys.version_info[0] >= 3:
     IntTypes = (int,)
 
     range_g = range     # range generator
+    def range_l(*args): # range list
+        return list(range(*args))
 
     def dict_keys(dikt):        # dict keys list
         return list(dikt.keys())
@@ -74,6 +76,7 @@ else:
     IntTypes = (int, long)
 
     range_g = xrange    # range generator
+    range_l = range     # range list
 
     def dict_keys(dikt):        # dict keys list
         return dikt.keys()

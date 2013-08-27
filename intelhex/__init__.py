@@ -55,6 +55,7 @@ from compat import (
     dict_keys,
     dict_keys_g,
     range_g,
+    range_l,
     )
 
 
@@ -491,7 +492,7 @@ class IntelHex(object):
             stop = addr.stop
             step = addr.step or 1
             if None not in (start, stop):
-                ra = range(start, stop, step)
+                ra = range_l(start, stop, step)
                 if len(ra) != len(byte):
                     raise ValueError('Length of bytes sequence does not match '
                         'address range')
@@ -560,9 +561,11 @@ class IntelHex(object):
         # is faster than hexstr.upper():
         # 0.452ms vs. 0.652ms (translate vs. upper)
         if sys.version_info[0] >= 3:
-            table = bytes(range(256)).upper()
+            # Python 3
+            table = bytes(range_l(256)).upper()
         else:
-            table = ''.join(chr(i).upper() for  i in range(256))
+            # Python 2
+            table = ''.join(chr(i).upper() for i in range_g(256))
 
 
 
@@ -666,7 +669,7 @@ class IntelHex(object):
                     bin[2] = b[1]   # lsb of low_addr
                     bin[3] = 0          # rectype
                     try:    # if there is small holes we'll catch them
-                        for i in range(chain_len):
+                        for i in range_g(chain_len):
                             bin[4+i] = self._buf[cur_addr+i]
                     except KeyError:
                         # we catch a hole so we should shrink the chain
@@ -779,7 +782,7 @@ class IntelHex(object):
             endaddr = int((maxaddr>>4)+1)*16
             maxdigits = max(len(str(endaddr)), 4)
             templa = '%%0%dX' % maxdigits
-            range16 = range(16)
+            range16 = range_l(16)
             for i in range_g(startaddr, endaddr, 16):
                 tofile.write(templa % i)
                 tofile.write(' ')
@@ -1156,7 +1159,7 @@ def _get_file_and_addr_range(s, _support_drive_letter=None):
         _support_drive_letter = (os.name == 'nt')
     drive = ''
     if _support_drive_letter:
-        if s[1:2] == ':' and s[0].upper() in ''.join([chr(i) for i in range(ord('A'), ord('Z')+1)]):
+        if s[1:2] == ':' and s[0].upper() in ''.join([chr(i) for i in range_g(ord('A'), ord('Z')+1)]):
             drive = s[:2]
             s = s[2:]
     parts = s.split(':')

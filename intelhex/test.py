@@ -42,27 +42,34 @@ import sys
 import tempfile
 import unittest
 
-from compat import asbytes, asstr, range_g
+from compat import (
+    asbytes,
+    asstr,
+    range_g,
+    range_l,
+    )
 import intelhex
-from intelhex import IntelHex, \
-                     IntelHexError, \
-                     HexReaderError, \
-                     AddressOverlapError, \
-                     HexRecordError, \
-                     RecordLengthError, \
-                     RecordTypeError, \
-                     RecordChecksumError, \
-                     EOFRecordError, \
-                     ExtendedSegmentAddressRecordError, \
-                     ExtendedLinearAddressRecordError, \
-                     StartSegmentAddressRecordError, \
-                     StartLinearAddressRecordError, \
-                     DuplicateStartAddressRecordError, \
-                     InvalidStartAddressValueError, \
-                     _EndOfFile, \
-                     BadAccess16bit, \
-                     hex2bin, \
-                     Record
+from intelhex import (
+    IntelHex,
+    IntelHexError,
+    HexReaderError,
+    AddressOverlapError,
+    HexRecordError,
+    RecordLengthError,
+    RecordTypeError,
+    RecordChecksumError,
+    EOFRecordError,
+    ExtendedSegmentAddressRecordError,
+    ExtendedLinearAddressRecordError,
+    StartSegmentAddressRecordError,
+    StartLinearAddressRecordError,
+    DuplicateStartAddressRecordError,
+    InvalidStartAddressValueError,
+    _EndOfFile,
+    BadAccess16bit,
+    hex2bin,
+    Record,
+    )
 
 
 __docformat__ = 'restructuredtext'
@@ -648,15 +655,15 @@ class TestIntelHex(TestIntelHexBase):
             "Address has unsupported type: %s" % type('foo'),
             setitem, 'foo', 0)
         # slice operations
-        ih[0:4] = range(4)
+        ih[0:4] = range_l(4)
         self.assertEquals({0:0, 1:1, 2:2, 3:3}, ih.todict())
-        ih[0:] = range(5,9)
+        ih[0:] = range_l(5,9)
         self.assertEquals({0:5, 1:6, 2:7, 3:8}, ih.todict())
-        ih[:4] = range(9,13)
+        ih[:4] = range_l(9,13)
         self.assertEquals({0:9, 1:10, 2:11, 3:12}, ih.todict())
         # with step
         ih = IntelHex()
-        ih[0:8:2] = range(4)
+        ih[0:8:2] = range_l(4)
         self.assertEquals({0:0, 2:1, 4:2, 6:3}, ih.todict())
         # errors in slice operations
         # ih[1:2] = 'a'
