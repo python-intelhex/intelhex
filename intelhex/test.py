@@ -36,33 +36,42 @@
 """Test suite for IntelHex class."""
 
 import array
-from cStringIO import StringIO
 import os
 import sys
 import tempfile
 import unittest
 
-from compat import asbytes, asstr
+from compat import (
+    StringIO,
+    UnicodeType,
+    asbytes,
+    asstr,
+    dict_items_g,
+    range_g,
+    range_l,
+    )
 import intelhex
-from intelhex import IntelHex, \
-                     IntelHexError, \
-                     HexReaderError, \
-                     AddressOverlapError, \
-                     HexRecordError, \
-                     RecordLengthError, \
-                     RecordTypeError, \
-                     RecordChecksumError, \
-                     EOFRecordError, \
-                     ExtendedSegmentAddressRecordError, \
-                     ExtendedLinearAddressRecordError, \
-                     StartSegmentAddressRecordError, \
-                     StartLinearAddressRecordError, \
-                     DuplicateStartAddressRecordError, \
-                     InvalidStartAddressValueError, \
-                     _EndOfFile, \
-                     BadAccess16bit, \
-                     hex2bin, \
-                     Record
+from intelhex import (
+    IntelHex,
+    IntelHexError,
+    HexReaderError,
+    AddressOverlapError,
+    HexRecordError,
+    RecordLengthError,
+    RecordTypeError,
+    RecordChecksumError,
+    EOFRecordError,
+    ExtendedSegmentAddressRecordError,
+    ExtendedLinearAddressRecordError,
+    StartSegmentAddressRecordError,
+    StartLinearAddressRecordError,
+    DuplicateStartAddressRecordError,
+    InvalidStartAddressValueError,
+    _EndOfFile,
+    BadAccess16bit,
+    hex2bin,
+    Record,
+    )
 
 
 __docformat__ = 'restructuredtext'
@@ -422,7 +431,7 @@ class TestIntelHex(TestIntelHexBase):
 
     def test_init_from_file(self):
         ih = IntelHex(self.f)
-        for addr in xrange(len(bin8)):
+        for addr in range_g(len(bin8)):
             expected = bin8[addr]
             actual = ih[addr]
             self.assertEqual(expected, actual,
@@ -432,7 +441,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_hex_fromfile(self):
         ih = IntelHex()
         ih.fromfile(self.f, format='hex')
-        for addr in xrange(len(bin8)):
+        for addr in range_g(len(bin8)):
             expected = bin8[addr]
             actual = ih[addr]
             self.assertEqual(expected, actual,
@@ -440,10 +449,10 @@ class TestIntelHex(TestIntelHexBase):
                              "%x (%x != %x)" % (addr, expected, actual))
 
     def test_unicode_filename(self):
-        handle, fname = tempfile.mkstemp(u'')
+        handle, fname = tempfile.mkstemp(UnicodeType(''))
         os.close(handle)
         try:
-            self.assertTrue(isinstance(fname, unicode))
+            self.assertTrue(isinstance(fname, UnicodeType))
             f = open(fname, 'w')
             try:
                 f.write(hex8)
@@ -648,15 +657,15 @@ class TestIntelHex(TestIntelHexBase):
             "Address has unsupported type: %s" % type('foo'),
             setitem, 'foo', 0)
         # slice operations
-        ih[0:4] = range(4)
+        ih[0:4] = range_l(4)
         self.assertEquals({0:0, 1:1, 2:2, 3:3}, ih.todict())
-        ih[0:] = range(5,9)
+        ih[0:] = range_l(5,9)
         self.assertEquals({0:5, 1:6, 2:7, 3:8}, ih.todict())
-        ih[:4] = range(9,13)
+        ih[:4] = range_l(9,13)
         self.assertEquals({0:9, 1:10, 2:11, 3:12}, ih.todict())
         # with step
         ih = IntelHex()
-        ih[0:8:2] = range(4)
+        ih[0:8:2] = range_l(4)
         self.assertEquals({0:0, 2:1, 4:2, 6:3}, ih.todict())
         # errors in slice operations
         # ih[1:2] = 'a'
@@ -700,7 +709,7 @@ class TestIntelHex(TestIntelHexBase):
         #
         def ihex(size=8):
             ih = IntelHex()
-            for i in xrange(size):
+            for i in range_g(size):
                 ih[i] = i
             return ih
         ih = ihex(8)
@@ -847,7 +856,7 @@ class TestIntelHex_big_files(TestIntelHexBase):
 
     def test_readfile(self):
         ih = intelhex.IntelHex(self.f)
-        for addr, byte in data64k.items():
+        for addr, byte in dict_items_g(data64k):
             readed = ih[addr]
             self.assertEquals(byte, readed,
                               "data not equal at addr %X "
@@ -866,7 +875,7 @@ class TestIntelHexGetPutString(TestIntelHexBase):
 
     def setUp(self):
         self.ih = IntelHex()
-        for i in xrange(10):
+        for i in range_g(10):
             self.ih[i] = i
 
     def test_gets(self):
@@ -1378,7 +1387,7 @@ class TestHex2Bin(unittest.TestCase):
     def test_hex2bin(self):
         ih = hex2bin(self.fin, self.fout)
         data = array.array('B', asbytes(self.fout.getvalue()))
-        for addr in xrange(len(bin8)):
+        for addr in range_g(len(bin8)):
             expected = bin8[addr]
             actual = data[addr]
             self.assertEqual(expected, actual,

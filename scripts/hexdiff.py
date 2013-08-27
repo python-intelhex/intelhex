@@ -37,7 +37,7 @@
 of compared data.
 """
 
-VERSION = '1.5'
+VERSION = '1.5.1'
 
 USAGE = '''hexdiff: diff dumps of 2 hex files.
 Usage:

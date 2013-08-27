@@ -35,7 +35,7 @@
 
 """Show content of hex file as hexdump."""
 
-VERSION = '1.5'
+VERSION = '1.5.1'
 
 USAGE = '''hex2dump: show content of hex file as hexdump.
 Usage:

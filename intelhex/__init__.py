@@ -34,7 +34,7 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
-@version    1.5
+@version    1.5.1
 '''
 
 
@@ -47,7 +47,18 @@ from bisect import bisect_right
 import os
 import sys
 
-from compat import asbytes, asstr
+from compat import (
+    IntTypes,
+    StrType,
+    StringIO,
+    asbytes,
+    asstr,
+    dict_items_g,
+    dict_keys,
+    dict_keys_g,
+    range_g,
+    range_l,
+    )
 
 
 class _DeprecatedParam(object):
@@ -77,7 +88,7 @@ class IntelHex(object):
         self._offset = 0
 
         if source is not None:
-            if isinstance(source, basestring) or getattr(source, "read", None):
+            if isinstance(source, StrType) or getattr(source, "read", None):
                 # load hex file
                 self.loadhex(source)
             elif isinstance(source, dict):
@@ -132,7 +143,7 @@ class IntelHex(object):
         if record_type == 0:
             # data record
             addr += self._offset
-            for i in xrange(4, 4+record_length):
+            for i in range_g(4, 4+record_length):
                 if not self._buf.get(addr, None) is None:
                     raise AddressOverlapError(address=addr, line=line)
                 self._buf[addr] = bin[i]
@@ -263,8 +274,8 @@ class IntelHex(object):
         start_addr = s.get('start_addr')
         if start_addr is not None:
             del s['start_addr']
-        for k in s.keys():
-            if type(k) not in (int, long) or k < 0:
+        for k in dict_keys_g(s):
+            if type(k) not in IntTypes or k < 0:
                 raise ValueError('Source dictionary should have only int keys')
         self._buf.update(s)
         if start_addr is not None:
@@ -319,12 +330,12 @@ class IntelHex(object):
         @return         array of unsigned char data.
         '''
         if not isinstance(pad, _DeprecatedParam):
-            print "IntelHex.tobinarray: 'pad' parameter is deprecated."
+            print ("IntelHex.tobinarray: 'pad' parameter is deprecated.")
             if pad is not None:
-                print "Please, use IntelHex.padding attribute instead."
+                print ("Please, use IntelHex.padding attribute instead.")
             else:
-                print "Please, don't pass it explicitly."
-                print "Use syntax like this: ih.tobinarray(start=xxx, end=yyy, size=zzz)"
+                print ("Please, don't pass it explicitly.")
+                print ("Use syntax like this: ih.tobinarray(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
         return self._tobinarray_really(start, end, pad, size)
@@ -343,7 +354,7 @@ class IntelHex(object):
 
         start, end = self._get_start_end(start, end, size)
 
-        for i in xrange(start, end+1):
+        for i in range_g(start, end+1):
             bin.append(self._buf.get(i, pad))
 
         return bin
@@ -359,12 +370,12 @@ class IntelHex(object):
         @return         string of binary data.
         '''
         if not isinstance(pad, _DeprecatedParam):
-            print "IntelHex.tobinstr: 'pad' parameter is deprecated."
+            print ("IntelHex.tobinstr: 'pad' parameter is deprecated.")
             if pad is not None:
-                print "Please, use IntelHex.padding attribute instead."
+                print ("Please, use IntelHex.padding attribute instead.")
             else:
-                print "Please, don't pass it explicitly."
-                print "Use syntax like this: ih.tobinstr(start=xxx, end=yyy, size=zzz)"
+                print ("Please, don't pass it explicitly.")
+                print ("Use syntax like this: ih.tobinstr(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
         return self._tobinstr_really(start, end, pad, size)
@@ -384,12 +395,12 @@ class IntelHex(object):
         @param  size    size of the block, used with start or end parameter.
         '''
         if not isinstance(pad, _DeprecatedParam):
-            print "IntelHex.tobinfile: 'pad' parameter is deprecated."
+            print ("IntelHex.tobinfile: 'pad' parameter is deprecated.")
             if pad is not None:
-                print "Please, use IntelHex.padding attribute instead."
+                print ("Please, use IntelHex.padding attribute instead.")
             else:
-                print "Please, don't pass it explicitly."
-                print "Use syntax like this: ih.tobinfile(start=xxx, end=yyy, size=zzz)"
+                print ("Please, don't pass it explicitly.")
+                print ("Use syntax like this: ih.tobinfile(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
         if getattr(fobj, "write", None) is None:
@@ -418,7 +429,7 @@ class IntelHex(object):
         '''Returns all used addresses in sorted order.
         @return         list of occupied data addresses in sorted order. 
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         aa.sort()
         return aa
 
@@ -426,7 +437,7 @@ class IntelHex(object):
         '''Get minimal address of HEX content.
         @return         minimal address or None if no data
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return None
         else:
@@ -436,7 +447,7 @@ class IntelHex(object):
         '''Get maximal address of HEX content.
         @return         maximal address or None if no data
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return None
         else:
@@ -449,19 +460,19 @@ class IntelHex(object):
                         if no data found.
         '''
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             return self._buf.get(addr, self.padding)
         elif t == slice:
-            addresses = self._buf.keys()
+            addresses = dict_keys(self._buf)
             ih = IntelHex()
             if addresses:
                 addresses.sort()
                 start = addr.start or addresses[0]
                 stop = addr.stop or (addresses[-1]+1)
                 step = addr.step or 1
-                for i in xrange(start, stop, step):
+                for i in range_g(start, stop, step):
                     x = self._buf.get(i)
                     if x is not None:
                         ih[i] = x
@@ -472,7 +483,7 @@ class IntelHex(object):
     def __setitem__(self, addr, byte):
         """Set byte at address."""
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             self._buf[addr] = byte
@@ -483,7 +494,7 @@ class IntelHex(object):
             stop = addr.stop
             step = addr.step or 1
             if None not in (start, stop):
-                ra = range(start, stop, step)
+                ra = range_l(start, stop, step)
                 if len(ra) != len(byte):
                     raise ValueError('Length of bytes sequence does not match '
                         'address range')
@@ -498,7 +509,7 @@ class IntelHex(object):
             if stop < 0:
                 raise TypeError('stop address cannot be negative')
             j = 0
-            for i in xrange(start, stop, step):
+            for i in range_g(start, stop, step):
                 self._buf[i] = byte[j]
                 j += 1
         else:
@@ -507,18 +518,18 @@ class IntelHex(object):
     def __delitem__(self, addr):
         """Delete byte at address."""
         t = type(addr)
-        if t in (int, long):
+        if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             del self._buf[addr]
         elif t == slice:
-            addresses = self._buf.keys()
+            addresses = dict_keys(self._buf)
             if addresses:
                 addresses.sort()
                 start = addr.start or addresses[0]
                 stop = addr.stop or (addresses[-1]+1)
                 step = addr.step or 1
-                for i in xrange(start, stop, step):
+                for i in range_g(start, stop, step):
                     x = self._buf.get(i)
                     if x is not None:
                         del self._buf[i]
@@ -527,7 +538,7 @@ class IntelHex(object):
 
     def __len__(self):
         """Return count of bytes with real values."""
-        return len(self._buf.keys())
+        return len(dict_keys(self._buf))
 
     def write_hex_file(self, f, write_start_addr=True):
         """Write data to file f in HEX format.
@@ -552,15 +563,17 @@ class IntelHex(object):
         # is faster than hexstr.upper():
         # 0.452ms vs. 0.652ms (translate vs. upper)
         if sys.version_info[0] >= 3:
-            table = bytes(range(256)).upper()
+            # Python 3
+            table = bytes(range_l(256)).upper()
         else:
-            table = ''.join(chr(i).upper() for  i in range(256))
+            # Python 2
+            table = ''.join(chr(i).upper() for i in range_g(256))
 
 
 
         # start address record if any
         if self.start_addr and write_start_addr:
-            keys = self.start_addr.keys()
+            keys = dict_keys(self.start_addr)
             keys.sort()
             bin = array('B', asbytes('\0'*9))
             if keys == ['CS','IP']:
@@ -600,7 +613,7 @@ class IntelHex(object):
                 raise InvalidStartAddressValueError(start_addr=self.start_addr)
 
         # data
-        addresses = self._buf.keys()
+        addresses = dict_keys(self._buf)
         addresses.sort()
         addr_len = len(addresses)
         if addr_len:
@@ -658,7 +671,7 @@ class IntelHex(object):
                     bin[2] = b[1]   # lsb of low_addr
                     bin[3] = 0          # rectype
                     try:    # if there is small holes we'll catch them
-                        for i in range(chain_len):
+                        for i in range_g(chain_len):
                             bin[4+i] = self._buf[cur_addr+i]
                     except KeyError:
                         # we catch a hole so we should shrink the chain
@@ -706,7 +719,7 @@ class IntelHex(object):
         be raised. Padding is not used."""
         a = array('B', asbytes('\0'*length))
         try:
-            for i in xrange(length):
+            for i in range_g(length):
                 a[i] = self._buf[addr+i]
         except KeyError:
             raise NotEnoughDataError(address=addr, length=length)
@@ -717,7 +730,7 @@ class IntelHex(object):
         entries.
         """
         a = array('B', asbytes(s))
-        for i in xrange(len(a)):
+        for i in range_g(len(a)):
             self._buf[addr+i] = a[i]
 
     def getsz(self, addr):
@@ -762,7 +775,7 @@ class IntelHex(object):
             else:
                 tofile.write('start_addr = %r\n' % start_addr)
         # actual data
-        addresses = self._buf.keys()
+        addresses = dict_keys(self._buf)
         if addresses:
             addresses.sort()
             minaddr = addresses[0]
@@ -771,8 +784,8 @@ class IntelHex(object):
             endaddr = int((maxaddr>>4)+1)*16
             maxdigits = max(len(str(endaddr)), 4)
             templa = '%%0%dX' % maxdigits
-            range16 = range(16)
-            for i in xrange(startaddr, endaddr, 16):
+            range16 = range_l(16)
+            for i in range_g(startaddr, endaddr, 16):
                 tofile.write(templa % i)
                 tofile.write(' ')
                 s = []
@@ -905,7 +918,7 @@ class IntelHex16bit(IntelHex):
 
         @return         minimal address used in this object
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return 0
         else:
@@ -916,7 +929,7 @@ class IntelHex16bit(IntelHex):
 
         @return         maximal address used in this object 
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return 0
         else:
@@ -941,7 +954,7 @@ class IntelHex16bit(IntelHex):
 
         start, end = self._get_start_end(start, end, size)
 
-        for addr in xrange(start, end+1):
+        for addr in range_g(start, end+1):
             bin.append(self[addr])
 
         return bin
@@ -1033,7 +1046,6 @@ def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
     @param n_context  number of context lines in the unidiff output
     """
     def prepare_lines(ih):
-        from cStringIO import StringIO
         sio = StringIO()
         ih.dump(sio)
         dump = sio.getvalue()
@@ -1148,7 +1160,7 @@ def _get_file_and_addr_range(s, _support_drive_letter=None):
         _support_drive_letter = (os.name == 'nt')
     drive = ''
     if _support_drive_letter:
-        if s[1:2] == ':' and s[0].upper() in ''.join([chr(i) for i in range(ord('A'), ord('Z')+1)]):
+        if s[1:2] == ':' and s[0].upper() in ''.join([chr(i) for i in range_g(ord('A'), ord('Z')+1)]):
             drive = s[:2]
             s = s[2:]
     parts = s.split(':')
@@ -1206,7 +1218,7 @@ class IntelHexError(Exception):
         """Initialize the Exception with the given message.
         """
         self.msg = msg
-        for key, value in kw.items():
+        for key, value in dict_items_g(kw):
             setattr(self, key, value)
 
     def __str__(self):

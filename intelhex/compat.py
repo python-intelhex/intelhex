@@ -1,4 +1,5 @@
 # Copyright (c) 2011, Bernhard Leiner
+# Copyright (c) 2013, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -34,7 +35,8 @@
 '''Compatibility functions for python 2 and 3.
 
 @author     Bernhard Leiner (bleiner AT gmail com)
-@version    1.0
+@author     Alexander Belchenko (alexander belchenko AT gmail com)
+@version    1.1
 '''
 
 __docformat__ = "javadoc"
@@ -43,6 +45,7 @@ __docformat__ = "javadoc"
 import sys
 
 if sys.version_info[0] >= 3:
+    # Python 3
     def asbytes(s):
         if isinstance(s, bytes):
             return s
@@ -51,7 +54,42 @@ if sys.version_info[0] >= 3:
         if isinstance(s, str):
             return s
         return s.decode('latin1')
+
+    IntTypes = (int,)
+    StrType = str
+    UnicodeType = str
+
+    range_g = range     # range generator
+    def range_l(*args): # range list
+        return list(range(*args))
+
+    def dict_keys(dikt):        # dict keys list
+        return list(dikt.keys())
+    def dict_keys_g(dikt):      # dict keys generator
+        return dikt.keys()
+    def dict_items_g(dikt):     # dict items generator
+        return dikt.items()
+
+    from io import StringIO, BytesIO
+
 else:
+    # Python 2
     asbytes = str
     asstr = str
 
+    IntTypes = (int, long)
+    StrType = basestring
+    UnicodeType = unicode
+
+    range_g = xrange    # range generator
+    range_l = range     # range list
+
+    def dict_keys(dikt):        # dict keys list
+        return dikt.keys()
+    def dict_keys_g(dikt):      # dict keys generator
+        return dikt.keys()
+    def dict_items_g(dikt):     # dict items generator
+        return dikt.items()
+
+    from cStringIO import StringIO
+    BytesIO = StringIO

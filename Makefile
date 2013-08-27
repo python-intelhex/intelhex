@@ -29,8 +29,10 @@ docs:
 	make -C docs/manual html
 
 2to3:
-	$(PYTHON) tools/2to3.py --no-diff --write --nobackups intelhex
-	python tools/crlf.py intelhex/__init__.py intelhex/bench.py intelhex/test.py
+	$(PYTHON) tools/2to3.py --no-diff --write --nobackups intelhex/__init__.py
+	python tools/crlf.py intelhex/__init__.py
+	$(PYTHON) tools/2to3.py --no-diff --write --nobackups intelhex/test.py
+	python tools/crlf.py intelhex/test.py
 	$(PYTHON) tools/2to3.py --no-diff --write --nobackups scripts
 	python tools/crlf.py scripts/bin2hex.py scripts/hex2bin.py scripts/hex2dump.py \
 		scripts/hexdiff.py scripts/hexmerge.py

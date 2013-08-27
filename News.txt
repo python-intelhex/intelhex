@@ -3,6 +3,9 @@ NEWS
 
 * yyyy/mm/dd v.1.5.1
 
+    - compat.py: provide more helper functions and aliases to reduce changes
+      required to convert python 2compatible sources to python 3. The code
+      becomes quite ugly, but such compatibility has its price.
 
 * 2013/08/02 v.1.5
 
