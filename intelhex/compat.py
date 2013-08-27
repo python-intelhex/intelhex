@@ -66,6 +66,8 @@ if sys.version_info[0] >= 3:
         return list(dikt.keys())
     def dict_keys_g(dikt):      # dict keys generator
         return dikt.keys()
+    def dict_items_g(dikt):     # dict items generator
+        return dikt.items()
 
 else:
     # Python 2
@@ -82,3 +84,5 @@ else:
         return dikt.keys()
     def dict_keys_g(dikt):      # dict keys generator
         return dikt.keys()
+    def dict_items_g(dikt):     # dict items generator
+        return dikt.items()

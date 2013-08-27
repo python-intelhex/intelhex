@@ -52,6 +52,7 @@ from compat import (
     StrType,
     asbytes,
     asstr,
+    dict_items_g,
     dict_keys,
     dict_keys_g,
     range_g,
@@ -1217,7 +1218,7 @@ class IntelHexError(Exception):
         """Initialize the Exception with the given message.
         """
         self.msg = msg
-        for key, value in kw.items():
+        for key, value in dict_items_g(kw):
             setattr(self, key, value)
 
     def __str__(self):

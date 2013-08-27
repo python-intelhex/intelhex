@@ -45,6 +45,7 @@ import unittest
 from compat import (
     asbytes,
     asstr,
+    dict_items_g,
     range_g,
     range_l,
     )
@@ -854,7 +855,7 @@ class TestIntelHex_big_files(TestIntelHexBase):
 
     def test_readfile(self):
         ih = intelhex.IntelHex(self.f)
-        for addr, byte in data64k.items():
+        for addr, byte in dict_items_g(data64k):
             readed = ih[addr]
             self.assertEquals(byte, readed,
                               "data not equal at addr %X "
