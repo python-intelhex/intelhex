@@ -59,6 +59,8 @@ METADATA = dict(
       keywords='Intel HEX hex2bin HEX8',
       license='BSD',
       classifiers = [
+        'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
         'Classifier: Development Status :: 5 - Production/Stable',
         'Classifier: Environment :: Console',
         'Classifier: Intended Audience :: Developers',
