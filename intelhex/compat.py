@@ -55,8 +55,9 @@ if sys.version_info[0] >= 3:
             return s
         return s.decode('latin1')
 
-    StrType = str
     IntTypes = (int,)
+    StrType = str
+    UnicodeType = str
 
     range_g = range     # range generator
     def range_l(*args): # range list
@@ -74,8 +75,9 @@ else:
     asbytes = str
     asstr = str
 
-    StrType = basestring
     IntTypes = (int, long)
+    StrType = basestring
+    UnicodeType = unicode
 
     range_g = xrange    # range generator
     range_l = range     # range list

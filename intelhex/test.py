@@ -43,6 +43,7 @@ import tempfile
 import unittest
 
 from compat import (
+    UnicodeType,
     asbytes,
     asstr,
     dict_items_g,
@@ -448,10 +449,10 @@ class TestIntelHex(TestIntelHexBase):
                              "%x (%x != %x)" % (addr, expected, actual))
 
     def test_unicode_filename(self):
-        handle, fname = tempfile.mkstemp(u'')
+        handle, fname = tempfile.mkstemp(UnicodeType(''))
         os.close(handle)
         try:
-            self.assertTrue(isinstance(fname, unicode))
+            self.assertTrue(isinstance(fname, UnicodeType))
             f = open(fname, 'w')
             try:
                 f.write(hex8)
