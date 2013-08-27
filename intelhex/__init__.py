@@ -50,6 +50,7 @@ import sys
 from compat import (
     IntTypes,
     StrType,
+    StringIO,
     asbytes,
     asstr,
     dict_items_g,
@@ -1045,7 +1046,6 @@ def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
     @param n_context  number of context lines in the unidiff output
     """
     def prepare_lines(ih):
-        from cStringIO import StringIO
         sio = StringIO()
         ih.dump(sio)
         dump = sio.getvalue()

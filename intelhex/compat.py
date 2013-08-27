@@ -70,6 +70,8 @@ if sys.version_info[0] >= 3:
     def dict_items_g(dikt):     # dict items generator
         return dikt.items()
 
+    from io import StringIO, BytesIO
+
 else:
     # Python 2
     asbytes = str
@@ -88,3 +90,6 @@ else:
         return dikt.keys()
     def dict_items_g(dikt):     # dict items generator
         return dikt.items()
+
+    from cStringIO import StringIO
+    BytesIO = StringIO

@@ -36,13 +36,13 @@
 """Test suite for IntelHex class."""
 
 import array
-from cStringIO import StringIO
 import os
 import sys
 import tempfile
 import unittest
 
 from compat import (
+    StringIO,
     UnicodeType,
     asbytes,
     asstr,
