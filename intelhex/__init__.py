@@ -360,7 +360,7 @@ class IntelHex(object):
         return bin
 
     def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None):
-        ''' Convert to binary form and return as a string.
+        ''' Convert to binary form and return as binary string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
         @param  pad     [DEPRECATED PARAMETER, please use self.padding instead]
@@ -381,7 +381,7 @@ class IntelHex(object):
         return self._tobinstr_really(start, end, pad, size)
 
     def _tobinstr_really(self, start, end, pad, size):
-        return asstr(self._tobinarray_really(start, end, pad, size).tostring())
+        return asbytes(self._tobinarray_really(start, end, pad, size).tostring())
 
     def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None):
         '''Convert to binary and write to file.

@@ -42,6 +42,7 @@ import tempfile
 import unittest
 
 from compat import (
+    BytesIO,
     StringIO,
     UnicodeType,
     asbytes,
@@ -490,24 +491,32 @@ class TestIntelHex(TestIntelHexBase):
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
-        s2 = asstr(bin8.tostring())
+        s2 = asbytes(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile(self):
         ih = IntelHex(self.f)
-        sio = StringIO()
+        sio = BytesIO()
         ih.tobinfile(sio)
         s1 = sio.getvalue()
         sio.close()
-        s2 = asstr(bin8.tostring())
+        s2 = asbytes(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
         # new API: .tofile universal method
-        sio = StringIO()
+        sio = BytesIO()
         ih.tofile(sio, format='bin')
         s1 = sio.getvalue()
         sio.close()
-        s2 = asstr(bin8.tostring())
+        s2 = asbytes(bin8.tostring())
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
+
+    def test_tobinfile_realfile(self):
+        ih = IntelHex(self.f)
+        tf = tempfile.TemporaryFile(mode='wb')
+        try:
+            ih.tobinfile(tf)
+        finally:
+            tf.close()
 
     def test_write_empty_hexfile(self):
         ih = intelhex.IntelHex()
@@ -753,8 +762,8 @@ class TestIntelHex(TestIntelHexBase):
 class TestIntelHexLoadBin(TestIntelHexBase):
 
     def setUp(self):
-        self.data = '0123456789'
-        self.f = StringIO(self.data)
+        self.bytes = asbytes('0123456789')
+        self.f = BytesIO(self.bytes)
 
     def tearDown(self):
         self.f.close()
@@ -764,28 +773,28 @@ class TestIntelHexLoadBin(TestIntelHexBase):
         ih.loadbin(self.f)
         self.assertEqual(0, ih.minaddr())
         self.assertEqual(9, ih.maxaddr())
-        self.assertEqual(self.data, ih.tobinstr())
+        self.assertEqual(self.bytes, ih.tobinstr())
 
     def test_bin_fromfile(self):
         ih = IntelHex()
         ih.fromfile(self.f, format='bin')
         self.assertEqual(0, ih.minaddr())
         self.assertEqual(9, ih.maxaddr())
-        self.assertEqual(self.data, ih.tobinstr())
+        self.assertEqual(self.bytes, ih.tobinstr())
 
     def test_loadbin_w_offset(self):
         ih = IntelHex()
         ih.loadbin(self.f, offset=100)
         self.assertEqual(100, ih.minaddr())
         self.assertEqual(109, ih.maxaddr())
-        self.assertEqual(self.data, ih.tobinstr())
+        self.assertEqual(self.bytes, ih.tobinstr())
 
     def test_loadfile_format_bin(self):
         ih = IntelHex()
         ih.loadfile(self.f, format='bin')
         self.assertEqual(0, ih.minaddr())
         self.assertEqual(9, ih.maxaddr())
-        self.assertEqual(self.data, ih.tobinstr())
+        self.assertEqual(self.bytes, ih.tobinstr())
 
 
 class TestIntelHexStartingAddressRecords(TestIntelHexBase):
@@ -1378,7 +1387,7 @@ class TestHex2Bin(unittest.TestCase):
 
     def setUp(self):
         self.fin = StringIO(hex8)
-        self.fout = StringIO()
+        self.fout = BytesIO()
 
     def tearDown(self):
         self.fin.close()

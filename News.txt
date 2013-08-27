@@ -6,6 +6,8 @@ NEWS
     - compat.py: provide more helper functions and aliases to reduce changes
       required to convert python 2compatible sources to python 3. The code
       becomes quite ugly, but such compatibility has its price.
+    - Python 3 compatibility: tobinstr should return bytes not unicode string
+      (Bug #1212698).
 
 * 2013/08/02 v.1.5
 
