@@ -60,6 +60,11 @@ if sys.version_info[0] >= 3:
 
     range_g = range     # range generator
 
+    def dict_keys(dikt):        # dict keys list
+        return list(dikt.keys())
+    def dict_keys_g(dikt):      # dict keys generator
+        return dikt.keys()
+
 else:
     # Python 2
     asbytes = str
@@ -69,3 +74,8 @@ else:
     IntTypes = (int, long)
 
     range_g = xrange    # range generator
+
+    def dict_keys(dikt):        # dict keys list
+        return dikt.keys()
+    def dict_keys_g(dikt):      # dict keys generator
+        return dikt.keys()

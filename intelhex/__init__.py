@@ -47,7 +47,15 @@ from bisect import bisect_right
 import os
 import sys
 
-from compat import asbytes, asstr, StrType, IntTypes, range_g
+from compat import (
+    IntTypes,
+    StrType,
+    asbytes,
+    asstr,
+    dict_keys,
+    dict_keys_g,
+    range_g,
+    )
 
 
 class _DeprecatedParam(object):
@@ -263,7 +271,7 @@ class IntelHex(object):
         start_addr = s.get('start_addr')
         if start_addr is not None:
             del s['start_addr']
-        for k in s.keys():
+        for k in dict_keys_g(s):
             if type(k) not in IntTypes or k < 0:
                 raise ValueError('Source dictionary should have only int keys')
         self._buf.update(s)
@@ -418,7 +426,7 @@ class IntelHex(object):
         '''Returns all used addresses in sorted order.
         @return         list of occupied data addresses in sorted order. 
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         aa.sort()
         return aa
 
@@ -426,7 +434,7 @@ class IntelHex(object):
         '''Get minimal address of HEX content.
         @return         minimal address or None if no data
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return None
         else:
@@ -436,7 +444,7 @@ class IntelHex(object):
         '''Get maximal address of HEX content.
         @return         maximal address or None if no data
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return None
         else:
@@ -454,7 +462,7 @@ class IntelHex(object):
                 raise TypeError('Address should be >= 0.')
             return self._buf.get(addr, self.padding)
         elif t == slice:
-            addresses = self._buf.keys()
+            addresses = dict_keys(self._buf)
             ih = IntelHex()
             if addresses:
                 addresses.sort()
@@ -512,7 +520,7 @@ class IntelHex(object):
                 raise TypeError('Address should be >= 0.')
             del self._buf[addr]
         elif t == slice:
-            addresses = self._buf.keys()
+            addresses = dict_keys(self._buf)
             if addresses:
                 addresses.sort()
                 start = addr.start or addresses[0]
@@ -527,7 +535,7 @@ class IntelHex(object):
 
     def __len__(self):
         """Return count of bytes with real values."""
-        return len(self._buf.keys())
+        return len(dict_keys(self._buf))
 
     def write_hex_file(self, f, write_start_addr=True):
         """Write data to file f in HEX format.
@@ -560,7 +568,7 @@ class IntelHex(object):
 
         # start address record if any
         if self.start_addr and write_start_addr:
-            keys = self.start_addr.keys()
+            keys = dict_keys(self.start_addr)
             keys.sort()
             bin = array('B', asbytes('\0'*9))
             if keys == ['CS','IP']:
@@ -600,7 +608,7 @@ class IntelHex(object):
                 raise InvalidStartAddressValueError(start_addr=self.start_addr)
 
         # data
-        addresses = self._buf.keys()
+        addresses = dict_keys(self._buf)
         addresses.sort()
         addr_len = len(addresses)
         if addr_len:
@@ -762,7 +770,7 @@ class IntelHex(object):
             else:
                 tofile.write('start_addr = %r\n' % start_addr)
         # actual data
-        addresses = self._buf.keys()
+        addresses = dict_keys(self._buf)
         if addresses:
             addresses.sort()
             minaddr = addresses[0]
@@ -905,7 +913,7 @@ class IntelHex16bit(IntelHex):
 
         @return         minimal address used in this object
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return 0
         else:
@@ -916,7 +924,7 @@ class IntelHex16bit(IntelHex):
 
         @return         maximal address used in this object 
         '''
-        aa = self._buf.keys()
+        aa = dict_keys(self._buf)
         if aa == []:
             return 0
         else:
