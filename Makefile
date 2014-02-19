@@ -7,10 +7,8 @@ all:
 	@echo  epydoc - run epydoc to create API documentation
 	@echo  wininst - Windows installer for Python
 	@echo  docs - build docs with ReST and Sphinx
-	@echo  2to3 - convert source code using 2to3 converter
-	@echo  3to2 - convert sources back after 2to3 (bzr revert)
 
-.PHONY: clean test epydoc wininst docs 2to3 3to2
+.PHONY: clean test epydoc wininst docs
 
 clean:
 	$(PYTHON) setup.py clean -a
@@ -27,15 +25,3 @@ wininst:
 docs:
 	rst2html.py docs/manual.txt docs/manual.html
 	make -C docs/manual html
-
-2to3:
-	$(PYTHON) tools/2to3.py --no-diff --write --nobackups intelhex/__init__.py
-	python tools/crlf.py intelhex/__init__.py
-	$(PYTHON) tools/2to3.py --no-diff --write --nobackups intelhex/test.py
-	python tools/crlf.py intelhex/test.py
-	$(PYTHON) tools/2to3.py --no-diff --write --nobackups scripts
-	python tools/crlf.py scripts/bin2hex.py scripts/hex2bin.py scripts/hex2dump.py \
-		scripts/hexdiff.py scripts/hexmerge.py
-
-3to2:
-	bzr revert --no-backup intelhex scripts 

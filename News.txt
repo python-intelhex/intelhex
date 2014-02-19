@@ -1,13 +1,15 @@
 NEWS
 ====
 
-* yyyy/mm/dd v.1.5.1
+* 2014/mm/dd v.2.0
 
     - compat.py: provide more helper functions and aliases to reduce changes
       required to convert python 2compatible sources to python 3. The code
       becomes quite ugly, but such compatibility has its price.
     - Python 3 compatibility: tobinstr should return bytes not unicode string
       (Bug #1212698).
+    - The same codebase can be run on both Python 2 (2.4-2.7) 
+       and Python 3 (3.3). No need to use 2to3.
 
 * 2013/08/02 v.1.5
 

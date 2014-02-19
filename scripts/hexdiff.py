@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2011-2013 Alexander Belchenko
+# Copyright (c) 2011-2014 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -37,7 +37,7 @@
 of compared data.
 """
 
-VERSION = '1.5.1'
+VERSION = '2.0'
 
 USAGE = '''hexdiff: diff dumps of 2 hex files.
 Usage:
@@ -67,7 +67,8 @@ def main(argv=None):
                 print(VERSION)
                 return 0
 
-    except getopt.GetoptError, e:
+    except getopt.GetoptError:
+        e = sys.exc_info()[1]     # current exception
         sys.stderr.write(str(e)+"\n")
         sys.stderr.write(USAGE+"\n")
         return 1

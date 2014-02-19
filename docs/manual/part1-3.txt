@@ -27,3 +27,9 @@ in the file system.
 
 See the Python distutils website for more information, or try typing, 
 ``python setup.py --help`` from the root directory of the archive.
+
+Also you can use modern tool called ``pip`` 
+(http://www.pip-installer.org/en/latest/)
+to install IntelHex library:
+
+	sudo pip install IntelHex

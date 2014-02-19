@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2005-2013, Alexander Belchenko
+# Copyright (c) 2005-2014, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -37,20 +37,11 @@
 
 import array
 import os
+import subprocess
 import sys
 import tempfile
 import unittest
 
-from compat import (
-    BytesIO,
-    StringIO,
-    UnicodeType,
-    asbytes,
-    asstr,
-    dict_items_g,
-    range_g,
-    range_l,
-    )
 import intelhex
 from intelhex import (
     IntelHex,
@@ -72,6 +63,16 @@ from intelhex import (
     BadAccess16bit,
     hex2bin,
     Record,
+    )
+from intelhex.compat import (
+    BytesIO,
+    StringIO,
+    UnicodeType,
+    asbytes,
+    asstr,
+    dict_items_g,
+    range_g,
+    range_l,
     )
 
 
@@ -386,7 +387,8 @@ class TestIntelHexBase(unittest.TestCase):
         """
         try:
             callableObj(*args, **kwargs)
-        except excClass, exc:
+        except excClass:
+            exc = sys.exc_info()[1]     # current exception
             excMsg = str(exc)
             if not msg:
                 # No message provided: any message is fine.
@@ -1494,6 +1496,43 @@ class Test_GetFileAndAddrRange(TestIntelHexBase):
         self.assertEqual(('C:\\filename.hex', 1, 10),
             intelhex._get_file_and_addr_range('C:\\filename.hex:0001:000A', True))
 
+
+class TestInSubprocess(unittest.TestCase):
+
+    def runProcessAndGetAsciiStdoutOrStderr(self, cmdline):
+        p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        stdout, stderr = p.communicate()
+        retcode = p.poll()
+        if stdout:
+            output = stdout.decode('ascii', 'replace')
+        elif stderr:
+            output = stderr.decode('ascii', 'replace')        
+        output = output.replace('\r', '')
+        return retcode, output
+
+    def versionChecker(self, cmdline_template):
+        cmdline = cmdline_template % sys.executable
+        retcode, output = self.runProcessAndGetAsciiStdoutOrStderr(cmdline)
+        self.assertEqual(intelhex.__version__, output.rstrip())
+        self.assertEqual(0, retcode)
+
+    def test_setup_version(self):
+        self.versionChecker('%s setup.py --version')
+
+    def test_sripts_bin2hex_version(self):
+        self.versionChecker('%s scripts/bin2hex.py --version')
+
+    def test_sripts_hex2bin_version(self):
+        self.versionChecker('%s scripts/hex2bin.py --version')
+
+    def test_sripts_hex2dump_version(self):
+        self.versionChecker('%s scripts/hex2dump.py --version')
+
+    def test_sripts_hexdiff_version(self):
+        self.versionChecker('%s scripts/hexdiff.py --version')
+
+    def test_sripts_hexmerge_version(self):
+        self.versionChecker('%s scripts/hexmerge.py --version')
 
 ##
 # MAIN

@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2013, Alexander Belchenko
+# Copyright (c) 2005-2014, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -34,10 +34,10 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
-@version    1.5.1
+@version    2.0
 '''
 
-
+__version__   = '2.0'
 __docformat__ = "javadoc"
 
 
@@ -47,7 +47,7 @@ from bisect import bisect_right
 import os
 import sys
 
-from compat import (
+from intelhex.compat import (
     IntTypes,
     StrType,
     StringIO,
@@ -976,7 +976,8 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
     """
     try:
         h = IntelHex(fin)
-    except HexReaderError, e:
+    except HexReaderError:
+        e = sys.exc_info()[1]     # current exception
         txt = "ERROR: bad HEX file: %s" % str(e)
         print(txt)
         return 1
@@ -998,7 +999,8 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
             # using .padding attribute rather than pad argument to function call
             h.padding = pad
         h.tobinfile(fout, start, end)
-    except IOError, e:
+    except IOError:
+        e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
         print(txt)
         return 1
@@ -1018,14 +1020,16 @@ def bin2hex(fin, fout, offset=0):
     h = IntelHex()
     try:
         h.loadbin(fin, offset)
-    except IOError, e:
+    except IOError:
+        e = sys.exc_info()[1]     # current exception
         txt = 'ERROR: unable to load bin file:', str(e)
         print(txt)
         return 1
 
     try:
         h.tofile(fout, format='hex')
-    except IOError, e:
+    except IOError:
+        e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
         print(txt)
         return 1
@@ -1227,7 +1231,8 @@ class IntelHexError(Exception):
             return self.msg
         try:
             return self._fmt % self.__dict__
-        except (NameError, ValueError, KeyError), e:
+        except (NameError, ValueError, KeyError):
+            e = sys.exc_info()[1]     # current exception
             return 'Unprintable exception %s: %s' \
                 % (repr(e), str(e))
 

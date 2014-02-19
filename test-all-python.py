@@ -37,11 +37,12 @@
 
 import subprocess
 import sys
+import time
 
 
 PYTHONS = (
     # display name, executable [full] path
-    ('2.3', 'C:\Python23'),
+    #('2.3', 'C:\Python23\python'),     # 2.3 is not supported
     ('2.4', 'C:\Python24\python'),
     ('2.5', 'C:\Python25\python'),
     ('2.6-32bit', 'C:\Python26-32bit\python'),
@@ -57,6 +58,7 @@ def main():
     retcode = 0
     not_found = []
     failed = []
+    print('%s started: %s\n' % (__file__, time.asctime()))
     for display_name, executable in PYTHONS:
         if checkPythonExists(display_name, executable):
             if not runTestWithPython(display_name, executable):
@@ -89,6 +91,7 @@ def checkPythonExists(display_name, executable):
         output = stdout.decode('ascii', 'replace')
     elif stderr:
         output = stderr.decode('ascii', 'replace')        
+    output = output.replace('\r', '')
     if not output.endswith('\n'):
         output = output + '\n'
     sys.stdout.write(output)
@@ -97,7 +100,7 @@ def checkPythonExists(display_name, executable):
 def runTestWithPython(display_name, executable):
     """ Runs `$(PYTHON) setup.py test -q` """
     cmd = '%s setup.py test -q' % executable
-    sys.stdout.write('  Running tests against %s ... ' % display_name)
+    sys.stdout.write('   Running tests against %s ... ' % display_name)
     p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     stdout, stderr = p.communicate()
     retcode = p.poll()

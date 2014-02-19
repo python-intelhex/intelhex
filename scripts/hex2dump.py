@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008,2010,2011,2012,2013 Alexander Belchenko
+# Copyright (c) 2008,2010,2011,2012,2013,2014 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 """Show content of hex file as hexdump."""
 
-VERSION = '1.5.1'
+VERSION = '2.0'
 
 USAGE = '''hex2dump: show content of hex file as hexdump.
 Usage:
@@ -61,7 +61,8 @@ def hex2dump(hexfile, start=None, end=None):
         hexfile = sys.stdin
     try:
         ih = intelhex.IntelHex(hexfile)
-    except (IOError, intelhex.IntelHexError), e:
+    except (IOError, intelhex.IntelHexError):
+        e = sys.exc_info()[1]     # current exception
         sys.stderr.write('Error reading file: %s\n' % e)
         return 1
     if not (start is None and end is None):
@@ -102,7 +103,8 @@ def main(argv=None):
             raise getopt.GetoptError('Hex file is not specified')
         if len(args) > 1:
             raise getopt.GetoptError('Too many arguments')
-    except getopt.GetoptError, msg:
+    except getopt.GetoptError:
+        msg = sys.exc_info()[1]     # current exception
         txt = 'ERROR: '+str(msg)  # that's required to get not-so-dumb result from 2to3 tool
         print(txt)
         print(USAGE)
@@ -110,7 +112,8 @@ def main(argv=None):
 
     try:
         return hex2dump(args[0], start, end)
-    except IOError, e:
+    except IOError:
+        e = sys.exc_info()[1]     # current exception
         import errno
         if e.errno not in (0, errno.EPIPE):
             raise

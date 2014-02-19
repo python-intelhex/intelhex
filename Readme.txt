@@ -7,8 +7,8 @@ Python implementation
 
 Author: Alexander Belchenko
 Contact: alexander dot belchenko at gmail dot com
-Date: yyyy/mm/dd
-Version: 1.5.1
+Date: 2014/mm/dd
+Version: 2.0
 
 Introduction
 ------------
@@ -67,17 +67,5 @@ epydoc tool: http://epydoc.sourceforge.net/
 
 Python 3 compatibility
 ----------------------
-Intelhex library developed using Python 2 and supposed to support
-Python 2.4 and higher.
-
-In addition there was added support for Python 3. To use Intelhex library on
-Python 3 you should translate its sources with 2to3 utility.
-
-You can make such translation manually with help of Makefile in sources:
-
-    make 2to3 PYTHON=python3
-
-Alternatively sources and scripts will be automatically translated while
-executing standard install spell:
-
-    python3 setup.py build install
+Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.3) without
+external libraries or 2to3 tool. Enjoy.

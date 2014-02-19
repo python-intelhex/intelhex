@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008,2010,2011,2013 Alexander Belchenko
+# Copyright (c) 2008,2010,2011,2013,2014 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 """Merge content of several hex files into one file."""
 
-VERSION = '1.5.1'
+VERSION = '2.0'
 
 USAGE = '''hexmerge: merge content of hex files.
 Usage:
@@ -85,7 +85,6 @@ import sys
 
 def main(args=None):
     import getopt
-    import intelhex
 
     output = None
     start = None
@@ -131,11 +130,13 @@ def main(args=None):
         if len(args) == 0:
             raise getopt.GetoptError('You should specify file list')
 
-    except getopt.GetoptError, e:
+    except getopt.GetoptError:
+        e = sys.exc_info()[1]     # current exception
         sys.stderr.write(str(e)+"\n")
         sys.stderr.write(USAGE+"\n")
         return 1
 
+    import intelhex
     # TODO: move actual merge code into intelhex package as helper function
     #       and write couple of tests for it.
     res = intelhex.IntelHex()
@@ -159,7 +160,8 @@ def main(args=None):
             ih = ih[fstart:end_addr_inclusive(fend)]
         try:
             res.merge(ih, overlap)
-        except intelhex.AddressOverlapError, e:
+        except intelhex.AddressOverlapError:
+            e = sys.exc_info()[1]     # current exception
             sys.stderr.write('Merging: '+fname+"\n")
             sys.stderr.write(str(e)+"\n")
             return 1

@@ -262,7 +262,8 @@ def main(argv=None):
 
         if args:
             raise getopt.GetoptError('Arguments are not used.')
-    except getopt.GetoptError, msg:
+    except getopt.GetoptError:
+        msg = sys.exc_info()[1]     # current exception
         txt = str(msg)
         print(txt)
         return 1

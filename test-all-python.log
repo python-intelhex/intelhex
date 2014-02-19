@@ -1,0 +1,18 @@
+test-all-python.py started: Wed Feb 19 13:28:15 2014
+
+Check presence of python 2.4 ... Python 2.4.4
+   Running tests against 2.4 ... OK
+Check presence of python 2.5 ... Python 2.5.4
+   Running tests against 2.5 ... OK
+Check presence of python 2.6-32bit ... Python 2.6.6
+   Running tests against 2.6-32bit ... OK
+Check presence of python 2.6-64bit ... Python 2.6.6
+   Running tests against 2.6-64bit ... OK
+Check presence of python 2.7-32bit ... Python 2.7.6
+   Running tests against 2.7-32bit ... OK
+Check presence of python 2.7-64bit ... Python 2.7.6
+   Running tests against 2.7-64bit ... OK
+Check presence of python 3.3-32bit ... Python 3.3.4
+   Running tests against 3.3-32bit ... OK
+Check presence of python 3.3-64bit ... Python 3.3.4
+   Running tests against 3.3-64bit ... OK

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008,2010,2011,2012,2013 Alexander Belchenko
+# Copyright (c) 2008,2010,2011,2012,2013,2014 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,14 +35,12 @@
 
 '''Intel HEX file format bin2hex convertor utility.'''
 
-VERSION = '1.5.1'
+VERSION = '2.0'
 
 if __name__ == '__main__':
     import getopt
     import os
     import sys
-
-    from intelhex import bin2hex
 
     usage = '''Bin2Hex convertor utility.
 Usage:
@@ -89,7 +87,8 @@ Options:
         if len(args) > 2:
             raise getopt.GetoptError('Too many arguments')
 
-    except getopt.GetoptError, msg:
+    except getopt.GetoptError:
+        msg = sys.exc_info()[1]     # current exception
         txt = 'ERROR: '+str(msg)    # that's required to get not-so-dumb result from 2to3 tool
         print(txt)
         print(usage)
@@ -122,4 +121,5 @@ Options:
         fout = sys.stdout
         force_stream_binary(fout)
 
+    from intelhex import bin2hex
     sys.exit(bin2hex(fin, fout, offset))

@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008-2013, Alexander Belchenko
+# Copyright (c) 2008-2014, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -40,7 +40,7 @@ from distutils.core import Command, setup
 
 METADATA = dict(
       name='intelhex',
-      version='1.5.1',
+      version='2.0',
 
       scripts=[
         'scripts/bin2hex.py',
@@ -130,16 +130,9 @@ def main():
     metadata = METADATA.copy()
     metadata['cmdclass'] = {
         'test': test,
-        'bench': bench,
+        #'bench': bench,    # bench is out of date
         }
-    if sys.version_info[0] >= 3:
-        from distutils.command.build_py import build_py_2to3
-        metadata['cmdclass']['build_py'] = build_py_2to3
-        from distutils.command.build_scripts import build_scripts_2to3
-        metadata['cmdclass']['build_scripts'] = build_scripts_2to3
-
-    setup(**metadata)
-
+    return setup(**metadata)
 
 if __name__ == '__main__':
     main()
