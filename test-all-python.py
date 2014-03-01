@@ -40,18 +40,30 @@ import sys
 import time
 
 
-PYTHONS = (
-    # display name, executable [full] path
-    #('2.3', 'C:\Python23\python'),     # 2.3 is not supported
-    ('2.4', 'C:\Python24\python'),
-    ('2.5', 'C:\Python25\python'),
-    ('2.6-32bit', 'C:\Python26-32bit\python'),
-    ('2.6-64bit', 'C:\Python26-64bit\python'),
-    ('2.7-32bit', 'C:\Python27-32bit\python'),
-    ('2.7-64bit', 'C:\Python27-64bit\python'),
-    ('3.3-32bit', 'C:\Python33-32bit\python'),
-    ('3.3-64bit', 'C:\Python33-64bit\python'),
-    )
+if sys.platform == 'win32':
+    PYTHONS = (
+        # display name, executable [full] path
+        #('2.3', 'C:\Python23\python'),     # 2.3 is not supported
+        ('2.4', 'C:\Python24\python'),
+        ('2.5', 'C:\Python25\python'),
+        ('2.6-32bit', 'C:\Python26-32bit\python'),
+        ('2.6-64bit', 'C:\Python26-64bit\python'),
+        ('2.7-32bit', 'C:\Python27-32bit\python'),
+        ('2.7-64bit', 'C:\Python27-64bit\python'),
+        ('3.3-32bit', 'C:\Python33-32bit\python'),
+        ('3.3-64bit', 'C:\Python33-64bit\python'),
+        )
+else:
+    PYTHONS = (
+        # display name, executable [full] path
+        ('2.4', 'python2.4'),
+        ('2.5', 'python2.5'),
+        ('2.6', 'python2.6'),
+        ('2.7', 'python2.7'),
+        ('3.3-32bit', 'python3.3-32'),
+        ('3.3-64bit', 'python3.3-64'),
+        )
+
 
 
 def main():
@@ -79,7 +91,7 @@ def checkPythonExists(display_name, executable):
     sys.stdout.write('Check presence of python %s ... ' % display_name)
     cmd = '%s -V' % executable
     try:
-        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     except:
         exc = sys.exc_info()[1]     # current exception
         sys.stdout.write('ERROR\n  Exception: %s\n' % str(exc))
@@ -101,7 +113,7 @@ def runTestWithPython(display_name, executable):
     """ Runs `$(PYTHON) setup.py test -q` """
     cmd = '%s setup.py test -q' % executable
     sys.stdout.write('   Running tests against %s ... ' % display_name)
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
     stdout, stderr = p.communicate()
     retcode = p.poll()
     if retcode == 0:
