@@ -37,6 +37,7 @@
 
 import array
 import os
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -1500,6 +1501,8 @@ class Test_GetFileAndAddrRange(TestIntelHexBase):
 class TestInSubprocess(unittest.TestCase):
 
     def runProcessAndGetAsciiStdoutOrStderr(self, cmdline):
+        if sys.platform != 'win32':
+            cmdline = shlex.split(cmdline)
         p = subprocess.Popen(cmdline, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         stdout, stderr = p.communicate()
         retcode = p.poll()
