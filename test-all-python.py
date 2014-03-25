@@ -44,14 +44,15 @@ if sys.platform == 'win32':
     PYTHONS = (
         # display name, executable [full] path
         #('2.3', 'C:\Python23\python'),     # 2.3 is not supported
-        ('2.4', 'C:\Python24\python'),
-        ('2.5', 'C:\Python25\python'),
-        ('2.6-32bit', 'C:\Python26-32bit\python'),
-        ('2.6-64bit', 'C:\Python26-64bit\python'),
-        ('2.7-32bit', 'C:\Python27-32bit\python'),
-        ('2.7-64bit', 'C:\Python27-64bit\python'),
-        ('3.3-32bit', 'C:\Python33-32bit\python'),
-        ('3.3-64bit', 'C:\Python33-64bit\python'),
+        ('2.4', r'C:\Python\2.4\python'),
+        ('2.5', r'C:\Python\2.5\python'),
+        ('2.6-32bit', r'C:\Python\2.6-32\python'),
+        ('2.6-64bit', r'C:\Python\2.6-64\python'),
+        ('2.7-32bit', r'C:\Python\2.7-32\python'),
+        ('2.7-64bit', r'C:\Python\2.7-64\python'),
+        ('3.3-32bit', r'C:\Python\3.3-32\python'),
+        ('3.3-64bit', r'C:\Python\3.3-64\python'),
+        ('3.4-32bit', r'C:\Python\3.4-32\python'),
         )
 else:
     PYTHONS = (
