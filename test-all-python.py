@@ -107,6 +107,7 @@ def checkPythonExists(display_name, executable):
     output = output.replace('\r', '')
     if not output.endswith('\n'):
         output = output + '\n'
+    output = output.replace(u'\ufffd', u'?')
     sys.stdout.write(output)
     return retcode == 0
 
