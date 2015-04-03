@@ -124,6 +124,8 @@ def runTestWithPython(display_name, executable):
         return True
     else:
         sys.stdout.write('FAILED\n')
+        sys.stdout.write(stdout.decode('ascii', 'ignore'))
+        sys.stdout.write(stderr.decode('ascii', 'ignore'))
         return False
 
 if __name__ == '__main__':

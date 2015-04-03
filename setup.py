@@ -98,7 +98,7 @@ class test(Command):
         runner = unittest.TextTestRunner(stream=sys.stdout, verbosity=verbosity)
         result = runner.run(suite)
         if result.errors or result.failures:
-            return 1
+            sys.exit(1)
 
 
 class bench(Command):
