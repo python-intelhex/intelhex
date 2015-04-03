@@ -53,6 +53,7 @@ if sys.platform == 'win32':
         ('3.3-32bit', r'C:\Python\3.3-32\python'),
         ('3.3-64bit', r'C:\Python\3.3-64\python'),
         ('3.4-32bit', r'C:\Python\3.4-32\python'),
+        ('3.4-64bit', r'C:\Python\3.4-64\python'),
         )
 else:
     PYTHONS = (
