@@ -65,6 +65,7 @@ from intelhex import (
     hex2bin,
     Record,
     )
+from intelhex import compat
 from intelhex.compat import (
     BytesIO,
     StringIO,
@@ -1496,6 +1497,24 @@ class Test_GetFileAndAddrRange(TestIntelHexBase):
             intelhex._get_file_and_addr_range('C:\\filename.hex:1:A', True))
         self.assertEqual(('C:\\filename.hex', 1, 10),
             intelhex._get_file_and_addr_range('C:\\filename.hex:0001:000A', True))
+
+
+class TestXrangeLongInt(unittest.TestCase):
+
+    def test_xrange_longint(self):
+        # Bug #1408934: xrange(longint) blows with OverflowError:
+        if compat.Python == 2:
+            self.assertRaises(OverflowError, xrange, 2684625744, 2684625747)
+        #
+        upr = compat.range_g(2684625744, 2684625747)
+        self.assertEqual([2684625744, 2684625745, 2684625746], list(upr))
+        upr = compat.range_g(2684625744, 2684625747, 2)
+        self.assertEqual([2684625744, 2684625746], list(upr))
+        #
+        dnr = compat.range_g(2684625746, 2684625743, -1)
+        self.assertEqual([2684625746, 2684625745, 2684625744], list(dnr))
+        dnr = compat.range_g(2684625746, 2684625743, -2)
+        self.assertEqual([2684625746, 2684625744], list(dnr))
 
 
 class TestInSubprocess(unittest.TestCase):

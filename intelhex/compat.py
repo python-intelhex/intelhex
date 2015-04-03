@@ -46,6 +46,8 @@ import sys
 
 if sys.version_info[0] >= 3:
     # Python 3
+    Python = 3
+
     def asbytes(s):
         if isinstance(s, bytes):
             return s
@@ -74,6 +76,8 @@ if sys.version_info[0] >= 3:
 
 else:
     # Python 2
+    Python = 2
+
     asbytes = str
     asstr = str
 
@@ -81,7 +85,39 @@ else:
     StrType = basestring
     UnicodeType = unicode
 
-    range_g = xrange    # range generator
+    #range_g = xrange    # range generator
+    def range_g(*args):
+        # we want to use xrange here but on python 2 it does not work with long ints
+        try:
+            return xrange(*args)
+        except OverflowError:
+            start = 0
+            stop = 0
+            step = 1
+            n = len(args)
+            if n == 1:
+                stop = args[0]
+            elif n == 2:
+                start, stop = args
+            elif n == 3:
+                start, stop, step = args
+            else:
+                raise TypeError('wrong number of arguments in range_g call!')
+            if step == 0:
+                raise ValueError('step cannot be zero')
+            if step > 0:
+                def up(start, stop, step):
+                    while start < stop:
+                        yield start
+                        start += step
+                return up(start, stop, step)
+            else:
+                def down(start, stop, step):
+                    while start > stop:
+                        yield start
+                        start += step
+                return down(start, stop, step)
+
     range_l = range     # range list
 
     def dict_keys(dikt):        # dict keys list
