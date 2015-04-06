@@ -8,3 +8,5 @@
 ./MANIFEST
 __pycache__
 tags
+fastimport.marks
+fastimport.stream
