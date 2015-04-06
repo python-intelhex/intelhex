@@ -1,13 +1,10 @@
-==========================================
-Intel HEX file format reader and convertor
-==========================================
----------------------
-Python implementation
----------------------
+-----------------------
+Python IntelHex library
+-----------------------
 
 Author: Alexander Belchenko
-Contact: alexander dot belchenko at gmail dot com
-Date: 2014/mm/dd
+Contact: alexander belchenko at gmail com
+Date: 2015/mm/dd
 Version: 2.0
 
 Introduction
@@ -30,42 +27,63 @@ License
 -------
 The code distributed under BSD license. See LICENSE.txt in sources archive.
 
+In short: you can use IntelHex library in your project without any restrictions.
+
+If you're using IntelHex library in your open-source project, or your company 
+created freely available set of tools, utilities or sdk based on IntelHex
+library - please, send me email and tell something about your project. 
+I'd like to add name of your project/company to page "Who Uses IntelHex".
+
+Python 3 compatibility
+----------------------
+Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.3 and later) 
+without external libraries or 2to3 tool from the same codebase.
+
 Download
 --------
-https://launchpad.net/intelhex/+download
+* https://pypi.python.org/pypi/IntelHex
+* https://launchpad.net/intelhex/+download
+* https://github.com/bialix/intelhex
 
 Install
 -------
-python setup.py install
+Install using pip (no separate download required):
 
-Project at Launchpad
---------------------
-Intelhex project at Launchpad.net:
+    pip install intelhex
+
+Install from sources (classic python's magic spell):
+
+    python setup.py install
+
+Source code
+-----------
+Intelhex project on Launchpad:
 
     https://launchpad.net/intelhex/
-
-There is bug tracker and source code history browser. I use Bazaar version
-control system for development of intelhex.
     
-Bzr (Bazaar version-control system) itself is here: 
-http://bazaar.canonical.com
+Get code with bzr:
+    
+    bzr branch lp:intelhex
 
-Documentation
--------------
+IntelHex on GitHub:
+
+    https://github.com/bialix/intelhex
+    
+Get code with git:
+
+    git clone https://github.com/bialix/intelhex.git
+
+User manual
+-----------
 User manual for IntelHex available in the sources docs/manual/ directory.
 You can browse User Manual online:
-http://www.bialix.com/intelhex/manual/
 
+    http://pythonhosted.org//IntelHex/
+
+API documentation
+-----------------
 You can use epydoc for creating API documentation for IntelHex class. Run:
 
     $ python epydoc.py intelhex
 
-You can browse API documentation online:
-http://www.bialix.com/intelhex/api/
-
 epydoc tool: http://epydoc.sourceforge.net/
-
-Python 3 compatibility
-----------------------
-Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.3) without
-external libraries or 2to3 tool. Enjoy.

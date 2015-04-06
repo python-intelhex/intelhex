@@ -1,16 +1,3 @@
-:mod:`intelhex` package
------------------------------------
-
-.. module:: intelhex
-   :platform: OS-independent
-   :synopsis: Intel HEX file format reader and converter.
-
-.. class:: IntelHex(source)
-
-Full API documentation available at 
-http://bialix.com/intelhex/api/index.html
-
-
 Embedding into other projects
 *****************************
 IntelHex should be easy to embed in other projects. 
@@ -27,3 +14,9 @@ directory and used as a system package.
 In either case, IntelHex is distributed with a BSD-style license. 
 This permits you to use it in any way you see fit, provided that the package 
 is appropriately credited.
+
+If you're using IntelHex library in your open-source project, or your company 
+created freely available set of tools, utilities or sdk based on IntelHex
+library - please, send me email (to alexander belchenko at gmail com)
+and tell something about your project. 
+I'd like to add name of your project/company to page "Who Uses IntelHex".

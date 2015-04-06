@@ -1,6 +1,6 @@
----------------------------
-Python IntelHex User Manual
----------------------------
+-----------------------------------
+Python IntelHex Library User Manual
+-----------------------------------
 
 :Version: 2.0
 
@@ -37,11 +37,6 @@ They provide help if called incorrectly.
 .. include:: manual/part3-3.txt
 .. include:: manual/part3-4.txt
 .. include:: manual/part3-5.txt
-
-``intelhex`` package
---------------------
-Full API documentation available at 
-http://bialix.com/intelhex/api/index.html
 
 Embedding into other projects
 *****************************
