@@ -1,6 +1,9 @@
 Author: Alexander Belchenko
 
-Copyright (C) Alexander Belchenko, 2005-2014
+Copyright (C) Alexander Belchenko, 2005-2015
+
+Special thanks to Bernhard Leiner for huge help in porting
+IntelHex library to Python 3.
 
 Contributors:
 
