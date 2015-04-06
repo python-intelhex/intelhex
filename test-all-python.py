@@ -40,6 +40,7 @@ import sys
 import time
 
 
+# TODO: extract this as some sort of config file
 if sys.platform == 'win32':
     PYTHONS = (
         # display name, executable [full] path
@@ -54,6 +55,7 @@ if sys.platform == 'win32':
         ('3.3-64bit', r'C:\Python\3.3-64\python'),
         ('3.4-32bit', r'C:\Python\3.4-32\python'),
         ('3.4-64bit', r'C:\Python\3.4-64\python'),
+        ('3.5-64bit', r'C:\Python\3.5-64\python'),
         )
 else:
     PYTHONS = (
@@ -65,7 +67,6 @@ else:
         ('3.3-32bit', 'python3.3-32'),
         ('3.3-64bit', 'python3.3-64'),
         )
-
 
 
 def main():
