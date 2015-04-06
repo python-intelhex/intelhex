@@ -1,0 +1,10 @@
+Mirror bzr repo to git
+**********************
+
+1) cd bzr intelhex branch
+2) bzr fast-export -b test-all-pythons . fastimport.stream
+3) copy fastimport.stream to git checkout
+4) ensure current git branch is test-all-pythons
+5) git fast-import < fastimport.stream
+6) checkout git master branch and merge test-all-pythons mirror there
+7) push to github
