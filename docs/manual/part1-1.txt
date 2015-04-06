@@ -16,13 +16,17 @@ inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
 In addition you can try to inspect differences between 2 HEX files with
 ``hexdiff.py`` utility which uses dump output similar to ``hex2dump.py``.
 
-This manual and more information can be found at:
+You can find IntelHex library on PyPI:
 
-http://www.bialix.com/intelhex/
+https://pypi.python.org/pypi/IntelHex
 
-or at the Launchpad.net project page at:
+on Launchpad:
 
-https://launchpad.net/intelhex/
+https://launchpad.net/intelhex
+
+on GitHub:
+
+https://github.com/bialix/intelhex
 
 
 Motivation

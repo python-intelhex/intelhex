@@ -1,17 +1,71 @@
 Installation
 ************
-IntelHex may be downloaded from:
+
+Note: some commands below have `sudo` as first word.
+It's required only on Linux or MacOSX. 
+Omit that prefix if you're on Windows.
+
+Installing with pip
+~~~~~~~~~~~~~~~~~~~
+If you just need IntelHex library installed as your
+system python library 
+then it's better to use modern tool called ``pip`` 
+(http://www.pip-installer.org/en/latest/)
+to install with command:
+
+	sudo pip install intelhex
+
+Latest versions of Python interpreter (like 2.7.9, or 3.4.x and later)
+have pip in the standard installer/distribution.
+
+The simplest way to check whether you have pip installed
+is to check command (for Python 2.5+):
+
+	python -m pip list
+
+If this does not work, you can install pip by downloading single file
+from this page: https://pip.pypa.io/en/latest/installing.html#install-pip
+and run it as
+
+	sudo python get-pip.py
+
+
+Download sources
+~~~~~~~~~~~~~~~~
+You can get archive with latest released code, docs and other files
+from PyPI:
+
+https://pypi.python.org/pypi/IntelHex
+
+Also IntelHex may be downloaded from:
 
 https://launchpad.net/intelhex/+download
 
-or 
+You can get archive with unreleased code from GitHub page:
 
-http://www.bialix.com/intelhex/
+https://github.com/bialix/intelhex
 
-IntelHex is distributed as a standard Python Distutils package. 
+Use corresponding menu item in the right-hand side bar on that page 
+(e.g. "Download ZIP").
+
+
+Get source code with bzr or git
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Get the latest development code with bzr:
+
+	bzr branch lp:intelhex
+        
+Or get the latest development code with git:
+
+	git clone https://github.com/bialix/intelhex.git
+
+
+Install from sources
+~~~~~~~~~~~~~~~~~~~~
+IntelHex has got stadard setup.py installation script. 
 Assuming Python is properly installed on your platform, 
 installation should just require running the following command 
-from the root directory of the archive::
+from the root directory of the sources::
 
     sudo python setup.py install
 
@@ -26,10 +80,17 @@ The scripts should be in your PATH so that they can be called from anywhere
 in the file system.
 
 See the Python distutils website for more information, or try typing, 
-``python setup.py --help`` from the root directory of the archive.
+``python setup.py --help`` from the root directory of the sources.
 
-Also you can use modern tool called ``pip`` 
-(http://www.pip-installer.org/en/latest/)
-to install IntelHex library:
+Note for Windows users
+~~~~~~~~~~~~~~~~~~~~~~
+Please note that for historical reasons IntelHex library doesn't use
+setuptools for installation task, therefore we don't create exe-wrappers
+for helper scripts as hex2bin.py, bin2hex.py and other mentioned in this
+documentation (see section Convenience Scripts).
 
-	sudo pip install IntelHex
+You can find these scripts in your python Script directory 
+(usually `C:\\PythonXY\\Scripts`). You need either create batch file to run them,
+or use Python interpreter:
+
+	python C:\\PythonXY\\Scripts\\hex2bin.py ...

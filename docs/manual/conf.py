@@ -41,8 +41,8 @@ source_suffix = '.txt'
 master_doc = 'index'
 
 # General information about the project.
-project = 'IntelHex'
-copyright = '2005-2014, Alexander Belchenko'
+project = 'Python IntelHex library'
+copyright = '2005-2015, Alexander Belchenko'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -155,7 +155,7 @@ html_static_path = ['.static']
 #html_file_suffix = ''
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'IntelHexdoc'
+htmlhelp_basename = 'PythonIntelhexLibrary'
 
 
 # Options for LaTeX output
@@ -170,7 +170,7 @@ htmlhelp_basename = 'IntelHexdoc'
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, document class [howto/manual]).
 latex_documents = [
-  ('index', 'IntelHex.tex', 'IntelHex Documentation',
+  ('index', 'IntelHex.tex', 'Python IntelHex library Documentation',
    'Alexander Belchenko', 'manual'),
 ]
 
