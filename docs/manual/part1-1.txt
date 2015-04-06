@@ -36,5 +36,22 @@ when I've stuck with its limitations and unintuitive behavior.
 
 So I've made this library and related tools which gives me 
 full control over data and HEX file creation.
+Not the best reason to start yet another project. 
+But, as you probably know, nothing is better than scratch our own itches, 
+especially if you want to re-implement something 
+in your favorite programming language.
+
+Over the years it turned out my small python library was very useful 
+for many people, and allowed them not only create utilities to manipulate
+with HEX files, but also create custom bootloaders for their devices.
+
+I started to write this library in 2005, and now 10 years later it's still
+alive and useful to other developers. That keeps me working on improving
+this code, even though I don't work on embedding systems for some time.
+
+If you find IntelHex library useful - please, send me email 
+and tell a bit about how you're using it and in which projects/areas.
+That not only satisfy my curiosity but also helps me to keep working 
+on this project.
 
 .. _SRecord: http://srecord.sourceforge.net/
