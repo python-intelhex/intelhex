@@ -2,11 +2,12 @@ PYTHON := python
 
 all:
 	@echo Available targets:
-	@echo  clean - clean build directory
-	@echo  test - run unittest
-	@echo  epydoc - run epydoc to create API documentation
+	@echo  clean   - clean build directory
+	@echo  test    - run unittest
+	@echo  epydoc  - run epydoc to create API documentation
 	@echo  wininst - Windows installer for Python
-	@echo  docs - build docs with ReST and Sphinx
+	@echo  docs    - build docs with ReST and Sphinx
+	@echo  wheel   - build wheel binary archive (see pip & wheel)
 
 .PHONY: clean test epydoc wininst docs
 
@@ -25,3 +26,6 @@ wininst:
 docs:
 	rst2html.py docs/manual.txt docs/manual.html
 	make -C docs/manual html
+
+wheel:
+	$(PYTHON) -m pip wheel .

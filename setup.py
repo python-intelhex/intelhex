@@ -55,7 +55,8 @@ METADATA = dict(
       author_email='alexander.belchenko@gmail.com',
       url='http://www.bialix.com/intelhex/',
 
-      description='Intel HEX file format reader and convertor',
+      description='Python Intel Hex library',
+      long_description='Python Intel Hex library',
       keywords='Intel HEX hex2bin HEX8',
       license='BSD',
       classifiers = [
