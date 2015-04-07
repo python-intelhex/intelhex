@@ -78,7 +78,7 @@ User manual
 User manual for IntelHex available in the sources docs/manual/ directory.
 You can browse User Manual online:
 
-    http://pythonhosted.org//IntelHex/
+    http://pythonhosted.org/IntelHex/
 
 API documentation
 -----------------
