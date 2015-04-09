@@ -9,9 +9,8 @@ Version: 2.0
 
 Introduction
 ------------
-The Intel HEX file format widely used in microprocessors and microcontrollers 
-area as the de-facto standard for representation of code for programming 
-microelectronic devices.
+The Intel HEX file format is widely used in microprocessors and microcontrollers 
+area as the de facto standard for code representation for microelectronic devices programming.
 
 This work implements an **intelhex** Python library to read, write, 
 create from scratch and manipulate data from HEX (also known as Intel HEX) 
@@ -25,14 +24,14 @@ inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
 
 License
 -------
-The code distributed under BSD license. See LICENSE.txt in sources archive.
+The code is distributed under BSD license. See LICENSE.txt in the sources archive.
 
 In short: you can use IntelHex library in your project without any restrictions.
 
 If you're using IntelHex library in your open-source project, or your company 
 created freely available set of tools, utilities or sdk based on IntelHex
-library - please, send me email and tell something about your project. 
-I'd like to add name of your project/company to page "Who Uses IntelHex".
+library, please send me an email and tell something about your project. 
+I'd like to add the name of your project/company to page "Who Uses IntelHex".
 
 Python 3 compatibility
 ----------------------
@@ -75,7 +74,7 @@ Get code with git:
 
 User manual
 -----------
-User manual for IntelHex available in the sources docs/manual/ directory.
+User manual for IntelHex is available in the sources docs/manual/ directory.
 You can browse User Manual online:
 
     http://pythonhosted.org/IntelHex/

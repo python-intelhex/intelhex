@@ -1,8 +1,7 @@
 About
 *****
-The Intel HEX file format widely used in microprocessors and microcontrollers 
-area as the de-facto standard for representation of code for programming 
-microelectronic devices.
+The Intel HEX file format is widely used in microprocessors and microcontrollers 
+area as the de facto standard for code representation for microelectronic devices programming.
 
 This work implements an **intelhex** Python library to read, write, 
 create from scratch and manipulate data from HEX (also known as Intel HEX) 
@@ -13,7 +12,7 @@ to do basic tasks that utilize this library. The ``bin2hex.py`` script
 converts binary data to HEX, and the ``hex2bin.py`` works the other direction. 
 ``hex2dump.py`` converts data from HEX to a hexdump which is useful for
 inspecting data, and ``hexmerge.py`` merges multiple HEX files into one.
-In addition you can try to inspect differences between 2 HEX files with
+In addition you can try inspecting differences between two HEX files with
 ``hexdiff.py`` utility which uses dump output similar to ``hex2dump.py``.
 
 You can find IntelHex library on PyPI:
@@ -31,27 +30,27 @@ https://github.com/bialix/intelhex
 
 Motivation
 ~~~~~~~~~~
-This work was partially inspired by SRecord_ software in that moment
-when I've stuck with its limitations and unintuitive behavior.
+This work was partially inspired by SRecord_ software at the moment
+when I stuck with its limitations and unintuitive behavior.
 
-So I've made this library and related tools which gives me 
+So I've made this library and related tools which give me 
 full control over data and HEX file creation.
 Not the best reason to start yet another project. 
 But, as you probably know, nothing is better than scratch our own itches, 
 especially if you want to re-implement something 
 in your favorite programming language.
 
-Over the years it turned out my small python library was very useful 
-for many people, and allowed them not only create utilities to manipulate
-with HEX files, but also create custom bootloaders for their devices.
+Over the years it turned out that my small python library was very useful 
+to many people, and allowed them not only to create utilities to manipulate
+with HEX files, but also to create custom bootloaders for their devices.
 
-I started to write this library in 2005, and now 10 years later it's still
+I started writing this library in 2005, and now 10 years later it's still
 alive and useful to other developers. That keeps me working on improving
-this code, even though I don't work on embedding systems for some time.
+the code, even though I don't work on embedding systems for some time.
 
-If you find IntelHex library useful - please, send me email 
+If you find IntelHex library useful, please send me email 
 and tell a bit about how you're using it and in which projects/areas.
-That not only satisfy my curiosity but also helps me to keep working 
+That will not only satisfy my curiosity but also will help me to keep working 
 on this project.
 
 .. _SRecord: http://srecord.sourceforge.net/

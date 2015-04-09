@@ -2,8 +2,8 @@ Installation
 ************
 
 Note: some commands below have `sudo` as first word.
-It's required only on Linux or MacOSX. 
-Omit that prefix if you're on Windows.
+It's required only on Linux or Mac OS X. 
+Omit the prefix if you're on Windows.
 
 Installing with pip
 ~~~~~~~~~~~~~~~~~~~
@@ -11,11 +11,11 @@ If you just need IntelHex library installed as your
 system python library 
 then it's better to use modern tool called ``pip`` 
 (http://www.pip-installer.org/en/latest/)
-to install with command:
+to install with the command:
 
 	sudo pip install intelhex
 
-Latest versions of Python interpreter (like 2.7.9, or 3.4.x and later)
+The latest versions of Python interpreter (like 2.7.9, or 3.4.x and later)
 have pip in the standard installer/distribution.
 
 The simplest way to check whether you have pip installed
@@ -32,7 +32,7 @@ and run it as
 
 Download sources
 ~~~~~~~~~~~~~~~~
-You can get archive with latest released code, docs and other files
+You can get archive with the latest released code, docs and other files
 from PyPI:
 
 https://pypi.python.org/pypi/IntelHex
@@ -41,11 +41,11 @@ Also IntelHex may be downloaded from:
 
 https://launchpad.net/intelhex/+download
 
-You can get archive with unreleased code from GitHub page:
+You can get the archive with the unreleased code from GitHub page:
 
 https://github.com/bialix/intelhex
 
-Use corresponding menu item in the right-hand side bar on that page 
+Use the corresponding menu item in the right-hand side bar on that page 
 (e.g. "Download ZIP").
 
 
@@ -64,19 +64,19 @@ Install from sources
 ~~~~~~~~~~~~~~~~~~~~
 IntelHex has got stadard setup.py installation script. 
 Assuming Python is properly installed on your platform, 
-installation should just require running the following command 
+installation should require just running of the following command 
 from the root directory of the sources::
 
     sudo python setup.py install
 
 This will install the intelhex package into your system's site-packages 
 directory and place the helper scripts in your Python site-packages 
-binaries directory. After that is done, any other Python scripts or modules 
+binaries directory. Once it is done, any other Python scripts or modules 
 should be able to import the package using::
 
     >>> from intelhex import IntelHex
 
-The scripts should be in your PATH so that they can be called from anywhere 
+The scripts should be in your PATH so that they could be called from anywhere 
 in the file system.
 
 See the Python distutils website for more information, or try typing, 
@@ -90,7 +90,7 @@ for helper scripts as hex2bin.py, bin2hex.py and other mentioned in this
 documentation (see section Convenience Scripts).
 
 You can find these scripts in your python Script directory 
-(usually `C:\\PythonXY\\Scripts`). You need either create batch file to run them,
+(usually `C:\\PythonXY\\Scripts`). You need either to create batch file to run them,
 or use Python interpreter:
 
 	python C:\\PythonXY\\Scripts\\hex2bin.py ...
