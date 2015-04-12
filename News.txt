@@ -4,7 +4,7 @@ NEWS
 * 2015/04/12 v.2.0
 
     - The same codebase can be run on both Python 2 (2.4-2.7) 
-       and Python 3 (3.3+). No need to use 2to3.
+       and Python 3 (3.2+). No need to use 2to3.
     - compat.py: provide more helper functions and aliases to reduce changes
       required to convert python 2 compatible sources to python 3. 
       The code becomes quite ugly, but such compatibility has its price.
