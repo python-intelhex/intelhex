@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* 2015/mm/dd v.2.0
+* 2015/04/12 v.2.0
 
     - The same codebase can be run on both Python 2 (2.4-2.7) 
        and Python 3 (3.3+). No need to use 2to3.

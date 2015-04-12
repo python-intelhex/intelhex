@@ -4,7 +4,7 @@ Python IntelHex library
 
 Author: Alexander Belchenko
 Contact: alexander belchenko at gmail com
-Date: 2015/mm/dd
+Date: 2015/04/12
 Version: 2.0
 
 Introduction

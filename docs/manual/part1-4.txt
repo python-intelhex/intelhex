@@ -1,4 +1,25 @@
 Python 3 compatibility
 **********************
-Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.3) without
+Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.2-3.5) without
 external libraries or 2to3 tool. Enjoy.
+
+I've successfully run unit tests of IntelHex against following versions of
+Python:
+
+	2.4.4, 2.5.4, 2.6.6 (32/64 bits), 2.7.9 (32/64 bits), 
+        3.2.5 (32/64 bits), 3.3.5 (32/64 bits), 3.4.3 (32/64 bits),
+        3.5.0a3 (32/64 bits),
+        and also PyPy 2.5.1 (which is Python 2.7.9)
+
+
+Which Python version should you use?
+------------------------------------
+If you don't really know which version of Python (2 or 3) you should use with
+IntelHex then please check following pre-requisites:
+
+1) Are you already have some Python installed on your computer and that
+   version is supported by IntelHex (see above)?
+2) Should you use another third-party libraries? If so, check their
+   requirements.
+3) Python 2.7 is the safest choice so far, but if you have a chance then try latest
+   stable Python 3 version.

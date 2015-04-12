@@ -65,6 +65,8 @@ if sys.platform == 'win32':
 
         ('3.5-32bit', r'C:\Python\3.5-32\python'),
         ('3.5-64bit', r'C:\Python\3.5-64\python'),
+
+        ('pypy',      r'C:\Python\pypy-2.5.1-win32\pypy'),
         )
 else:
     PYTHONS = (

@@ -28,3 +28,7 @@ Check presence of python 3.5-32bit ... Python 3.5.0a3
    Running tests against 3.5-32bit ... OK
 Check presence of python 3.5-64bit ... Python 3.5.0a3
    Running tests against 3.5-64bit ... OK
+
+Check presence of python pypy ... Python 2.7.9 (9c4588d731b7, Mar 23 2015, 20:00:36)
+[PyPy 2.5.1 with MSC v.1500 32 bit]
+   Running tests against pypy ... OK

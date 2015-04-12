@@ -53,7 +53,7 @@ METADATA = dict(
 
       author='Alexander Belchenko',
       author_email='alexander.belchenko@gmail.com',
-      url='http://www.bialix.com/intelhex/',
+      url='https://pypi.python.org/pypi/IntelHex',
 
       description='Python Intel Hex library',
       long_description='Python Intel Hex library',
@@ -61,6 +61,7 @@ METADATA = dict(
       license='BSD',
       classifiers = [
         'Programming Language :: Python',
+        'Programming Language :: Python :: 2',
         'Programming Language :: Python :: 3',
         'Classifier: Development Status :: 5 - Production/Stable',
         'Classifier: Environment :: Console',
