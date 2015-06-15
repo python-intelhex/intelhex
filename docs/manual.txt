@@ -37,6 +37,7 @@ They provide help if called incorrectly.
 .. include:: manual/part3-3.txt
 .. include:: manual/part3-4.txt
 .. include:: manual/part3-5.txt
+.. include:: manual/part3-6.txt
 
 Embedding into other projects
 *****************************

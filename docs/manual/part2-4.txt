@@ -71,3 +71,16 @@ This defaults to '0xFF', but it can be changed by the user like so::
     >>> print ih[0]       # prints 0xFF because this location is blank
     >>> ih.padding = 0x00 # change padding byte
     >>> print ih[0]       # prints 0x00 because this location is blank
+
+Summarizing the data chunks
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
+One of the more useful properties of HEX files is that they can specify data
+in discontinuous segments. There are two main methods to summarize which
+data addresses are occupied::
+
+    >>> ih.addresses()
+    >>> ih.segments()
+
+The first will return a list of occupied data addresses in sorted order. The
+second will return a list of ``xrange`` objects, in sorted order, representing
+contiguous segment chunks of occupied data addresses.

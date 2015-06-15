@@ -1,0 +1,19 @@
+Script ``hexinfo.py``
+*********************
+This is a script to summarize a hex file's contents.
+
+This utility creates a YAML-formatted, human-readable
+summary ofa set of HEX files. It includes the file name,
+execution start address (if any), and the address ranges
+covered by the data (if any).
+
+::
+
+    hexinfo: summarize a hex file's contents.
+
+    Usage:
+        python hexinfo.py [options] FILE [ FILE ... ]
+
+    Options:
+        -h, --help              this help message.
+        -v, --version           version info.

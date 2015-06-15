@@ -850,37 +850,20 @@ class IntelHex(object):
                 elif overlap == 'replace':
                     self.start_addr = other.start_addr
 
-
     def segments(self):
-        """Return a list of (start, end) tuples of contiguous segments."""
+        """Return a list of ordered xrange objects representing contiguous occupied data addresses."""
         addresses = self.addresses()
+        if not addresses:
+            return []
+        elif len(addresses) == 1:
+            return([xrange(addresses[0], addresses[0]+1)])
         adjacent_differences = [(b - a) for (a, b) in zip(addresses[:-1], addresses[1:])]
         breaks = [i for (i, x) in enumerate(adjacent_differences) if x > 1]
         endings = [addresses[b] for b in breaks]
         endings.append(addresses[-1])
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
-        return [(a, b) for (a, b) in zip(beginings, endings)]
-
-    def info(self):
-        """Return a dict of information about current memory, using hex strings for addresses."""
-        info = {}
-        if self.start_addr:
-            keys = dict_keys(self.start_addr)
-            keys.sort()
-            if keys == ['CS','IP']:
-                entry = '0x{:04X}{:04X}'.format(self.start_addr['CS'], self.start_addr['IP'])
-            elif keys == ['EIP']:
-                entry = '0x{:08X}'.format(self.start_addr['EIP'])
-            info['entry'] = entry
-        segments = self.segments()
-        info['segments'] = [{ 'begin': '0x{:08X}'.format(a), 'end': '0x{:08X}'.format(b)} for (a, b) in segments]
-        return info
-
-    def json_info(self, indent=2):
-        """Return a JSON-formatted string representing the memory layout."""
-        import json
-        return json.dumps(self.info(), sort_keys=True, indent=indent)
+        return [xrange(a, b+1) for (a, b) in zip(beginings, endings)]
 #/IntelHex
 
 
