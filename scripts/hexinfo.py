@@ -33,7 +33,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Summarize the information in a hex file my printing the execution
+"""Summarize the information in a hex file by printing the execution
         start address (if any), and the address ranges covered by the
         data (if any), in YAML format.
 """
