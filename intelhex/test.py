@@ -766,31 +766,42 @@ class TestIntelHex(TestIntelHexBase):
         # test that address segments are correctly summarized
         ih = IntelHex()
         sg = ih.segments()
-        self.assertIsInstance(sg, list)
+        self.assertTrue(isinstance(sg, list))
         self.assertEquals(len(sg), 0)
         ih[0x100] = 0
         sg = ih.segments()
-        self.assertIsInstance(sg, list)
+        self.assertTrue(isinstance(sg, list))
         self.assertEquals(len(sg), 1)
-        self.assertIsInstance(sg[0], xrange)
-        self.assertEquals(min(sg[0]), 0x100)
-        self.assertEquals(max(sg[0]), 0x100)
-        ih[0x101] = 1
-        sg = ih.segments()
-        self.assertIsInstance(sg, list)
-        self.assertEquals(len(sg), 1)
+        self.assertTrue(isinstance(sg[0], tuple))
+        self.assertTrue(len(sg[0]) == 2)
+        self.assertTrue(sg[0][0] < sg[0][1])
         self.assertEquals(min(sg[0]), 0x100)
         self.assertEquals(max(sg[0]), 0x101)
+        ih[0x101] = 1
+        sg = ih.segments()
+        self.assertTrue(isinstance(sg, list))
+        self.assertEquals(len(sg), 1)
+        self.assertTrue(isinstance(sg[0], tuple))
+        self.assertTrue(len(sg[0]) == 2)
+        self.assertTrue(sg[0][0] < sg[0][1])
+        self.assertEquals(min(sg[0]), 0x100)
+        self.assertEquals(max(sg[0]), 0x102)
         ih[0x200] = 2
         ih[0x201] = 3
         ih[0x202] = 4
         sg = ih.segments()
-        self.assertIsInstance(sg, list)
+        self.assertTrue(isinstance(sg, list))
         self.assertEquals(len(sg), 2)
+        self.assertTrue(isinstance(sg[0], tuple))
+        self.assertTrue(len(sg[0]) == 2)
+        self.assertTrue(sg[0][0] < sg[0][1])
+        self.assertTrue(isinstance(sg[1], tuple))
+        self.assertTrue(len(sg[1]) == 2)
+        self.assertTrue(sg[1][0] < sg[1][1])
         self.assertEquals(min(sg[0]), 0x100)
-        self.assertEquals(max(sg[0]), 0x101)
+        self.assertEquals(max(sg[0]), 0x102)
         self.assertEquals(min(sg[1]), 0x200)
-        self.assertEquals(max(sg[1]), 0x202)
+        self.assertEquals(max(sg[1]), 0x203)
         pass
 
 class TestIntelHexLoadBin(TestIntelHexBase):

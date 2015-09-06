@@ -72,7 +72,7 @@ def summarize_yaml(fname):
     if segments:
         print("{:s}data:".format(INDENT))
         for s in segments:
-            print("{:s}{:s}{{ first: 0x{:08X}, last: 0x{:08X}, length: 0x{:08X} }}".format(INDENT, INLIST, min(s), max(s), len(s)))
+            print("{:s}{:s}{{ first: 0x{:08X}, last: 0x{:08X}, length: 0x{:08X} }}".format(INDENT, INLIST, s[0], s[1]-1, s[1]-s[0]))
     print("")
 
 def main(argv=None):

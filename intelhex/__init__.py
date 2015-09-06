@@ -851,19 +851,22 @@ class IntelHex(object):
                     self.start_addr = other.start_addr
 
     def segments(self):
-        """Return a list of ordered xrange objects representing contiguous occupied data addresses."""
+        """Return a list of ordered tuple objects, representing contiguous occupied data addresses.
+        Each tuple has a length of two and follows the semantics of the range and xrange objects.
+        The second entry of the tuple is always an integer greater than the first entry.
+        """
         addresses = self.addresses()
         if not addresses:
             return []
         elif len(addresses) == 1:
-            return([xrange(addresses[0], addresses[0]+1)])
+            return([(addresses[0], addresses[0]+1)])
         adjacent_differences = [(b - a) for (a, b) in zip(addresses[:-1], addresses[1:])]
         breaks = [i for (i, x) in enumerate(adjacent_differences) if x > 1]
         endings = [addresses[b] for b in breaks]
         endings.append(addresses[-1])
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
-        return [xrange(a, b+1) for (a, b) in zip(beginings, endings)]
+        return [(a, b+1) for (a, b) in zip(beginings, endings)]
 #/IntelHex
 
 
