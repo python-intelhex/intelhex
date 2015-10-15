@@ -82,5 +82,7 @@ data addresses are occupied::
     >>> ih.segments()
 
 The first will return a list of occupied data addresses in sorted order. The
-second will return a list of ``xrange`` objects, in sorted order, representing
-contiguous segment chunks of occupied data addresses.
+second will return a list of 2-tuples objects, in sorted order, representing
+start and stop addresses of contiguous segment chunks of occupied data. 
+Those 2-tuples are suitable to be used as ``start`` and ``stop``
+arguments of standard ``range`` function.
