@@ -960,6 +960,17 @@ class TestIntelHexGetPutString(TestIntelHexBase):
 
 class TestIntelHexDump(TestIntelHexBase):
 
+    def test_bad_width(self):
+        ih = IntelHex()
+        sio = StringIO()
+        badwidths = [0, -1, -10.5, 2.5]
+        for bw in badwidths:
+            self.assertRaisesMsg(ValueError, "width must be a positive integer.",
+                ih.dump, sio, bw)
+        badwidthtypes = ['', {}, [], sio]
+        for bwt in badwidthtypes:
+            self.assertRaisesMsg(TypeError, None, ih.dump, sio, bwt)
+
     def test_empty(self):
         ih = IntelHex()
         sio = StringIO()
@@ -972,26 +983,53 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[1] = 0x34
         sio = StringIO()
         ih.dump(sio)
+        ih.dump(sio, 3) # width = 3
         self.assertEquals(
-            '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
+            '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n'
+            '0000  12 34 --  |.4 |\n',  # width = 3
             sio.getvalue())
+            
         ih[16] = 0x56
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(sio)
+        ih.dump(sio, withpadding=True)
+        ih.dump(sio, 3) # width = 3
         self.assertEquals(
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n'
-            '0010  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
+            '0010  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n'
+            '0000  12 34 FF FF FF FF FF FF FF FF FF FF FF FF FF FF  |.4..............|\n'
+            '0010  56 FF FF FF FF FF FF FF FF FF FF FF FF FF 98 FF  |V...............|\n'
+            '0000  12 34 --  |.4 |\n'  # width = 3
+            '0003  -- -- --  |   |\n'
+            '0006  -- -- --  |   |\n'
+            '0009  -- -- --  |   |\n'
+            '000C  -- -- --  |   |\n'
+            '000F  -- 56 --  | V |\n'
+            '0012  -- -- --  |   |\n'
+            '0015  -- -- --  |   |\n'
+            '0018  -- -- --  |   |\n'
+            '001B  -- -- --  |   |\n'
+            '001E  98 -- --  |.  |\n',
             sio.getvalue())
 
     def test_minaddr_not_zero(self):
         ih = IntelHex()
-        ih[16] = 0x56
+        ih[17] = 0x56
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(sio)
+        ih.dump(sio, withpadding=True)
+        ih.dump(sio, 3) # width = 3
         self.assertEquals(
-            '0010  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
+            '0010  -- 56 -- -- -- -- -- -- -- -- -- -- -- -- 98 --  | V            . |\n'
+            '0010  FF 56 FF FF FF FF FF FF FF FF FF FF FF FF 98 FF  |.V..............|\n'
+            '000F  -- -- 56  |  V|\n'  # width = 3
+            '0012  -- -- --  |   |\n'
+            '0015  -- -- --  |   |\n'
+            '0018  -- -- --  |   |\n'
+            '001B  -- -- --  |   |\n'
+            '001E  98 -- --  |.  |\n',
             sio.getvalue())
 
     def test_start_addr(self):
