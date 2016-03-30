@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008,2010,2011,2012,2013,2014,2015 Alexander Belchenko
+# Copyright (c) 2008-2016 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 '''Intel HEX file format bin2hex convertor utility.'''
 
-VERSION = '2.0'
+VERSION = '2.1'
 
 if __name__ == '__main__':
     import getopt
@@ -94,21 +94,12 @@ Options:
         print(usage)
         sys.exit(2)
 
-    def force_stream_binary(stream):
-        """Force binary mode for stream on Windows."""
-        if os.name == 'nt':
-            f_fileno = getattr(stream, 'fileno', None)
-            if f_fileno:
-                fileno = f_fileno()
-                if fileno >= 0:
-                    import msvcrt
-                    msvcrt.setmode(fileno, os.O_BINARY)
+    from intelhex import compat
 
     fin = args[0]
     if fin == '-':
         # read from stdin
-        fin = sys.stdin
-        force_stream_binary(fin)
+        fin = compat.get_binary_stdin()
     elif not os.path.isfile(fin):
         txt = "ERROR: File not found: %s" % fin   # that's required to get not-so-dumb result from 2to3 tool
         print(txt)
@@ -118,8 +109,7 @@ Options:
         fout = args[1]
     else:
         # write to stdout
-        fout = sys.stdout
-        force_stream_binary(fout)
+        fout = sys.stdout   # compat.get_binary_stdout()
 
     from intelhex import bin2hex
     sys.exit(bin2hex(fin, fout, offset))

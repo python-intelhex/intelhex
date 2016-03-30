@@ -77,6 +77,9 @@ if sys.version_info[0] >= 3:
     def get_binary_stdout():
         return sys.stdout.buffer
 
+    def get_binary_stdin():
+        return sys.stdin.buffer
+
 else:
     # Python 2
     Python = 2
@@ -133,14 +136,20 @@ else:
     from cStringIO import StringIO
     BytesIO = StringIO
 
-    def get_binary_stdout():
-        # force binary mode for stdout on Windows
-        import os
+    import os
+    def _force_stream_binary(stream):
+        """Force binary mode for stream on Windows."""
         if os.name == 'nt':
-            f_fileno = getattr(sys.stdout, 'fileno', None)
+            f_fileno = getattr(stream, 'fileno', None)
             if f_fileno:
                 fileno = f_fileno()
                 if fileno >= 0:
                     import msvcrt
                     msvcrt.setmode(fileno, os.O_BINARY)
-        return sys.stdout
+        return stream
+
+    def get_binary_stdout():
+        return _force_stream_binary(sys.stdout)
+
+    def get_binary_stdin():
+        return _force_stream_binary(sys.stdin)
