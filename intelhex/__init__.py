@@ -751,16 +751,24 @@ class IntelHex(object):
         self.puts(addr, s)
         self._buf[addr+len(s)] = 0
 
-    def dump(self, tofile=None):
+    def dump(self, tofile=None, width=16, withpadding=False):
         """Dump object content to specified file object or to stdout if None.
         Format is a hexdump with some header information at the beginning,
         addresses on the left, and data on right.
 
-        @param  tofile        file-like object to dump to
+        @param  tofile          file-like object to dump to
+        @param  width           number of bytes per line (i.e. columns)
+        @param  withpadding     print padding character instead of '--'
+        @raise  ValueError      if width is not a positive integer
         """
 
+        if width < 1 or int(width) != width:
+            raise ValueError('width must be a positive integer.')
+        # The integer can be of float type - does not work with bit operations
+        width = int(width)
         if tofile is None:
             tofile = sys.stdout
+            
         # start addr possibly
         if self.start_addr is not None:
             cs = self.start_addr.get('CS')
@@ -778,17 +786,21 @@ class IntelHex(object):
             addresses.sort()
             minaddr = addresses[0]
             maxaddr = addresses[-1]
-            startaddr = int(minaddr>>4)*16
-            endaddr = int((maxaddr>>4)+1)*16
-            maxdigits = max(len(str(endaddr)), 4)
+            startaddr = (minaddr // width) * width
+            endaddr = ((maxaddr // width) + 1) * width
+            maxdigits = max(len(hex(endaddr)) - 2, 4)   # Less 2 to exclude '0x'
             templa = '%%0%dX' % maxdigits
-            range16 = range_l(16)
-            for i in range_g(startaddr, endaddr, 16):
+            rangewidth = range_l(width)
+            if withpadding:
+                pad = self.padding
+            else:
+                pad = None
+            for i in range_g(startaddr, endaddr, width):
                 tofile.write(templa % i)
                 tofile.write(' ')
                 s = []
-                for j in range16:
-                    x = self._buf.get(i+j)
+                for j in rangewidth:
+                    x = self._buf.get(i+j, pad)
                     if x is not None:
                         tofile.write(' %02X' % x)
                         if 32 <= x < 127:   # GNU less does not like 0x7F (128 decimal) so we'd better show it as dot
