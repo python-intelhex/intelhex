@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2008,2010,2011,2012,2013,2014,2015 Alexander Belchenko
+# Copyright (c) 2008-2016 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 """Show content of hex file as hexdump."""
 
-VERSION = '2.0'
+VERSION = '2.1'
 
 USAGE = '''hex2dump: show content of hex file as hexdump.
 Usage:

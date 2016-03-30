@@ -569,8 +569,6 @@ class IntelHex(object):
             # Python 2
             table = ''.join(chr(i).upper() for i in range_g(256))
 
-
-
         # start address record if any
         if self.start_addr and write_start_addr:
             keys = dict_keys(self.start_addr)
