@@ -762,7 +762,7 @@ class IntelHex(object):
         @raise  ValueError      if width is not a positive integer
         """
 
-        if width < 1 or int(width) != width:
+        if not isinstance(width,int) or width < 1:
             raise ValueError('width must be a positive integer.')
         # The integer can be of float type - does not work with bit operations
         width = int(width)
