@@ -47,6 +47,7 @@ Options:
     -r, --range=START:END   specify address range for dumping
                             (ascii hex value).
                             Range can be in form 'START:' or ':END'.
+    --width=N               dump N data bytes per line (default: 16).
 
 Arguments:
     HEXFILE     name of hex file for processing (use '-' to read
@@ -55,7 +56,9 @@ Arguments:
 
 import sys
 
-def hex2dump(hexfile, start=None, end=None):
+DEFAULT_WIDTH = 16
+
+def hex2dump(hexfile, start=None, end=None, width=DEFAULT_WIDTH):
     import intelhex
     if hexfile == '-':
         hexfile = sys.stdin
@@ -67,7 +70,7 @@ def hex2dump(hexfile, start=None, end=None):
         return 1
     if not (start is None and end is None):
         ih = ih[slice(start,end)]
-    ih.dump()
+    ih.dump(tofile=sys.stdout, width=width)
     return 0
 
 
@@ -79,10 +82,11 @@ def main(argv=None):
 
     start = None
     end = None
+    width = DEFAULT_WIDTH
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hvp:r:",
-                                  ["help", "version", "range="])
+                                  ["help", "version", "range=", "width="])
         for o, a in opts:
             if o in ("-h", "--help"):
                 print(USAGE)
@@ -99,6 +103,13 @@ def main(argv=None):
                         end = int(l[1], 16)
                 except:
                     raise getopt.GetoptError('Bad range value(s)')
+            elif o == "--width":
+                try:
+                    width = int(a)
+                    if width < 1:
+                        raise ValueError
+                except:
+                    raise getopt.GetoptError('Bad width value (%s)' % a)
         if not args:
             raise getopt.GetoptError('Hex file is not specified')
         if len(args) > 1:
@@ -111,7 +122,7 @@ def main(argv=None):
         return 2
 
     try:
-        return hex2dump(args[0], start, end)
+        return hex2dump(args[0], start, end, width)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         import errno
