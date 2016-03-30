@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2015, Alexander Belchenko
+# Copyright (c) 2005-2016, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -34,10 +34,10 @@
 '''Intel HEX file format reader and converter.
 
 @author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
-@version    2.0
+@version    2.1
 '''
 
-__version__   = '2.0'
+__version__   = '2.1'
 __docformat__ = "javadoc"
 
 

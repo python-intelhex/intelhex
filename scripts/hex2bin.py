@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2005,2006,2007,2008,2010,2011,2012,2013,2014,2015 Alexander Belchenko
+# Copyright (c) 2005-2016 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 '''Intel HEX file format hex2bin convertor utility.'''
 
-VERSION = '2.0'
+VERSION = '2.1'
 
 if __name__ == '__main__':
     import getopt
@@ -125,15 +125,8 @@ Options:
         fout = args[1]
     else:
         # write to stdout
-        fout = sys.stdout
-        # force binary mode for stdout on Windows
-        if os.name == 'nt':
-            f_fileno = getattr(sys.stdout, 'fileno', None)
-            if f_fileno:
-                fileno = f_fileno()
-                if fileno >= 0:
-                    import msvcrt
-                    msvcrt.setmode(fileno, os.O_BINARY)
+        from intelhex import compat
+        fout = compat.get_binary_stdout()
 
     from intelhex import hex2bin
     sys.exit(hex2bin(fin, fout, start, end, size, pad))

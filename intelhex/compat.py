@@ -1,5 +1,5 @@
 # Copyright (c) 2011, Bernhard Leiner
-# Copyright (c) 2013, 2015 Alexander Belchenko
+# Copyright (c) 2013-2016 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -36,7 +36,7 @@
 
 @author     Bernhard Leiner (bleiner AT gmail com)
 @author     Alexander Belchenko (alexander belchenko AT gmail com)
-@version    2.0
+@version    2.1
 '''
 
 __docformat__ = "javadoc"
@@ -73,6 +73,9 @@ if sys.version_info[0] >= 3:
         return dikt.items()
 
     from io import StringIO, BytesIO
+
+    def get_binary_stdout():
+        return sys.stdout.buffer
 
 else:
     # Python 2
@@ -129,3 +132,15 @@ else:
 
     from cStringIO import StringIO
     BytesIO = StringIO
+
+    def get_binary_stdout():
+        # force binary mode for stdout on Windows
+        import os
+        if os.name == 'nt':
+            f_fileno = getattr(sys.stdout, 'fileno', None)
+            if f_fileno:
+                fileno = f_fileno()
+                if fileno >= 0:
+                    import msvcrt
+                    msvcrt.setmode(fileno, os.O_BINARY)
+        return sys.stdout
