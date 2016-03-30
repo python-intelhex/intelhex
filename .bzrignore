@@ -11,3 +11,5 @@ tags
 fastimport.marks
 fastimport.stream
 wheelhouse
+./.git
+./.gitignore
