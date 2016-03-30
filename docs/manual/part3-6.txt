@@ -3,7 +3,7 @@ Script ``hexinfo.py``
 This is a script to summarize a hex file's contents.
 
 This utility creates a YAML-formatted, human-readable
-summary ofa set of HEX files. It includes the file name,
+summary of a set of HEX files. It includes the file name,
 execution start address (if any), and the address ranges
 covered by the data (if any).
 

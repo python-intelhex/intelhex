@@ -1,6 +1,21 @@
 NEWS
 ====
 
+* 2016/MM/DD v.2.1
+
+    - API changes: added IntelHex.segments() method that returns
+      a list of ordered tuple objects, representing contiguous occupied data 
+      addresses. (Andrew Fernandes)
+    - New command-line script ``hexinfo.py`` to print summary about hex files
+      contents (file name, start address, address ranges covered by the data)
+      in YAML format. (Andrew Fernandes)
+    - Better Python 3 compatibility when ``hex2bin.py`` and ``bin2hex.py``
+      scripts are trying to read/write binary data from stdin or to stdout.
+      (GitHub issue https://github.com/bialix/intelhex/issues/4)
+    - The main activity of the IntelHex project slowly drifing towards
+      GitHub - the main social network for OSS developers.
+      I don't mind to get some help from additional maintainer though.
+
 * 2015/04/12 v.2.0
 
     - The same codebase can be run on both Python 2 (2.4-2.7) 
