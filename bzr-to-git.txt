@@ -1,5 +1,9 @@
-Mirror bzr repo to git
-**********************
+NOTE: Outdated instructions.
+I don't mirror repo anymore, but try to keep 2 versions in sync manually.
+
+
+Mirror bzr repo to git with fast-export/fast-import
+***************************************************
 
 1) cd bzr intelhex branch
 2) bzr fast-export -b test-all-pythons . fastimport.stream
