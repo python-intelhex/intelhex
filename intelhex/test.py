@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 # Copyright (c) 2005-2016, Alexander Belchenko
 # All rights reserved.
 #
@@ -33,7 +31,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-"""Test suite for IntelHex class."""
+"""Test suite for IntelHex library."""
 
 import array
 import os
@@ -76,7 +74,7 @@ from intelhex.compat import (
     range_g,
     range_l,
     )
-
+from intelhex.__version__ import version_str
 
 __docformat__ = 'restructuredtext'
 
@@ -1631,7 +1629,7 @@ class TestInSubprocess(unittest.TestCase):
     def versionChecker(self, cmdline_template):
         cmdline = cmdline_template % sys.executable
         retcode, output = self.runProcessAndGetAsciiStdoutOrStderr(cmdline)
-        self.assertEqual(intelhex.__version__, output.rstrip())
+        self.assertEqual(version_str, output.rstrip())
         self.assertEqual(0, retcode)
 
     def test_setup_version(self):

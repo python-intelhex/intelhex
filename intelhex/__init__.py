@@ -31,15 +31,9 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
 # EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-'''Intel HEX file format reader and converter.
+'''Intel HEX format manipulation library.'''
 
-@author     Alexander Belchenko (alexander dot belchenko at gmail dot com)
-@version    2.1
-'''
-
-__version__   = '2.1'
 __docformat__ = "javadoc"
-
 
 from array import array
 from binascii import hexlify, unhexlify

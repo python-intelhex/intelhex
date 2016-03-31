@@ -36,7 +36,6 @@
 
 @author     Bernhard Leiner (bleiner AT gmail com)
 @author     Alexander Belchenko (alexander belchenko AT gmail com)
-@version    2.1
 '''
 
 __docformat__ = "javadoc"
