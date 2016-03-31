@@ -35,7 +35,7 @@ I'd like to add the name of your project/company to page "Who Uses IntelHex".
 
 Python 3 compatibility
 ----------------------
-Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.3 and later) 
+Intelhex library supports Python 2 (2.4-2.7) and Python 3 (3.2-3.5 or later)
 without external libraries or 2to3 tool from the same codebase.
 
 Download
