@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2014, 2015 Alexander Belchenko
+# Copyright (c) 2014-2016 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -42,6 +42,15 @@ import time
 
 # TODO: extract this as some sort of config file
 if sys.platform == 'win32':
+    # Get from Windows registry
+    # HKEY_LOCAL_MACHINE\SOFTWARE\Python
+    #                                PythonCore
+    #                                       2.6
+    #                                           InstallPath
+    #                                       2.7
+    #                                       3.3
+    #                                       3.4
+    # HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Python\PythonCore\3.3\InstallPath
     PYTHONS = (
         # display name, executable [full] path
         #('2.3', 'C:\Python23\python'),     # 2.3 is not supported
