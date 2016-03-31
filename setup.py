@@ -35,20 +35,17 @@
 
 """Setup script for IntelHex."""
 
-import sys
+import sys, glob
 from distutils.core import Command, setup
+
+import intelhex, intelhex.__version__
+
 
 METADATA = dict(
       name='intelhex',
-      version='2.1',
+      version=intelhex.__version__.version_str,
 
-      scripts=[
-        'scripts/bin2hex.py',
-        'scripts/hex2bin.py',
-        'scripts/hex2dump.py',
-        'scripts/hexdiff.py',
-        'scripts/hexmerge.py',
-        ],
+      scripts=glob.glob('scripts/*'),
       packages=['intelhex'],
 
       author='Alexander Belchenko',
