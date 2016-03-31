@@ -18,3 +18,4 @@ Contributors:
 * Nathan P. Stien
 * Stefan Schmitt
 * Zachary Clifford
+* "durexyl" @ GitHub
