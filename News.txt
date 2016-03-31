@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* 2016/MM/DD v.2.1
+* 2016/03/31 v.2.1
 
     - API changes: added ``IntelHex.segments()`` method that returns
       a list of ordered tuple objects, representing contiguous occupied data 
