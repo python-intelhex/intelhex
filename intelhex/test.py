@@ -1013,6 +1013,61 @@ class TestIntelHexDump(TestIntelHexBase):
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
 
+    def test_bad_width(self):
+        ih = IntelHex()
+        sio = StringIO()
+        badwidths = [0, -1, -10.5, 2.5]
+        for bw in badwidths:
+            self.assertRaisesMsg(ValueError, "width must be a positive integer.",
+                ih.dump, sio, bw)
+        badwidthtypes = ['', {}, [], sio]
+        for bwt in badwidthtypes:
+            self.assertRaisesMsg(ValueError, "width must be a positive integer.",
+                ih.dump, sio, bwt)
+
+    def test_simple_width3(self):
+        ih = IntelHex()
+        ih[0] = 0x12
+        ih[1] = 0x34
+        sio = StringIO()
+        ih.dump(tofile=sio, width=3)
+        self.assertEquals(
+            '0000  12 34 --  |.4 |\n',
+            sio.getvalue())
+            
+        ih[16] = 0x56
+        ih[30] = 0x98
+        sio = StringIO()
+        ih.dump(tofile=sio, width=3)
+        self.assertEquals(
+            '0000  12 34 --  |.4 |\n'
+            '0003  -- -- --  |   |\n'
+            '0006  -- -- --  |   |\n'
+            '0009  -- -- --  |   |\n'
+            '000C  -- -- --  |   |\n'
+            '000F  -- 56 --  | V |\n'
+            '0012  -- -- --  |   |\n'
+            '0015  -- -- --  |   |\n'
+            '0018  -- -- --  |   |\n'
+            '001B  -- -- --  |   |\n'
+            '001E  98 -- --  |.  |\n',
+            sio.getvalue())
+
+    def test_minaddr_not_zero_width3_padding(self):
+        ih = IntelHex()
+        ih[17] = 0x56
+        ih[30] = 0x98
+        sio = StringIO()
+        ih.dump(tofile=sio, width=3, withpadding=True)
+        self.assertEquals(
+            '000F  FF FF 56  |..V|\n'
+            '0012  FF FF FF  |...|\n'
+            '0015  FF FF FF  |...|\n'
+            '0018  FF FF FF  |...|\n'
+            '001B  FF FF FF  |...|\n'
+            '001E  98 FF FF  |...|\n',
+            sio.getvalue())
+
 
 class TestIntelHexMerge(TestIntelHexBase):
 
