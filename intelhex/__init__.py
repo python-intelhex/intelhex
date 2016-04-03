@@ -45,6 +45,7 @@ from intelhex.compat import (
     IntTypes,
     StrType,
     StringIO,
+    array_tobytes,
     asbytes,
     asstr,
     dict_items_g,
@@ -377,7 +378,7 @@ class IntelHex(object):
         return self._tobinstr_really(start, end, pad, size)
 
     def _tobinstr_really(self, start, end, pad, size):
-        return asbytes(self._tobinarray_really(start, end, pad, size).tostring())
+        return array_tobytes(self._tobinarray_really(start, end, pad, size))
 
     def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None):
         '''Convert to binary and write to file.
@@ -584,7 +585,7 @@ class IntelHex(object):
                 bin[7] = ip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
                 fwrite(':' +
-                       asstr(hexlify(bin.tostring()).translate(table)) +
+                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
                        '\n')
             elif keys == ['EIP']:
                 # Start Linear Address Record
@@ -599,7 +600,7 @@ class IntelHex(object):
                 bin[7] = eip & 0x0FF
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
                 fwrite(':' +
-                       asstr(hexlify(bin.tostring()).translate(table)) +
+                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
                        '\n')
             else:
                 if fclose:
@@ -636,7 +637,7 @@ class IntelHex(object):
                     bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
                     fwrite(':' +
-                           asstr(hexlify(bin.tostring()).translate(table)) +
+                           asstr(hexlify(array_tobytes(bin)).translate(table)) +
                            '\n')
 
                 while True:
@@ -674,7 +675,7 @@ class IntelHex(object):
                     bin[0] = chain_len
                     bin[4+chain_len] = (-sum(bin)) & 0x0FF    # chksum
                     fwrite(':' +
-                           asstr(hexlify(bin.tostring()).translate(table)) +
+                           asstr(hexlify(array_tobytes(bin)).translate(table)) +
                            '\n')
 
                     # adjust cur_addr/cur_ix
@@ -717,7 +718,7 @@ class IntelHex(object):
                 a[i] = self._buf[addr+i]
         except KeyError:
             raise NotEnoughDataError(address=addr, length=length)
-        return asstr(a.tostring())
+        return array_tobytes(a)
 
     def puts(self, addr, s):
         """Put string of bytes at given address. Will overwrite any previous
@@ -1114,7 +1115,7 @@ class Record(object):
         # calculate checksum
         s = (-sum(bytes)) & 0x0FF
         bin = array('B', bytes + [s])
-        return ':' + asstr(hexlify(bin.tostring())).upper()
+        return ':' + asstr(hexlify(array_tobytes(bin))).upper()
     _from_bytes = staticmethod(_from_bytes)
 
     def data(offset, bytes):

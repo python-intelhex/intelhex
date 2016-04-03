@@ -68,6 +68,7 @@ from intelhex.compat import (
     BytesIO,
     StringIO,
     UnicodeType,
+    array_tobytes,
     asbytes,
     asstr,
     dict_items_g,
@@ -413,7 +414,7 @@ class TestIntelHexBase(unittest.TestCase):
                 )
 
     def assertEqualWrittenData(self, a, b):
-        return self.assertEquals(a, b, """Written data is incorrect
+        return self.assertEqual(a, b, """Written data is incorrect
 Should be:
 %s
 
@@ -493,7 +494,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
-        s2 = asbytes(bin8.tostring())
+        s2 = asbytes(array_tobytes(bin8))
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile(self):
@@ -502,14 +503,14 @@ class TestIntelHex(TestIntelHexBase):
         ih.tobinfile(sio)
         s1 = sio.getvalue()
         sio.close()
-        s2 = asbytes(bin8.tostring())
+        s2 = asbytes(array_tobytes(bin8))
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
         # new API: .tofile universal method
         sio = BytesIO()
         ih.tofile(sio, format='bin')
         s1 = sio.getvalue()
         sio.close()
-        s2 = asbytes(bin8.tostring())
+        s2 = asbytes(array_tobytes(bin8))
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile_realfile(self):
@@ -571,61 +572,61 @@ class TestIntelHex(TestIntelHexBase):
 
     def test_todict(self):
         ih = IntelHex()
-        self.assertEquals({}, ih.todict())
+        self.assertEqual({}, ih.todict())
         ih = IntelHex(StringIO(hex64k))
-        self.assertEquals(data64k, ih.todict())
+        self.assertEqual(data64k, ih.todict())
         ih = IntelHex()
         ih[1] = 2
         ih.start_addr = {'EIP': 1234}
-        self.assertEquals({1: 2, 'start_addr': {'EIP': 1234}}, ih.todict())
+        self.assertEqual({1: 2, 'start_addr': {'EIP': 1234}}, ih.todict())
 
     def test_fromdict(self):
         ih = IntelHex()
         ih.fromdict({1:2, 3:4})
-        self.assertEquals({1:2, 3:4}, ih.todict())
+        self.assertEqual({1:2, 3:4}, ih.todict())
         ih.fromdict({1:5, 6:7})
-        self.assertEquals({1:5, 3:4, 6:7}, ih.todict())
+        self.assertEqual({1:5, 3:4, 6:7}, ih.todict())
         ih = IntelHex()
         ih.fromdict({1: 2, 'start_addr': {'EIP': 1234}})
-        self.assertEquals({1: 2, 'start_addr': {'EIP': 1234}}, ih.todict())
+        self.assertEqual({1: 2, 'start_addr': {'EIP': 1234}}, ih.todict())
         # bad dict
         self.assertRaises(ValueError, ih.fromdict, {'EIP': 1234})
         self.assertRaises(ValueError, ih.fromdict, {-1: 1234})
 
     def test_init_from_obj(self):
         ih = IntelHex({1:2, 3:4})
-        self.assertEquals({1:2, 3:4}, ih.todict())
+        self.assertEqual({1:2, 3:4}, ih.todict())
         ih.start_addr = {'EIP': 1234}
         ih2 = IntelHex(ih)
         ih[1] = 5
         ih.start_addr = {'EIP': 5678}
-        self.assertEquals({1:2, 3:4, 'start_addr': {'EIP': 1234}}, ih2.todict())
+        self.assertEqual({1:2, 3:4, 'start_addr': {'EIP': 1234}}, ih2.todict())
         self.assertNotEqual(id(ih), id(ih2))
 
     def test_dict_interface(self):
         ih = IntelHex()
-        self.assertEquals(0xFF, ih[0])  # padding byte substitution
+        self.assertEqual(0xFF, ih[0])  # padding byte substitution
         ih[0] = 1
-        self.assertEquals(1, ih[0])
+        self.assertEqual(1, ih[0])
         del ih[0]
-        self.assertEquals({}, ih.todict())  # padding byte substitution
+        self.assertEqual({}, ih.todict())  # padding byte substitution
 
     def test_len(self):
         ih = IntelHex()
-        self.assertEquals(0, len(ih))
+        self.assertEqual(0, len(ih))
         ih[2] = 1
-        self.assertEquals(1, len(ih))
+        self.assertEqual(1, len(ih))
         ih[1000] = 2
-        self.assertEquals(2, len(ih))
+        self.assertEqual(2, len(ih))
 
     def test__getitem__(self):
         ih = IntelHex()
         # simple cases
-        self.assertEquals(0xFF, ih[0])
+        self.assertEqual(0xFF, ih[0])
         ih[0] = 1
-        self.assertEquals(1, ih[0])
+        self.assertEqual(1, ih[0])
         # big address
-        self.assertEquals(0xFF, ih[2**32-1])
+        self.assertEqual(0xFF, ih[2**32-1])
         # wrong addr type/value for indexing operations
         def getitem(index):
             return ih[index]
@@ -644,20 +645,20 @@ class TestIntelHex(TestIntelHexBase):
         # full copy via slicing
         ih2 = ih[:]
         self.assertTrue(isinstance(ih2, IntelHex))
-        self.assertEquals({0:1, 1:2, 2:3, 10:4}, ih2.todict())
+        self.assertEqual({0:1, 1:2, 2:3, 10:4}, ih2.todict())
         # other slice operations
-        self.assertEquals({}, ih[3:8].todict())
-        self.assertEquals({0:1, 1:2}, ih[0:2].todict())
-        self.assertEquals({0:1, 1:2}, ih[:2].todict())
-        self.assertEquals({2:3, 10:4}, ih[2:].todict())
-        self.assertEquals({0:1, 2:3, 10:4}, ih[::2].todict())
-        self.assertEquals({10:4}, ih[3:11].todict())
+        self.assertEqual({}, ih[3:8].todict())
+        self.assertEqual({0:1, 1:2}, ih[0:2].todict())
+        self.assertEqual({0:1, 1:2}, ih[:2].todict())
+        self.assertEqual({2:3, 10:4}, ih[2:].todict())
+        self.assertEqual({0:1, 2:3, 10:4}, ih[::2].todict())
+        self.assertEqual({10:4}, ih[3:11].todict())
 
     def test__setitem__(self):
         ih = IntelHex()
         # simple indexing operation
         ih[0] = 1
-        self.assertEquals({0:1}, ih.todict())
+        self.assertEqual({0:1}, ih.todict())
         # errors
         def setitem(a,b):
             ih[a] = b
@@ -669,15 +670,15 @@ class TestIntelHex(TestIntelHexBase):
             setitem, 'foo', 0)
         # slice operations
         ih[0:4] = range_l(4)
-        self.assertEquals({0:0, 1:1, 2:2, 3:3}, ih.todict())
+        self.assertEqual({0:0, 1:1, 2:2, 3:3}, ih.todict())
         ih[0:] = range_l(5,9)
-        self.assertEquals({0:5, 1:6, 2:7, 3:8}, ih.todict())
+        self.assertEqual({0:5, 1:6, 2:7, 3:8}, ih.todict())
         ih[:4] = range_l(9,13)
-        self.assertEquals({0:9, 1:10, 2:11, 3:12}, ih.todict())
+        self.assertEqual({0:9, 1:10, 2:11, 3:12}, ih.todict())
         # with step
         ih = IntelHex()
         ih[0:8:2] = range_l(4)
-        self.assertEquals({0:0, 2:1, 4:2, 6:3}, ih.todict())
+        self.assertEqual({0:0, 2:1, 4:2, 6:3}, ih.todict())
         # errors in slice operations
         # ih[1:2] = 'a'
         self.assertRaisesMsg(ValueError,
@@ -704,7 +705,7 @@ class TestIntelHex(TestIntelHexBase):
         ih = IntelHex()
         ih[0] = 1
         del ih[0]
-        self.assertEquals({}, ih.todict())
+        self.assertEqual({}, ih.todict())
         # errors
         def delitem(addr):
             del ih[addr]
@@ -725,25 +726,25 @@ class TestIntelHex(TestIntelHexBase):
             return ih
         ih = ihex(8)
         del ih[:]       # delete all data
-        self.assertEquals({}, ih.todict())
+        self.assertEqual({}, ih.todict())
         ih = ihex(8)
         del ih[2:6]
-        self.assertEquals({0:0, 1:1, 6:6, 7:7}, ih.todict())
+        self.assertEqual({0:0, 1:1, 6:6, 7:7}, ih.todict())
         ih = ihex(8)
         del ih[::2]
-        self.assertEquals({1:1, 3:3, 5:5, 7:7}, ih.todict())
+        self.assertEqual({1:1, 3:3, 5:5, 7:7}, ih.todict())
 
     def test_addresses(self):
         # empty object
         ih = IntelHex()
-        self.assertEquals([], ih.addresses())
-        self.assertEquals(None, ih.minaddr())
-        self.assertEquals(None, ih.maxaddr())
+        self.assertEqual([], ih.addresses())
+        self.assertEqual(None, ih.minaddr())
+        self.assertEqual(None, ih.maxaddr())
         # normal object
         ih = IntelHex({1:2, 7:8, 10:0})
-        self.assertEquals([1,7,10], ih.addresses())
-        self.assertEquals(1, ih.minaddr())
-        self.assertEquals(10, ih.maxaddr())
+        self.assertEqual([1,7,10], ih.addresses())
+        self.assertEqual(1, ih.minaddr())
+        self.assertEqual(10, ih.maxaddr())
 
     def test__get_start_end(self):
         # test for private method _get_start_end
@@ -751,55 +752,55 @@ class TestIntelHex(TestIntelHexBase):
         ih = IntelHex()
         self.assertRaises(intelhex.EmptyIntelHexError, ih._get_start_end)
         self.assertRaises(intelhex.EmptyIntelHexError, ih._get_start_end, size=10)
-        self.assertEquals((0,9), ih._get_start_end(start=0, size=10))
-        self.assertEquals((1,10), ih._get_start_end(end=10, size=10))
+        self.assertEqual((0,9), ih._get_start_end(start=0, size=10))
+        self.assertEqual((1,10), ih._get_start_end(end=10, size=10))
         # normal object
         ih = IntelHex({1:2, 7:8, 10:0})
-        self.assertEquals((1,10), ih._get_start_end())
-        self.assertEquals((1,10), ih._get_start_end(size=10))        
-        self.assertEquals((0,9), ih._get_start_end(start=0, size=10))
-        self.assertEquals((1,10), ih._get_start_end(end=10, size=10))
+        self.assertEqual((1,10), ih._get_start_end())
+        self.assertEqual((1,10), ih._get_start_end(size=10))        
+        self.assertEqual((0,9), ih._get_start_end(start=0, size=10))
+        self.assertEqual((1,10), ih._get_start_end(end=10, size=10))
 
     def test_segments(self):
         # test that address segments are correctly summarized
         ih = IntelHex()
         sg = ih.segments()
         self.assertTrue(isinstance(sg, list))
-        self.assertEquals(len(sg), 0)
+        self.assertEqual(len(sg), 0)
         ih[0x100] = 0
         sg = ih.segments()
         self.assertTrue(isinstance(sg, list))
-        self.assertEquals(len(sg), 1)
+        self.assertEqual(len(sg), 1)
         self.assertTrue(isinstance(sg[0], tuple))
         self.assertTrue(len(sg[0]) == 2)
         self.assertTrue(sg[0][0] < sg[0][1])
-        self.assertEquals(min(sg[0]), 0x100)
-        self.assertEquals(max(sg[0]), 0x101)
+        self.assertEqual(min(sg[0]), 0x100)
+        self.assertEqual(max(sg[0]), 0x101)
         ih[0x101] = 1
         sg = ih.segments()
         self.assertTrue(isinstance(sg, list))
-        self.assertEquals(len(sg), 1)
+        self.assertEqual(len(sg), 1)
         self.assertTrue(isinstance(sg[0], tuple))
         self.assertTrue(len(sg[0]) == 2)
         self.assertTrue(sg[0][0] < sg[0][1])
-        self.assertEquals(min(sg[0]), 0x100)
-        self.assertEquals(max(sg[0]), 0x102)
+        self.assertEqual(min(sg[0]), 0x100)
+        self.assertEqual(max(sg[0]), 0x102)
         ih[0x200] = 2
         ih[0x201] = 3
         ih[0x202] = 4
         sg = ih.segments()
         self.assertTrue(isinstance(sg, list))
-        self.assertEquals(len(sg), 2)
+        self.assertEqual(len(sg), 2)
         self.assertTrue(isinstance(sg[0], tuple))
         self.assertTrue(len(sg[0]) == 2)
         self.assertTrue(sg[0][0] < sg[0][1])
         self.assertTrue(isinstance(sg[1], tuple))
         self.assertTrue(len(sg[1]) == 2)
         self.assertTrue(sg[1][0] < sg[1][1])
-        self.assertEquals(min(sg[0]), 0x100)
-        self.assertEquals(max(sg[0]), 0x102)
-        self.assertEquals(min(sg[1]), 0x200)
-        self.assertEquals(max(sg[1]), 0x203)
+        self.assertEqual(min(sg[0]), 0x100)
+        self.assertEqual(max(sg[0]), 0x102)
+        self.assertEqual(min(sg[1]), 0x200)
+        self.assertEqual(max(sg[1]), 0x203)
         pass
 
 class TestIntelHexLoadBin(TestIntelHexBase):
@@ -910,7 +911,7 @@ class TestIntelHex_big_files(TestIntelHexBase):
         ih = intelhex.IntelHex(self.f)
         for addr, byte in dict_items_g(data64k):
             readed = ih[addr]
-            self.assertEquals(byte, readed,
+            self.assertEqual(byte, readed,
                               "data not equal at addr %X "
                               "(%X != %X)" % (addr, byte, readed))
 
@@ -931,29 +932,29 @@ class TestIntelHexGetPutString(TestIntelHexBase):
             self.ih[i] = i
 
     def test_gets(self):
-        self.assertEquals('\x00\x01\x02\x03\x04\x05\x06\x07', self.ih.gets(0, 8))
-        self.assertEquals('\x07\x08\x09', self.ih.gets(7, 3))
+        self.assertEqual(b'\x00\x01\x02\x03\x04\x05\x06\x07', self.ih.gets(0, 8))
+        self.assertEqual(b'\x07\x08\x09', self.ih.gets(7, 3))
         self.assertRaisesMsg(intelhex.NotEnoughDataError,
             'Bad access at 0x1: '
             'not enough data to read 10 contiguous bytes',
             self.ih.gets, 1, 10)
 
     def test_puts(self):
-        self.ih.puts(0x03, 'hello')
-        self.assertEquals('\x00\x01\x02hello\x08\x09', self.ih.gets(0, 10))
+        self.ih.puts(0x03, b'hello')
+        self.assertEqual(b'\x00\x01\x02hello\x08\x09', self.ih.gets(0, 10))
 
     def test_getsz(self):
-        self.assertEquals('', self.ih.getsz(0))
+        self.assertEqual(b'', self.ih.getsz(0))
         self.assertRaisesMsg(intelhex.NotEnoughDataError,
             'Bad access at 0x1: '
             'not enough data to read zero-terminated string',
             self.ih.getsz, 1)
         self.ih[4] = 0
-        self.assertEquals('\x01\x02\x03', self.ih.getsz(1))
+        self.assertEqual(b'\x01\x02\x03', self.ih.getsz(1))
 
     def test_putsz(self):
         self.ih.putsz(0x03, 'hello')
-        self.assertEquals('\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
+        self.assertEqual(b'\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
 
 
 class TestIntelHexDump(TestIntelHexBase):
@@ -962,7 +963,7 @@ class TestIntelHexDump(TestIntelHexBase):
         ih = IntelHex()
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals('', sio.getvalue())
+        self.assertEqual('', sio.getvalue())
 
     def test_simple(self):
         ih = IntelHex()
@@ -970,14 +971,14 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[1] = 0x34
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals(
+        self.assertEqual(
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
         ih[16] = 0x56
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals(
+        self.assertEqual(
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n'
             '0010  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
             sio.getvalue())
@@ -988,7 +989,7 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals(
+        self.assertEqual(
             '0010  56 -- -- -- -- -- -- -- -- -- -- -- -- -- 98 --  |V             . |\n',
             sio.getvalue())
 
@@ -999,14 +1000,14 @@ class TestIntelHexDump(TestIntelHexBase):
         ih.start_addr = {'CS': 0x1234, 'IP': 0x5678}
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals(
+        self.assertEqual(
             'CS = 0x1234, IP = 0x5678\n'
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
         ih.start_addr = {'EIP': 0x12345678}
         sio = StringIO()
         ih.dump(sio)
-        self.assertEquals(
+        self.assertEqual(
             'EIP = 0x12345678\n'
             '0000  12 34 -- -- -- -- -- -- -- -- -- -- -- -- -- --  |.4              |\n',
             sio.getvalue())
@@ -1029,7 +1030,7 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[1] = 0x34
         sio = StringIO()
         ih.dump(tofile=sio, width=3)
-        self.assertEquals(
+        self.assertEqual(
             '0000  12 34 --  |.4 |\n',
             sio.getvalue())
             
@@ -1037,7 +1038,7 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(tofile=sio, width=3)
-        self.assertEquals(
+        self.assertEqual(
             '0000  12 34 --  |.4 |\n'
             '0003  -- -- --  |   |\n'
             '0006  -- -- --  |   |\n'
@@ -1057,7 +1058,7 @@ class TestIntelHexDump(TestIntelHexBase):
         ih[30] = 0x98
         sio = StringIO()
         ih.dump(tofile=sio, width=3, withpadding=True)
-        self.assertEquals(
+        self.assertEqual(
             '000F  FF FF 56  |..V|\n'
             '0012  FF FF FF  |...|\n'
             '0015  FF FF FF  |...|\n'
@@ -1073,13 +1074,13 @@ class TestIntelHexMerge(TestIntelHexBase):
         ih1 = IntelHex()
         ih2 = IntelHex()
         ih1.merge(ih2)
-        self.assertEquals({}, ih1.todict())
+        self.assertEqual({}, ih1.todict())
 
     def test_merge_simple(self):
         ih1 = IntelHex({0:1, 1:2, 2:3})
         ih2 = IntelHex({3:4, 4:5, 5:6})
         ih1.merge(ih2)
-        self.assertEquals({0:1, 1:2, 2:3, 3:4, 4:5, 5:6}, ih1.todict())
+        self.assertEqual({0:1, 1:2, 2:3, 3:4, 4:5, 5:6}, ih1.todict())
 
     def test_merge_wrong_args(self):
         ih1 = IntelHex()
@@ -1103,29 +1104,29 @@ class TestIntelHexMerge(TestIntelHexBase):
         ih1 = IntelHex({0:1})
         ih2 = IntelHex({0:2})
         ih1.merge(ih2, overlap='ignore')
-        self.assertEquals({0:1}, ih1.todict())
+        self.assertEqual({0:1}, ih1.todict())
         # replace
         ih1 = IntelHex({0:1})
         ih2 = IntelHex({0:2})
         ih1.merge(ih2, overlap='replace')
-        self.assertEquals({0:2}, ih1.todict())
+        self.assertEqual({0:2}, ih1.todict())
 
     def test_merge_start_addr(self):
         # this, None
         ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih2 = IntelHex()
         ih1.merge(ih2)
-        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        self.assertEqual({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
         # None, other
         ih1 = IntelHex()
         ih2 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih1.merge(ih2)
-        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        self.assertEqual({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
         # this == other: no conflict
         ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih2 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih1.merge(ih2)
-        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        self.assertEqual({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
         # this != other: conflict
         ## overlap=error
         ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
@@ -1137,12 +1138,12 @@ class TestIntelHexMerge(TestIntelHexBase):
         ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih2 = IntelHex({'start_addr': {'EIP': 0x87654321}})
         ih1.merge(ih2, overlap='ignore')
-        self.assertEquals({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
+        self.assertEqual({'start_addr': {'EIP': 0x12345678}}, ih1.todict())
         ## overlap=replace
         ih1 = IntelHex({'start_addr': {'EIP': 0x12345678}})
         ih2 = IntelHex({'start_addr': {'EIP': 0x87654321}})
         ih1.merge(ih2, overlap='replace')
-        self.assertEquals({'start_addr': {'EIP': 0x87654321}}, ih1.todict())
+        self.assertEqual({'start_addr': {'EIP': 0x87654321}}, ih1.todict())
 
 
 class TestIntelHex16bit(TestIntelHexBase):
@@ -1522,7 +1523,7 @@ class TestDiffDumps(unittest.TestCase):
             "+0010  -- -- -- -- 32 -- -- -- -- -- -- -- -- -- -- --  |    2           |\n"
             " 0020  -- -- -- -- -- -- -- -- 33 -- -- -- -- -- -- --  |        3       |\n"
             ) % dict(extra=extra)
-        self.assertEquals(shouldbe, result)
+        self.assertEqual(shouldbe, result)
 
 
 class TestBuildRecords(TestIntelHexBase):

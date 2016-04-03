@@ -41,7 +41,8 @@
 __docformat__ = "javadoc"
 
 
-import sys
+import sys, array
+
 
 if sys.version_info[0] >= 3:
     # Python 3
@@ -55,6 +56,8 @@ if sys.version_info[0] >= 3:
         if isinstance(s, str):
             return s
         return s.decode('latin1')
+
+    array_tobytes = getattr(array.array, "tobytes", array.array.tostring)
 
     IntTypes = (int,)
     StrType = str
@@ -85,6 +88,8 @@ else:
 
     asbytes = str
     asstr = str
+
+    array_tobytes = array.array.tostring
 
     IntTypes = (int, long)
     StrType = basestring
