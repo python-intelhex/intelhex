@@ -129,12 +129,11 @@ def get_test_data(n1, offset, n2):
     #
     return n1+n2, hexstr, ih
 
-def get_base_10K():
-    """Base 10K"""
-    return get_test_data(10000, 0, 0)
+def get_base_50K():
+    return get_test_data(50000, 0, 0)
 
-def get_100K():
-    return get_test_data(100000, 0, 0)
+def get_250K():
+    return get_test_data(250000, 0, 0)
 
 def get_100K_100K():
     return get_test_data(100000, 1000000, 100000)
@@ -151,8 +150,8 @@ class Measure(object):
 
     data_set = [
         # (data name, getter)
-        ('base 10K', get_base_10K),     # first should be base numbers
-        ('100K', get_100K),
+        ('base 50K', get_base_50K),     # first should be base numbers
+        ('250K', get_250K),
         ('1M', get_1M),
         ('100K+100K', get_100K_100K),
         ('0+100K', get_0_100K),
