@@ -27,13 +27,12 @@ If resulting value is ``q <= 1.0`` it's the best possible result,
 i.e. time increase proportionally to array size.
 """
 
-from cStringIO import StringIO
 import gc
 import sys
 import time
 
 import intelhex
-
+from intelhex.compat import StringIO, range_g
 
 def median(values):
     """Return median value for the list of values.
@@ -68,7 +67,7 @@ def run_readtest_N_times(func, hexstr, n):
     """
     assert n > 0
     times = []
-    for i in xrange(n):
+    for i in range_g(n):
         sio = StringIO(hexstr)
         times.append(run_test(func, sio))
         sio.close()
@@ -83,7 +82,7 @@ def run_writetest_N_times(func, n):
     """
     assert n > 0
     times = []
-    for i in xrange(n):
+    for i in range_g(n):
         sio = StringIO()
         times.append(run_test(func, sio))
         sio.close()
@@ -115,11 +114,11 @@ def get_test_data(n1, offset, n2):
     # make IntelHex object
     ih = intelhex.IntelHex()
     addr = 0
-    for i in xrange(n1):
+    for i in range_g(n1):
         ih[addr] = addr % 256
         addr += 1
     addr += offset
-    for i in xrange(n2):
+    for i in range_g(n2):
         ih[addr] = addr % 256
         addr += 1
     # make hex file

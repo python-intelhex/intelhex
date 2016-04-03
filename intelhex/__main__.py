@@ -36,3 +36,4 @@ if __name__ == '__main__':
     print()
     print("The intelhex package has some executable points:")
     print("  python -m intelhex.test  -- easy way to run unit tests.")
+    print("  python -m intelhex.bench -- run benchmarks.")
