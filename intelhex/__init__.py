@@ -54,6 +54,8 @@ from intelhex.compat import (
     range_l,
     )
 
+from intelhex.getsizeof import total_size
+
 
 class _DeprecatedParam(object):
     pass
@@ -871,6 +873,16 @@ class IntelHex(object):
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
         return [(a, b+1) for (a, b) in zip(beginings, endings)]
+        
+    def get_memory_size(self):
+        """Returns the approximate memory footprint for data."""
+        n = sys.getsizeof(self)
+        n += sys.getsizeof(self.padding)
+        n += total_size(self.start_addr)
+        n += total_size(self._buf)
+        n += sys.getsizeof(self._offset)
+        return n
+
 #/IntelHex
 
 
