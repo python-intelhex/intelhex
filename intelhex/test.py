@@ -932,29 +932,29 @@ class TestIntelHexGetPutString(TestIntelHexBase):
             self.ih[i] = i
 
     def test_gets(self):
-        self.assertEqual(b'\x00\x01\x02\x03\x04\x05\x06\x07', self.ih.gets(0, 8))
-        self.assertEqual(b'\x07\x08\x09', self.ih.gets(7, 3))
+        self.assertEqual(asbytes('\x00\x01\x02\x03\x04\x05\x06\x07'), self.ih.gets(0, 8))
+        self.assertEqual(asbytes('\x07\x08\x09'), self.ih.gets(7, 3))
         self.assertRaisesMsg(intelhex.NotEnoughDataError,
             'Bad access at 0x1: '
             'not enough data to read 10 contiguous bytes',
             self.ih.gets, 1, 10)
 
     def test_puts(self):
-        self.ih.puts(0x03, b'hello')
-        self.assertEqual(b'\x00\x01\x02hello\x08\x09', self.ih.gets(0, 10))
+        self.ih.puts(0x03, asbytes('hello'))
+        self.assertEqual(asbytes('\x00\x01\x02hello\x08\x09'), self.ih.gets(0, 10))
 
     def test_getsz(self):
-        self.assertEqual(b'', self.ih.getsz(0))
+        self.assertEqual(asbytes(''), self.ih.getsz(0))
         self.assertRaisesMsg(intelhex.NotEnoughDataError,
             'Bad access at 0x1: '
             'not enough data to read zero-terminated string',
             self.ih.getsz, 1)
         self.ih[4] = 0
-        self.assertEqual(b'\x01\x02\x03', self.ih.getsz(1))
+        self.assertEqual(asbytes('\x01\x02\x03'), self.ih.getsz(1))
 
     def test_putsz(self):
-        self.ih.putsz(0x03, 'hello')
-        self.assertEqual(b'\x00\x01\x02hello\x00\x09', self.ih.gets(0, 10))
+        self.ih.putsz(0x03, asbytes('hello'))
+        self.assertEqual(asbytes('\x00\x01\x02hello\x00\x09'), self.ih.gets(0, 10))
 
 
 class TestIntelHexDump(TestIntelHexBase):

@@ -2,8 +2,7 @@
 # Code from http://code.activestate.com/recipes/577504/
 # Created by Raymond Hettinger on Fri, 17 Dec 2010 (MIT)
 
-from __future__ import print_function
-from sys import getsizeof, stderr
+import sys
 from itertools import chain
 from collections import deque
 try:
@@ -32,16 +31,16 @@ def total_size(o, handlers={}, verbose=False):
                    }
     all_handlers.update(handlers)     # user handlers take precedence
     seen = set()                      # track which object id's have already been seen
-    default_size = getsizeof(0)       # estimate sizeof object without __sizeof__
+    default_size = sys.getsizeof(0)       # estimate sizeof object without __sizeof__
 
     def sizeof(o):
         if id(o) in seen:       # do not double count the same object
             return 0
         seen.add(id(o))
-        s = getsizeof(o, default_size)
+        s = sys.getsizeof(o, default_size)
 
         if verbose:
-            print(s, type(o), repr(o), file=stderr)
+            print(s, type(o), repr(o))#, file=stderr)
 
         for typ, handler in all_handlers.items():
             if isinstance(o, typ):
@@ -59,7 +58,7 @@ if __name__ == '__main__':
     print("dict 3 elements")
     d = {0:0xFF, 1:0xEE, 2:0xCC}
     print(total_size(d, verbose=True))
-    
-    print("array 3 elements")
-    import array
-    print(total_size(array.array('B', b'\x01\x02\x03')))
+
+    #print("array 3 elements")
+    #import array
+    #print(total_size(array.array('B', b'\x01\x02\x03')))
