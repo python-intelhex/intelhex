@@ -338,22 +338,17 @@ class IntelHex(object):
         return self._tobinarray_really(start, end, pad, size)
 
     def _tobinarray_really(self, start, end, pad, size):
+        """Return binary array."""
         if pad is None:
             pad = self.padding
-
         bin = array('B')
-
         if self._buf == {} and None in (start, end):
             return bin
-
         if size is not None and size <= 0:
             raise ValueError("tobinarray: wrong value for size")
-
         start, end = self._get_start_end(start, end, size)
-
         for i in range_g(start, end+1):
             bin.append(self._buf.get(i, pad))
-
         return bin
 
     def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None):
@@ -364,7 +359,7 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
-        @return         string of binary data.
+        @return         bytes string of binary data.
         '''
         if not isinstance(pad, _DeprecatedParam):
             print ("IntelHex.tobinstr: 'pad' parameter is deprecated.")
@@ -711,7 +706,8 @@ class IntelHex(object):
     def gets(self, addr, length):
         """Get string of bytes from given address. If any entries are blank
         from addr through addr+length, a NotEnoughDataError exception will
-        be raised. Padding is not used."""
+        be raised. Padding is not used.
+        """
         a = array('B', asbytes('\0'*length))
         try:
             for i in range_g(length):
@@ -729,7 +725,7 @@ class IntelHex(object):
             self._buf[addr+i] = a[i]
 
     def getsz(self, addr):
-        """Get zero-terminated string from given address. Will raise 
+        """Get zero-terminated bytes string from given address. Will raise 
         NotEnoughDataError exception if a hole is encountered before a 0.
         """
         i = 0
@@ -744,7 +740,7 @@ class IntelHex(object):
         return self.gets(addr, i)
 
     def putsz(self, addr, s):
-        """Put string in object at addr and append terminating zero at end."""
+        """Put bytes string in object at addr and append terminating zero at end."""
         self.puts(addr, s)
         self._buf[addr+len(s)] = 0
 

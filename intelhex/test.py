@@ -494,7 +494,7 @@ class TestIntelHex(TestIntelHexBase):
     def test_tobinstr(self):
         ih = IntelHex(self.f)
         s1 = ih.tobinstr()
-        s2 = asbytes(array_tobytes(bin8))
+        s2 = array_tobytes(bin8)
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile(self):
@@ -503,14 +503,14 @@ class TestIntelHex(TestIntelHexBase):
         ih.tobinfile(sio)
         s1 = sio.getvalue()
         sio.close()
-        s2 = asbytes(array_tobytes(bin8))
+        s2 = array_tobytes(bin8)
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
         # new API: .tofile universal method
         sio = BytesIO()
         ih.tofile(sio, format='bin')
         s1 = sio.getvalue()
         sio.close()
-        s2 = asbytes(array_tobytes(bin8))
+        s2 = array_tobytes(bin8)
         self.assertEqual(s2, s1, "data not equal\n%s\n\n%s" % (s1, s2))
 
     def test_tobinfile_realfile(self):
