@@ -625,9 +625,9 @@ class IntelHex(object):
                     bin[0] = 2      # reclen
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
-                    bin[3] = 4      # rectyp
+                    bin[3] = 2      # rectyp
                     high_ofs = int(cur_addr>>16)
-                    b = divmod(high_ofs, 256)
+                    b = divmod(cur_addr/16, 256)
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
