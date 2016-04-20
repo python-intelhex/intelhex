@@ -532,7 +532,7 @@ class IntelHex(object):
         """Return count of bytes with real values."""
         return len(dict_keys(self._buf))
 
-    def write_hex_file(self, f, write_start_addr=True):
+    def write_hex_file(self, f, write_start_addr=True, linear_mode=True):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -625,9 +625,13 @@ class IntelHex(object):
                     bin[0] = 2      # reclen
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
-                    bin[3] = 2      # rectyp
                     high_ofs = int(cur_addr>>16)
-                    b = divmod(cur_addr/16, 256)
+                    if linear_mode:
+                        bin[3] = 4      # rectyp
+                        b = divmod(high_ofs, 256)
+                    else:
+                        bin[3] = 2      # rectyp
+                        b = divmod(cur_addr/16, 256)
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
@@ -691,12 +695,16 @@ class IntelHex(object):
 
     def tofile(self, fobj, format):
         """Write data to hex or bin file. Preferred method over tobin or tohex.
+        "hex" format uses linear addressing mode (04 records)
+        "shex" format uses segmented addressing mode (02 records instead of 04)
 
         @param  fobj        file name or file-like object
-        @param  format      file format ("hex" or "bin")
+        @param  format      file format ("hex", "shex" or "bin")
         """
         if format == 'hex':
             self.write_hex_file(fobj)
+        elif format == 'shex':
+            self.write_hex_file(fobj, linear_mode=False)
         elif format == 'bin':
             self.tobinfile(fobj)
         else:
