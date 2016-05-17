@@ -532,7 +532,19 @@ class IntelHex(object):
         """Return count of bytes with real values."""
         return len(dict_keys(self._buf))
 
-    def write_hex_file(self, f, write_start_addr=True):
+    def _get_eol_textfile(eolstyle, platform):
+        if eolstyle == 'native':
+            return '\n'
+        elif eolstyle == 'CRLF':
+            if platform != 'win32':
+                return '\r\n'
+            else:
+                return '\n'
+        else:
+            raise ValueError("wrong eolstyle %s" % repr(eolstyle))
+    _get_eol_textfile = staticmethod(_get_eol_textfile)
+
+    def write_hex_file(self, f, write_start_addr=True, eolstyle='native'):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -540,6 +552,9 @@ class IntelHex(object):
                                     record to file (enabled by default).
                                     If there is no start address in obj, nothing
                                     will be written regardless of this setting.
+        @param  eolstyle            can be used to force CRLF line-endings
+                                    for output file on different platforms.
+                                    Supported eol styles: 'native', 'CRLF'.
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -549,6 +564,8 @@ class IntelHex(object):
             fobj = open(f, 'w')
             fwrite = fobj.write
             fclose = fobj.close
+
+        eol = IntelHex._get_eol_textfile(eolstyle, sys.platform)
 
         # Translation table for uppercasing hex ascii string.
         # timeit shows that using hexstr.translate(table)
@@ -581,7 +598,7 @@ class IntelHex(object):
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
                 fwrite(':' +
                        asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                       '\n')
+                       eol)
             elif keys == ['EIP']:
                 # Start Linear Address Record
                 bin[0] = 4      # reclen
@@ -596,7 +613,7 @@ class IntelHex(object):
                 bin[8] = (-sum(bin)) & 0x0FF    # chksum
                 fwrite(':' +
                        asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                       '\n')
+                       eol)
             else:
                 if fclose:
                     fclose()
@@ -633,7 +650,7 @@ class IntelHex(object):
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
                     fwrite(':' +
                            asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                           '\n')
+                           eol)
 
                 while True:
                     # produce one record
@@ -671,7 +688,7 @@ class IntelHex(object):
                     bin[4+chain_len] = (-sum(bin)) & 0x0FF    # chksum
                     fwrite(':' +
                            asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                           '\n')
+                           eol)
 
                     # adjust cur_addr/cur_ix
                     cur_ix += chain_len
@@ -685,7 +702,7 @@ class IntelHex(object):
                         break
 
         # end-of-file record
-        fwrite(":00000001FF\n")
+        fwrite(":00000001FF"+eol)
         if fclose:
             fclose()
 
