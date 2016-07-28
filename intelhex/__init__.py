@@ -401,7 +401,7 @@ class IntelHex(object):
         else:
             close_fd = False
 
-        fobj.write(self._tobinstr_really(start, end, pad, size))
+        fobj.write(self._tobinstr_really(start, end, pad, size).encode())
 
         if close_fd:
             fobj.close()
