@@ -557,6 +557,8 @@ class IntelHex(object):
                                     Supported eol styles: 'native', 'CRLF'.
         @param byte_count           number of bytes in the data field
         """
+        if byte_count > 255 or byte_count < 1:
+            raise ValueError("wrong byte_count " + str(byte_count))
         fwrite = getattr(f, "write", None)
         if fwrite:
             fobj = f
