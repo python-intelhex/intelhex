@@ -59,8 +59,7 @@ def summarize_yaml(fname):
     from intelhex import IntelHex
     ih = IntelHex(fname)
     if ih.start_addr:
-        keys = ih.start_addr.keys()
-        keys.sort()
+        keys = sorted(ih.start_addr.keys())
         if keys == ['CS','IP']:
             entry = ih.start_addr['CS'] * 65536 + ih.start_addr['IP']
         elif keys == ['EIP']:
