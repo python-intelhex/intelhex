@@ -521,6 +521,14 @@ class TestIntelHex(TestIntelHexBase):
         finally:
             tf.close()
 
+    def test__get_eol_textfile(self):
+        self.assertEqual('\n', IntelHex._get_eol_textfile('native', 'win32'))
+        self.assertEqual('\n', IntelHex._get_eol_textfile('native', 'linux'))
+        self.assertEqual('\n', IntelHex._get_eol_textfile('CRLF', 'win32'))
+        self.assertEqual('\r\n', IntelHex._get_eol_textfile('CRLF', 'linux'))
+        self.assertRaisesMsg(ValueError, "wrong eolstyle 'LF'",
+            IntelHex._get_eol_textfile, 'LF', 'win32')
+
     def test_write_empty_hexfile(self):
         ih = intelhex.IntelHex()
         sio = StringIO()
