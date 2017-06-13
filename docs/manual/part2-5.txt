@@ -22,11 +22,21 @@ to disk you can use the builtin StringIO file-like object, e.g.::
 
 Variable ``hexstr`` will contain a string with the content of a HEX8 file.
 
-To write data as a hex file you also can use universal method ``tofile``::
+You can customize hex file output with following optional arguments
+to ``write_hex_file`` call:
 
+  * ``write_start_addr`` - you can disable start address record in new hex file;
+  * ``eolstyle`` - you can force ``CRLF`` line endings in new hex file.
+
+
+Data converters
+~~~~~~~~~~~~~~~
+
+To write data as a hex file with default settings you also can use
+universal method ``tofile``::
+
+    # the code below is the same as "ih.write_hex_file(sio)"
     >>> ih.tofile(sio, format='hex')
-
-**NOTE:** using IntelHex.tofile is recommended way.
 
 Class IntelHex has several methods for converting data of IntelHex objects 
 into binary form:
