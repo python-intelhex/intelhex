@@ -1599,7 +1599,7 @@ class TestXrangeLongInt(unittest.TestCase):
     def test_xrange_longint(self):
         # Bug #1408934: xrange(longint) blows with OverflowError:
         if compat.Python == 2:
-            self.assertRaises(OverflowError, xrange, 2684625744, 2684625747)
+            self.assertRaises(OverflowError, xrange, sys.maxint, sys.maxint+3)
         #
         upr = compat.range_g(2684625744, 2684625747)
         self.assertEqual([2684625744, 2684625745, 2684625746], list(upr))
