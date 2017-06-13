@@ -7,7 +7,7 @@ all:
 	@echo  epydoc  - run epydoc to create API documentation
 	@echo  wininst - Windows installer for Python
 	@echo  docs    - build docs with ReST and Sphinx
-	@echo  wheel   - build wheel binary archive (see pip & wheel)
+	@echo  wheel   - build python wheel binary archive
 
 .PHONY: clean test epydoc wininst docs
 
