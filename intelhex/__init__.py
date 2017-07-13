@@ -544,7 +544,8 @@ class IntelHex(object):
             raise ValueError("wrong eolstyle %s" % repr(eolstyle))
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
-    def write_hex_file(self, f, write_start_addr=True, eolstyle='native'):
+    def write_hex_file(self, f, write_start_addr=True,
+                       eolstyle='native', write_ela=False):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -555,6 +556,8 @@ class IntelHex(object):
         @param  eolstyle            can be used to force CRLF line-endings
                                     for output file on different platforms.
                                     Supported eol styles: 'native', 'CRLF'.
+        @param  write_ela           force re-writing extended linear address
+                                    at each beginning of segments if True.
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -693,7 +696,11 @@ class IntelHex(object):
                     # adjust cur_addr/cur_ix
                     cur_ix += chain_len
                     if cur_ix < addr_len:
-                        cur_addr = addresses[cur_ix]
+                        if write_ela and (addresses[cur_ix] - cur_addr > 0x10):
+                            cur_addr = addresses[cur_ix]
+                            break
+                        else:
+                            cur_addr = addresses[cur_ix]
                     else:
                         cur_addr = maxaddr + 1
                         break
