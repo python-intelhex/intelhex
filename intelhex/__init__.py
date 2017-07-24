@@ -545,7 +545,7 @@ class IntelHex(object):
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
     def write_hex_file(self, f, write_start_addr=True,
-                       eolstyle='native', write_ela=False):
+                       eolstyle='native', write_ela=False, data_rec_len=16):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -558,6 +558,7 @@ class IntelHex(object):
                                     Supported eol styles: 'native', 'CRLF'.
         @param  write_ela           force re-writing extended linear address
                                     at each beginning of segments if True.
+        @param  data_rec_len        length of record in bytes (default 16)
         """
         fwrite = getattr(f, "write", None)
         if fwrite:
@@ -659,7 +660,8 @@ class IntelHex(object):
                     # produce one record
                     low_addr = cur_addr & 0x0FFFF
                     # chain_len off by 1
-                    chain_len = min(15, 65535-low_addr, maxaddr-cur_addr)
+                    chain_len = min(data_rec_len - 1, 65535 - low_addr,
+                                    maxaddr - cur_addr)
 
                     # search continuous chain
                     stop_addr = cur_addr + chain_len
