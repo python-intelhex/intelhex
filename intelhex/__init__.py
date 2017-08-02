@@ -582,47 +582,6 @@ class IntelHex(object):
             # Python 2
             table = ''.join(chr(i).upper() for i in range_g(256))
 
-        # start address record if any
-        if self.start_addr and write_start_addr:
-            keys = dict_keys(self.start_addr)
-            keys.sort()
-            bin = array('B', asbytes('\0'*9))
-            if keys == ['CS','IP']:
-                # Start Segment Address Record
-                bin[0] = 4      # reclen
-                bin[1] = 0      # offset msb
-                bin[2] = 0      # offset lsb
-                bin[3] = 3      # rectyp
-                cs = self.start_addr['CS']
-                bin[4] = (cs >> 8) & 0x0FF
-                bin[5] = cs & 0x0FF
-                ip = self.start_addr['IP']
-                bin[6] = (ip >> 8) & 0x0FF
-                bin[7] = ip & 0x0FF
-                bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':' +
-                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                       eol)
-            elif keys == ['EIP']:
-                # Start Linear Address Record
-                bin[0] = 4      # reclen
-                bin[1] = 0      # offset msb
-                bin[2] = 0      # offset lsb
-                bin[3] = 5      # rectyp
-                eip = self.start_addr['EIP']
-                bin[4] = (eip >> 24) & 0x0FF
-                bin[5] = (eip >> 16) & 0x0FF
-                bin[6] = (eip >> 8) & 0x0FF
-                bin[7] = eip & 0x0FF
-                bin[8] = (-sum(bin)) & 0x0FF    # chksum
-                fwrite(':' +
-                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
-                       eol)
-            else:
-                if fclose:
-                    fclose()
-                raise InvalidStartAddressValueError(start_addr=self.start_addr)
-
         # data
         addresses = dict_keys(self._buf)
         addresses.sort()
@@ -709,6 +668,48 @@ class IntelHex(object):
                     high_addr = int(cur_addr>>16)
                     if high_addr > high_ofs:
                         break
+
+        # start address record if any
+        if self.start_addr and write_start_addr:
+            keys = dict_keys(self.start_addr)
+            keys.sort()
+            bin = array('B', asbytes('\0'*9))
+            if keys == ['CS','IP']:
+                # Start Segment Address Record
+                bin[0] = 4      # reclen
+                bin[1] = 0      # offset msb
+                bin[2] = 0      # offset lsb
+                bin[3] = 3      # rectyp
+                cs = self.start_addr['CS']
+                bin[4] = (cs >> 8) & 0x0FF
+                bin[5] = cs & 0x0FF
+                ip = self.start_addr['IP']
+                bin[6] = (ip >> 8) & 0x0FF
+                bin[7] = ip & 0x0FF
+                bin[8] = (-sum(bin)) & 0x0FF    # chksum
+                fwrite(':' +
+                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
+                       eol)
+            elif keys == ['EIP']:
+                # Start Linear Address Record
+                bin[0] = 4      # reclen
+                bin[1] = 0      # offset msb
+                bin[2] = 0      # offset lsb
+                bin[3] = 5      # rectyp
+                eip = self.start_addr['EIP']
+                bin[4] = (eip >> 24) & 0x0FF
+                bin[5] = (eip >> 16) & 0x0FF
+                bin[6] = (eip >> 8) & 0x0FF
+                bin[7] = eip & 0x0FF
+                bin[8] = (-sum(bin)) & 0x0FF    # chksum
+                fwrite(':' +
+                       asstr(hexlify(array_tobytes(bin)).translate(table)) +
+                       eol)
+            else:
+                if fclose:
+                    fclose()
+                raise InvalidStartAddressValueError(start_addr=self.start_addr)
+
 
         # end-of-file record
         fwrite(":00000001FF"+eol)
