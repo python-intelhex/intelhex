@@ -1,6 +1,17 @@
 NEWS
 ====
 
+* 2018/MM/DD v.2.2
+
+    - API changes: ``IntelHex.write_hex_file`` method: added support for new
+      parameter: ``eolstyle = native | CRLF``. (Alexander Belchenko)
+    - Unit tests: Fixed xrange overflow test for Python 2.7 on 64-bit platforms.
+      Use sys.maxint to ensure we trigger an exception. (Masayuki Takeda)
+    - Script ``hexinfo.py``: Python 3 compatibility for processing start address
+      dict keys. (patch from GitHub user mentaal)
+    - Added get_memory_size() method: approx memory footprint of IntelHex object
+      plus data. (Alexander Belchenko)
+
 * 2016/03/31 v.2.1
 
     - API changes: added ``IntelHex.segments()`` method that returns
