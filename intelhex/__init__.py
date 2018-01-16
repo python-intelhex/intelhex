@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2016, Alexander Belchenko
+# Copyright (c) 2005-2018, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -558,7 +558,7 @@ class IntelHex(object):
         @param byte_count           number of bytes in the data field
         """
         if byte_count > 255 or byte_count < 1:
-            raise ValueError("wrong byte_count " + str(byte_count))
+            raise ValueError("wrong byte_count value: %s" % byte_count)
         fwrite = getattr(f, "write", None)
         if fwrite:
             fobj = f
@@ -659,7 +659,7 @@ class IntelHex(object):
                     # produce one record
                     low_addr = cur_addr & 0x0FFFF
                     # chain_len off by 1
-                    chain_len = min(byte_count - 1, 65535-low_addr, maxaddr-cur_addr)
+                    chain_len = min(byte_count-1, 65535-low_addr, maxaddr-cur_addr)
 
                     # search continuous chain
                     stop_addr = cur_addr + chain_len

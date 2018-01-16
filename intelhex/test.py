@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2016, Alexander Belchenko
+# Copyright (c) 2005-2018, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -1672,28 +1672,30 @@ class TestWriteHexFileByteCount(unittest.TestCase):
     def test_write_hex_file_bad_byte_count(self):
         ih = intelhex.IntelHex(self.f)
         sio = StringIO()
-        with self.assertRaises(ValueError):
-            ih.write_hex_file(sio, byte_count=0)
-        with self.assertRaises(ValueError):
-            ih.write_hex_file(sio, byte_count=-1)
-        with self.assertRaises(ValueError):
-            ih.write_hex_file(sio, byte_count=256)
+        self.assertRaises(ValueError, ih.write_hex_file, sio, byte_count=0)
+        self.assertRaises(ValueError, ih.write_hex_file, sio, byte_count=-1)
+        self.assertRaises(ValueError, ih.write_hex_file, sio, byte_count=256)
 
     def test_write_hex_file_byte_count_1(self):
         ih = intelhex.IntelHex(self.f)
+        ih1 = ih[:4]
         sio = StringIO()
-        ih.write_hex_file(sio, byte_count=1)
+        ih1.write_hex_file(sio, byte_count=1)
         s = sio.getvalue()
-        # control written hex first line to check that byte count is 1
-        sio.seek(0)
-        self.assertEqual(sio.readline(), ':0100000002FD\n',
-                         "Written hex is not in byte count 1")
         sio.close()
-
+        # check that we have all data records with data length == 1
+        self.assertEqual((
+            ':0100000002FD\n'
+            ':0100010005F9\n'
+            ':01000200A25B\n'
+            ':01000300E517\n'
+            ':00000001FF\n'
+            ), s,
+            "Written hex is not in byte count 1")
+        # read back and check content
         fin = StringIO(s)
         ih2 = intelhex.IntelHex(fin)
-
-        self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
+        self.assertEqual(ih1.tobinstr(), ih2.tobinstr(),
                          "Written hex file does not equal with original")
 
     def test_write_hex_file_byte_count_13(self):
@@ -1703,8 +1705,9 @@ class TestWriteHexFileByteCount(unittest.TestCase):
         s = sio.getvalue()
         # control written hex first line to check that byte count is 13
         sio.seek(0)
-        self.assertEqual(sio.readline(), ':0D0000000205A2E576246AF8E6057622786E\n',
-                         "Written hex is not in byte count 1")
+        self.assertEqual(sio.readline(), 
+            ':0D0000000205A2E576246AF8E6057622786E\n',
+            "Written hex is not in byte count 13")
         sio.close()
 
         fin = StringIO(s)
@@ -1720,8 +1723,17 @@ class TestWriteHexFileByteCount(unittest.TestCase):
         s = sio.getvalue()
         # control written hex first line to check that byte count is 255
         sio.seek(0)
-        self.assertEqual(sio.readline(), ':FF0000000205A2E576246AF8E60576227867300702786AE475F0011204AD0204552000EB7F2ED2008018EF540F2490D43440D4FF30040BEF24BFB41A0050032461FFE57760021577057AE57A7002057930070D7867E475F0011204ADEF02049B02057B7403D2078003E4C207F5768B678A688969E4F577F579F57AE57760077F2012003E80F57578FFC201C200C202C203C205C206C20812000CFF700D3007057F0012004FAF7AAE7922B4255FC2D5C20412000CFF24D0B40A00501A75F00A787730D50508B6FF0106C6A426F620D5047002D20380D924CFB41A00EF5004C2E5D20402024FD20180C6D20080C0D20280BCD2D580BAD20580B47F2012003E20020774010E\n',
-                         "Written hex is not in byte count 1")
+        self.assertEqual(sio.readline(), 
+            (':FF0000000205A2E576246AF8E60576227867300702786AE475F0011204AD02'
+              '04552000EB7F2ED2008018EF540F2490D43440D4FF30040BEF24BFB41A0050'
+              '032461FFE57760021577057AE57A7002057930070D7867E475F0011204ADEF'
+              '02049B02057B7403D2078003E4C207F5768B678A688969E4F577F579F57AE5'
+              '7760077F2012003E80F57578FFC201C200C202C203C205C206C20812000CFF'
+              '700D3007057F0012004FAF7AAE7922B4255FC2D5C20412000CFF24D0B40A00'
+              '501A75F00A787730D50508B6FF0106C6A426F620D5047002D20380D924CFB4'
+              '1A00EF5004C2E5D20402024FD20180C6D20080C0D20280BCD2D580BAD20580'
+              'B47F2012003E20020774010E\n'),
+            "Written hex is not in byte count 255")
         sio.close()
 
         fin = StringIO(s)
