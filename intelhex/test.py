@@ -1659,6 +1659,77 @@ class TestInSubprocess(unittest.TestCase):
     def test_sripts_hexmerge_version(self):
         self.versionChecker('%s scripts/hexmerge.py --version')
 
+
+class TestWriteHexFileByteCount(unittest.TestCase):
+
+    def setUp(self):
+        self.f = StringIO(hex8)
+
+    def tearDown(self):
+        self.f.close()
+        del self.f
+
+    def test_write_hex_file_bad_byte_count(self):
+        ih = intelhex.IntelHex(self.f)
+        sio = StringIO()
+        with self.assertRaises(ValueError):
+            ih.write_hex_file(sio, byte_count=0)
+        with self.assertRaises(ValueError):
+            ih.write_hex_file(sio, byte_count=-1)
+        with self.assertRaises(ValueError):
+            ih.write_hex_file(sio, byte_count=256)
+
+    def test_write_hex_file_byte_count_1(self):
+        ih = intelhex.IntelHex(self.f)
+        sio = StringIO()
+        ih.write_hex_file(sio, byte_count=1)
+        s = sio.getvalue()
+        # control written hex first line to check that byte count is 1
+        sio.seek(0)
+        self.assertEqual(sio.readline(), ':0100000002FD\n',
+                         "Written hex is not in byte count 1")
+        sio.close()
+
+        fin = StringIO(s)
+        ih2 = intelhex.IntelHex(fin)
+
+        self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
+                         "Written hex file does not equal with original")
+
+    def test_write_hex_file_byte_count_13(self):
+        ih = intelhex.IntelHex(self.f)
+        sio = StringIO()
+        ih.write_hex_file(sio, byte_count=13)
+        s = sio.getvalue()
+        # control written hex first line to check that byte count is 13
+        sio.seek(0)
+        self.assertEqual(sio.readline(), ':0D0000000205A2E576246AF8E6057622786E\n',
+                         "Written hex is not in byte count 1")
+        sio.close()
+
+        fin = StringIO(s)
+        ih2 = intelhex.IntelHex(fin)
+
+        self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
+                         "Written hex file does not equal with original")
+
+    def test_write_hex_file_byte_count_255(self):
+        ih = intelhex.IntelHex(self.f)
+        sio = StringIO()
+        ih.write_hex_file(sio, byte_count=255)
+        s = sio.getvalue()
+        # control written hex first line to check that byte count is 255
+        sio.seek(0)
+        self.assertEqual(sio.readline(), ':FF0000000205A2E576246AF8E60576227867300702786AE475F0011204AD0204552000EB7F2ED2008018EF540F2490D43440D4FF30040BEF24BFB41A0050032461FFE57760021577057AE57A7002057930070D7867E475F0011204ADEF02049B02057B7403D2078003E4C207F5768B678A688969E4F577F579F57AE57760077F2012003E80F57578FFC201C200C202C203C205C206C20812000CFF700D3007057F0012004FAF7AAE7922B4255FC2D5C20412000CFF24D0B40A00501A75F00A787730D50508B6FF0106C6A426F620D5047002D20380D924CFB41A00EF5004C2E5D20402024FD20180C6D20080C0D20280BCD2D580BAD20580B47F2012003E20020774010E\n',
+                         "Written hex is not in byte count 1")
+        sio.close()
+
+        fin = StringIO(s)
+        ih2 = intelhex.IntelHex(fin)
+
+        self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
+                         "Written hex file does not equal with original")
+
 ##
 # MAIN
 if __name__ == '__main__':
