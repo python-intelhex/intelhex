@@ -11,6 +11,10 @@ NEWS
       dict keys. (patch from GitHub user mentaal)
     - Added get_memory_size() method: approx memory footprint of IntelHex object
       plus data. (Alexander Belchenko)
+    - API changes: ``IntelHex.write_hex_file()`` method gets new optional 
+      parameter ``byte_count`` to specify how many bytes should be written
+      to each data record in output file. Default value is 16.
+      (patch from GitHub user erki1993)
 
 * 2016/03/31 v.2.1
 

@@ -20,4 +20,5 @@ Contributors:
 * Stefan Schmitt
 * Zachary Clifford
 * "durexyl" @ GitHub
+* "erki1993" @ GitHub
 * "mentaal" @ GitHub

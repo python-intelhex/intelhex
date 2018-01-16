@@ -41,7 +41,6 @@ without external libraries or 2to3 tool from the same codebase.
 Download
 --------
 * https://pypi.python.org/pypi/IntelHex
-* https://launchpad.net/intelhex/+download
 * https://github.com/bialix/intelhex
 
 Install
@@ -56,14 +55,6 @@ Install from sources (classic python's magic spell):
 
 Source code
 -----------
-Intelhex project on Launchpad:
-
-    https://launchpad.net/intelhex/
-    
-Get code with bzr:
-    
-    bzr branch lp:intelhex
-
 IntelHex on GitHub:
 
     https://github.com/bialix/intelhex

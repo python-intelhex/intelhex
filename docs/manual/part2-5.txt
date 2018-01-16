@@ -27,6 +27,8 @@ to ``write_hex_file`` call:
 
   * ``write_start_addr`` - you can disable start address record in new hex file;
   * ``eolstyle`` - you can force ``CRLF`` line endings in new hex file.
+  * ``byte_count`` - you can control how many bytes should be written to each
+    data record.
 
 
 Data converters
