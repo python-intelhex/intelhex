@@ -1,4 +1,4 @@
-# Copyright (c) 2005-2016, Alexander Belchenko
+# Copyright (c) 2005-2018, Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -544,7 +544,7 @@ class IntelHex(object):
             raise ValueError("wrong eolstyle %s" % repr(eolstyle))
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
-    def write_hex_file(self, f, write_start_addr=True, eolstyle='native'):
+    def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -555,7 +555,10 @@ class IntelHex(object):
         @param  eolstyle            can be used to force CRLF line-endings
                                     for output file on different platforms.
                                     Supported eol styles: 'native', 'CRLF'.
+        @param byte_count           number of bytes in the data field
         """
+        if byte_count > 255 or byte_count < 1:
+            raise ValueError("wrong byte_count value: %s" % byte_count)
         fwrite = getattr(f, "write", None)
         if fwrite:
             fobj = f
@@ -656,7 +659,7 @@ class IntelHex(object):
                     # produce one record
                     low_addr = cur_addr & 0x0FFFF
                     # chain_len off by 1
-                    chain_len = min(15, 65535-low_addr, maxaddr-cur_addr)
+                    chain_len = min(byte_count-1, 65535-low_addr, maxaddr-cur_addr)
 
                     # search continuous chain
                     stop_addr = cur_addr + chain_len
