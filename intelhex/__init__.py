@@ -898,7 +898,7 @@ class IntelHex(object):
         elif len(addresses) == 1:
             return([(addresses[0], addresses[0]+1)])
         if not alignment:
-            alignment = len(addresses)
+            alignment = addresses[-1] + 1
         adjacent_differences = [(b - a) for (a, b) in zip(addresses[:-1], addresses[1:])]
         breaks = [i for (i, x) in enumerate(adjacent_differences) if x > 1]
         endings = [addresses[b] for b in breaks]
