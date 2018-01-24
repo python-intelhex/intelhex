@@ -809,6 +809,26 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual(max(sg[0]), 0x102)
         self.assertEqual(min(sg[1]), 0x200)
         self.assertEqual(max(sg[1]), 0x203)
+        ih[0x1fe] = 5
+        ih[0x1ff] = 6
+        sg = ih.segments(alignment=0x200)
+        self.assertTrue(isinstance(sg, list))
+        self.assertEqual(len(sg), 3)
+        self.assertTrue(isinstance(sg[0], tuple))
+        self.assertTrue(len(sg[0]) == 2)
+        self.assertTrue(sg[0][0] < sg[0][1])
+        self.assertTrue(isinstance(sg[1], tuple))
+        self.assertTrue(len(sg[1]) == 2)
+        self.assertTrue(sg[1][0] < sg[1][1])
+        self.assertTrue(isinstance(sg[2], tuple))
+        self.assertTrue(len(sg[2]) == 2)
+        self.assertTrue(sg[2][0] < sg[2][1])
+        self.assertEqual(min(sg[0]), 0x100)
+        self.assertEqual(max(sg[0]), 0x102)
+        self.assertEqual(min(sg[1]), 0x1fe)
+        self.assertEqual(max(sg[1]), 0x200)
+        self.assertEqual(min(sg[2]), 0x200)
+        self.assertEqual(max(sg[2]), 0x203)
         pass
 
 class TestIntelHexLoadBin(TestIntelHexBase):

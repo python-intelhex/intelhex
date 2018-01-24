@@ -873,24 +873,40 @@ class IntelHex(object):
                 elif overlap == 'replace':
                     self.start_addr = other.start_addr
 
-    def segments(self):
+    def segments(self, alignment=None):
         """Return a list of ordered tuple objects, representing contiguous occupied data addresses.
         Each tuple has a length of two and follows the semantics of the range and xrange objects.
-        The second entry of the tuple is always an integer greater than the first entry.
+        The second entry of the tuple is always an integer greater than the first entry. If
+        integer is passed as alignment, the contiguous segments are further split along
+        boundaries of integer multiples of the alignment.
+
+        @param alignment integer boundary on which to split segments
         """
+        # helper routine for splitting segments along alignment
+        def _align(start, end, align):
+            stop = (start//align + 1) * align - 1
+            if stop >= end:
+                yield (start, end)
+            else:
+                yield (start, stop)
+                for (a, b) in _align(stop+1, end, align):
+                    yield (a, b)
+        # get normal segments
         addresses = self.addresses()
         if not addresses:
             return []
         elif len(addresses) == 1:
             return([(addresses[0], addresses[0]+1)])
+        if not alignment:
+            alignment = len(addresses)
         adjacent_differences = [(b - a) for (a, b) in zip(addresses[:-1], addresses[1:])]
         breaks = [i for (i, x) in enumerate(adjacent_differences) if x > 1]
         endings = [addresses[b] for b in breaks]
         endings.append(addresses[-1])
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
-        return [(a, b+1) for (a, b) in zip(beginings, endings)]
-        
+        return [(a, b+1) for (x, y) in zip(beginings, endings) for (a, b) in _align(x, y, alignment)]
+
     def get_memory_size(self):
         """Returns the approximate memory footprint for data."""
         n = sys.getsizeof(self)
