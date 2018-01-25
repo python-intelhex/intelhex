@@ -809,27 +809,27 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual(max(sg[0]), 0x102)
         self.assertEqual(min(sg[1]), 0x200)
         self.assertEqual(max(sg[1]), 0x203)
-        ih[0x1fe] = 5
-        ih[0x1ff] = 6
-        sg = ih.segments(alignment=0x200)
-        self.assertTrue(isinstance(sg, list))
-        self.assertEqual(len(sg), 3)
-        self.assertTrue(isinstance(sg[0], tuple))
-        self.assertTrue(len(sg[0]) == 2)
-        self.assertTrue(sg[0][0] < sg[0][1])
-        self.assertTrue(isinstance(sg[1], tuple))
-        self.assertTrue(len(sg[1]) == 2)
-        self.assertTrue(sg[1][0] < sg[1][1])
-        self.assertTrue(isinstance(sg[2], tuple))
-        self.assertTrue(len(sg[2]) == 2)
-        self.assertTrue(sg[2][0] < sg[2][1])
-        self.assertEqual(min(sg[0]), 0x100)
-        self.assertEqual(max(sg[0]), 0x102)
-        self.assertEqual(min(sg[1]), 0x1fe)
-        self.assertEqual(max(sg[1]), 0x200)
-        self.assertEqual(min(sg[2]), 0x200)
-        self.assertEqual(max(sg[2]), 0x203)
-        pass
+
+    def test_segments_alignment(self):
+        # test that address segments are correctly summarized and aligned
+        ih = IntelHex()
+        self.assertEqual([], ih.segments(alignment=4))
+        # 5 input segments; 1 and 2 come out unchanged, 3, 4, and 5 come
+        # out split into three sub-segments each (11 total output segments)
+        # (using alignment=4)
+        ih.puts(0x000, asbytes('0123'))   # aligned segment
+        ih.puts(0x105, asbytes( '56' ))   # aligned sub-segment
+        ih.puts(0x200, asbytes('0123456789ab')) # aligned multi-span
+        ih.puts(0x300, asbytes('0123456789'  )) # left-justified multi-span
+        ih.puts(0x402, asbytes(  '23456789ab')) # right-justified multi-span
+        expected = [
+            (0x000, 0x004), # from aligned segment
+            (0x105, 0x107), # from aligned sub-segment
+            (0x200, 0x204), (0x204, 0x208), (0x208, 0x20c), # from aligned multi-span
+            (0x300, 0x304), (0x304, 0x308), (0x308, 0x30a), # from left-justified multi-span
+            (0x402, 0x404), (0x404, 0x408), (0x408, 0x40c), # from right-justified multi-span
+        ]
+        self.assertEqual(expected, ih.segments(alignment=4))
 
 class TestIntelHexLoadBin(TestIntelHexBase):
 
