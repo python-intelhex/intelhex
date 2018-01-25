@@ -1585,6 +1585,111 @@ class TestBuildRecords(TestIntelHexBase):
             intelhex.Record.start_linear_address(0x12345678))
 
 
+class Test_AlignSegment(TestIntelHexBase):
+
+    def test_singlespan(self):
+        # any segment between (0,3) inclusive should be returned un-changed for align=4
+        #   0       --> 0
+        #   0 1     --> 0 1
+        #   0 1 2   --> 0 1 2
+        #   0 1 2 3 --> 0 1 2 3
+        #     1     -->   1
+        #     1 2   -->   1 2
+        #     1 2 3 -->   1 2 3
+        #       2   -->     2
+        #       2 3 -->     2 3
+        #         3 -->       3
+        for a in range(0,4):
+            for b in range(a,4):
+                self.assertEqual([(a,b)], list(intelhex._align_segment(a, b, 4)))
+
+    def test_offset_singlespan(self):
+        # any segment between (8,11) inclusive should be returned un-changed for align=4
+        #   8       --> 8
+        #   8 9     --> 8 9
+        #   8 9 a   --> 8 9 a
+        #   8 9 a b --> 8 9 a b
+        #     9     -->   9
+        #     9 a   -->   9 a
+        #     9 a b -->   9 a b
+        #       a   -->     a
+        #       a b -->     a b
+        #         b -->       b
+        for a in range(8,12):
+            for b in range(a,12):
+                self.assertEqual([(a,b)], list(intelhex._align_segment(a, b, 4)))
+
+    def test_aligned_multispan(self):
+        # with align=4, segments (0,11) and (8,19) should each be split into three
+        # equal-length sub-segments
+        #   0 1 2 3 4 5 6 7 8 9 a b --> 0 1 2 3 , 4 5 6 7 , 8 9 a b
+        #   8 9 a b c d e f g h i j --> 8 9 a b , c d e f , g h i j
+        for a in [ 0, 8 ]:
+            aligned = [ (a, a+4-1), (a+4, a+8-1), (a+8, a+11) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a, a+11, 4)))
+
+    def test_leftjustified_multispan(self):
+        # with align=4, if start address is aligned but end address is not, we expect
+        # to see n equal-length sub-segments followed by one shorter segment at the end
+        #   0 1 2 3 4 5 6 7 8 9 a --> 0 1 2 3 , 4 5 6 7 , 8 9 a
+        #   0 1 2 3 4 5 6 7 8 9   --> 0 1 2 3 , 4 5 6 7 , 8 9
+        #   0 1 2 3 4 5 6 7 8     --> 0 1 2 3 , 4 5 6 7 , 8
+        #   8 9 a b c d e f g h i --> 8 9 a b , c d e f , g h i
+        #   8 9 a b c d e f g h   --> 8 9 a b , c d e f , g h
+        #   8 9 a b c d e f g     --> 8 9 a b , c d e f , g
+        for a in [ 0, 8 ]:
+            aligned = [ (a, a+4-1), (a+4, a+8-1), (a+8, a+10) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a, a+10, 4)))
+            aligned = [ (a, a+4-1), (a+4, a+8-1), (a+8, a+ 9) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a, a+ 9, 4)))
+            aligned = [ (a, a+4-1), (a+4, a+8-1), (a+8, a+ 8) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a, a+ 8, 4)))
+
+    def test_rightjustified_multispan(self):
+        # with align=4, if end address is aligned but start address is not, we expect
+        # to see one shorter segment followed by n equal-length sub-segments
+        #   1 2 3 4 5 6 7 8 9 a b --> 1 2 3 , 4 5 6 7 , 8 9 a b
+        #     2 3 4 5 6 7 8 9 a b -->   2 3 , 4 5 6 7 , 8 9 a b
+        #       3 4 5 6 7 8 9 a b -->     3 , 4 5 6 7 , 8 9 a b
+        #   9 a b c d e f g h i j --> 9 a b , c d e f , g h i j
+        #     a b c d e f g h i j -->   a b , c d e f , g h i j
+        #       b c d e f g h i j -->     b , c d e f , g h i j
+        for a in [ 0, 8 ]:
+            aligned = [ (a+1, a+4-1), (a+4, a+8-1), (a+8, a+11) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+1, a+11, 4)))
+            aligned = [ (a+2, a+4-1), (a+4, a+8-1), (a+8, a+11) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+2, a+11, 4)))
+            aligned = [ (a+3, a+4-1), (a+4, a+8-1), (a+8, a+11) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+3, a+11, 4)))
+
+    def test_integer_parameters_only(self):
+        # all parameters must evaluate to integers
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 3, 4.5))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 3.5, 4))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0.5, 3, 4))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 3, 'h'))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 'b', 4))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment('a', 3, 4))
+
+    def test_nonpositive_alignment(self):
+        # alignment must be positive (>= 1)
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 3,  0))
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(0, 3, -4))
+
+    def test_negative_segment(self):
+        # segments must be monotonically increasing
+        with self.assertRaises(ValueError):
+            list(intelhex._align_segment(3, 0, 4))
+
+
 class Test_GetFileAndAddrRange(TestIntelHexBase):
 
     def test_simple(self):
