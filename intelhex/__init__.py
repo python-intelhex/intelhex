@@ -882,15 +882,6 @@ class IntelHex(object):
 
         @param alignment integer boundary on which to split segments
         """
-        # helper routine for splitting segments along alignment
-        def _align(start, end, align):
-            stop = (start//align + 1) * align - 1
-            if stop >= end:
-                yield (start, end)
-            else:
-                yield (start, stop)
-                for (a, b) in _align(stop+1, end, align):
-                    yield (a, b)
         # get normal segments
         addresses = self.addresses()
         if not addresses:
@@ -905,7 +896,7 @@ class IntelHex(object):
         endings.append(addresses[-1])
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
-        return [(a, b+1) for (x, y) in zip(beginings, endings) for (a, b) in _align(x, y, alignment)]
+        return [(a, b+1) for (x, y) in zip(beginings, endings) for (a, b) in _align_segment(x, y, alignment)]
 
     def get_memory_size(self):
         """Returns the approximate memory footprint for data."""
@@ -1028,6 +1019,35 @@ class IntelHex16bit(IntelHex):
 
 
 #/class IntelHex16bit
+
+
+def _align_segment(start, end, alignment):
+    """Split segment into sub-segments on alignment boundaries. If the segment
+    spans an integer multiple of alignment it is split into two sub-segments,
+    each of which is further sub-divided if it spans additional bounadries.
+
+    @param start     start address of the segment
+    @param end       end address of the segment (inclusive)
+    @param alignment integer alignment boundary
+
+    @return          generator of ordered tuple sub-segments representing the
+                     start and end addresses (inclusive) of each sub-segment,
+                     in order of increasing start address; no sub-segment will
+                     span an integery multiple of `alignment`.
+    """
+    if not (float(start).is_integer() and float(end).is_integer() and float(alignment).is_integer()):
+        raise ValueError("_align_segment: all parameters must be int")
+    if alignment <= 0:
+        raise ValueError("_align_segment: alignment must be positive")
+    if end < start:
+        raise ValueError("_align_segment: segment must be monotonic")
+    stop = (start//alignment + 1) * alignment - 1
+    if stop >= end:
+        yield (start, end)
+    else:
+        yield (start, stop)
+        for (a, b) in _align_segment(stop+1, end, alignment):
+            yield (a, b)
 
 
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
