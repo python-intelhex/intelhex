@@ -1662,6 +1662,24 @@ class Test_AlignSegment(TestIntelHexBase):
             aligned = [ (a+3, a+4-1), (a+4, a+8-1), (a+8, a+11) ]
             self.assertEqual(aligned, list(intelhex._align_segment(a+3, a+11, 4)))
 
+    def test_centered_multispan(self):
+        # with align=4, if neither end address nor start address is aligned,
+        # we expect to see one shorter sub-segment at start and one at end,
+        # separated by n equal-length sub-segments.
+        #   1 2 3 4 5 6 7 8 9 a --> 1 2 3 , 4 5 6 7 , 8 9 a
+        #     2 3 4 5 6 7 8 9   -->   2 3 , 4 5 6 7 , 8 9
+        #       3 4 5 6 7 8     -->     3 , 4 5 6 7 , 8
+        #   9 a b c d e f g h i --> 9 a b , c d e f , g h i
+        #     a b c d e f g h   -->   a b , c d e f , g h
+        #       b c d e f g     -->     b , c d e f , g
+        for a in [ 0, 8 ]:
+            aligned = [ (a+1, a+4-1), (a+4, a+8-1), (a+8, a+10) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+1, a+10, 4)))
+            aligned = [ (a+2, a+4-1), (a+4, a+8-1), (a+8, a+ 9) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+2, a+ 9, 4)))
+            aligned = [ (a+3, a+4-1), (a+4, a+8-1), (a+8, a+ 8) ]
+            self.assertEqual(aligned, list(intelhex._align_segment(a+3, a+ 8, 4)))
+
     def test_integer_parameters_only(self):
         # all parameters must evaluate to integers
         with self.assertRaises(ValueError):
