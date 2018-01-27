@@ -1707,6 +1707,12 @@ class Test_AlignSegment(TestIntelHexBase):
         with self.assertRaises(ValueError):
             list(intelhex._align_segment(3, 0, 4))
 
+    def test_many_splits(self):
+        # this will produce 65536 sub-segments; previous recursive
+        # implementation would fall over at 1000
+        for subsegment in intelhex._align_segment(0, 2**18, 4):
+            pass
+
 
 class Test_GetFileAndAddrRange(TestIntelHexBase):
 

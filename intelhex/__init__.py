@@ -1041,13 +1041,14 @@ def _align_segment(start, end, alignment):
         raise ValueError("_align_segment: alignment must be positive")
     if end < start:
         raise ValueError("_align_segment: segment must be monotonic")
-    stop = (start//alignment + 1) * alignment - 1
-    if stop >= end:
-        yield (start, end)
-    else:
-        yield (start, stop)
-        for (a, b) in _align_segment(stop+1, end, alignment):
-            yield (a, b)
+    while True:
+        stop = (start//alignment + 1) * alignment - 1
+        if stop >= end:
+            yield (start, end)
+            return
+        else:
+            yield (start, stop)
+            start = stop+1
 
 
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
