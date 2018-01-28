@@ -41,7 +41,7 @@ without external libraries or 2to3 tool from the same codebase.
 Download
 --------
 * https://pypi.python.org/pypi/IntelHex
-* https://github.com/bialix/intelhex
+* https://github.com/bialix/intelhex/releases
 
 Install
 -------
