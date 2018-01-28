@@ -2,10 +2,10 @@
 Python IntelHex library
 -----------------------
 
-Author: Alexander Belchenko
-Contact: alexander belchenko at gmail com
-Date: 2018/01/28
-Version: 2.2
+:Author: Alexander Belchenko
+:Contact: alexander belchenko at gmail com
+:Date: 2018/01/28
+:Version: 2.2
 
 Introduction
 ------------
