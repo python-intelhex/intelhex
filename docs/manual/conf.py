@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'Python IntelHex library'
-copyright = '2005-2016, Alexander Belchenko'
+copyright = '2005-2018, Alexander Belchenko'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

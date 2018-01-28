@@ -1,7 +1,7 @@
 NEWS
 ====
 
-* 2018/MM/DD v.2.2
+* 2018/01/28 v.2.2
 
     - API changes: ``IntelHex.write_hex_file`` method: added support for new
       parameter: ``eolstyle = native | CRLF``. (Alexander Belchenko)

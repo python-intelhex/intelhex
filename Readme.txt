@@ -4,7 +4,7 @@ Python IntelHex library
 
 Author: Alexander Belchenko
 Contact: alexander belchenko at gmail com
-Date: 2018/MM/DD
+Date: 2018/01/28
 Version: 2.2
 
 Introduction
@@ -69,6 +69,8 @@ User manual for IntelHex is available in the sources docs/manual/ directory.
 You can browse User Manual online:
 
     http://pythonhosted.org/IntelHex/
+
+    https://readthedocs.org/projects/python-intelhex/
 
 API documentation
 -----------------

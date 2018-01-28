@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2005-2016 Alexander Belchenko
+# Copyright (c) 2005-2018 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -35,7 +35,7 @@
 
 '''Intel HEX file format hex2bin convertor utility.'''
 
-VERSION = '2.1'
+VERSION = '2.2'
 
 if __name__ == '__main__':
     import getopt

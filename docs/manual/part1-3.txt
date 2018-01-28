@@ -7,8 +7,7 @@ Omit the prefix if you're on Windows.
 
 Installing with pip
 ~~~~~~~~~~~~~~~~~~~
-If you just need IntelHex library installed as your
-system python library 
+If you just need IntelHex library installed as your system python library 
 then it's better to use modern tool called ``pip`` 
 (http://www.pip-installer.org/en/latest/)
 to install with the command:
@@ -37,11 +36,12 @@ from PyPI:
 
 https://pypi.python.org/pypi/IntelHex
 
-Also IntelHex may be downloaded from:
+You can get the archive with the released code from corresponding section
+of GitHub project:
 
-https://launchpad.net/intelhex/+download
+https://github.com/bialix/intelhex/releases
 
-You can get the archive with the unreleased code from GitHub page:
+or even unreleased bleeding edge code from GitHub page:
 
 https://github.com/bialix/intelhex
 
@@ -49,14 +49,8 @@ Use the corresponding menu item in the right-hand side bar on that page
 (e.g. "Download ZIP").
 
 
-Get source code with bzr or git
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-Get the latest development code with bzr:
-
-	bzr branch lp:intelhex
-        
-Or get the latest development code with git:
-
+Get source code with git
+~~~~~~~~~~~~~~~~~~~~~~~~
 	git clone https://github.com/bialix/intelhex.git
 
 
@@ -90,7 +84,7 @@ for helper scripts as hex2bin.py, bin2hex.py and other mentioned in this
 documentation (see section Convenience Scripts).
 
 You can find these scripts in your python Script directory 
-(usually `C:\\PythonXY\\Scripts`). You need either to create batch file to run them,
-or use Python interpreter:
+(usually `C:\\PythonXY\\Scripts`).
+You need either to create batch file to run them, or use Python interpreter:
 
 	python C:\\PythonXY\\Scripts\\hex2bin.py ...

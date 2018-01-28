@@ -19,10 +19,6 @@ You can find IntelHex library on PyPI:
 
 https://pypi.python.org/pypi/IntelHex
 
-on Launchpad:
-
-https://launchpad.net/intelhex
-
 on GitHub:
 
 https://github.com/bialix/intelhex
@@ -31,7 +27,7 @@ https://github.com/bialix/intelhex
 Motivation
 ~~~~~~~~~~
 This work was partially inspired by SRecord_ software at the moment
-when I stuck with its limitations and unintuitive behavior.
+when I stuck with its limitations and unintuitive behavior (for me personally).
 
 So I've made this library and related tools which give me 
 full control over data and HEX file creation.
@@ -44,9 +40,10 @@ Over the years it turned out that my small python library was very useful
 to many people, and allowed them not only to create utilities to manipulate
 with HEX files, but also to create custom bootloaders for their devices.
 
-I started writing this library in 2005, and now 10 years later it's still
-alive and useful to other developers. That keeps me working on improving
-the code, even though I don't work on embedding systems for some time.
+I started writing this library in 2005, and now more than 10 years later 
+it's still alive and useful to other developers. 
+That keeps me working on improving the code,
+even though I don't work on embedding systems for some time.
 
 If you find IntelHex library useful, please send me email 
 and tell a bit about how you're using it and in which projects/areas.

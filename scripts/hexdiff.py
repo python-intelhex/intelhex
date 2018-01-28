@@ -1,6 +1,6 @@
 #!/usr/bin/python
 
-# Copyright (c) 2011-2016 Alexander Belchenko
+# Copyright (c) 2011-2018 Alexander Belchenko
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms,
@@ -37,7 +37,7 @@
 of compared data.
 """
 
-VERSION = '2.1'
+VERSION = '2.2'
 
 USAGE = '''hexdiff: diff dumps of 2 hex files.
 Usage:
