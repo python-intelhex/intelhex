@@ -13,3 +13,4 @@ fastimport.stream
 wheelhouse
 ./.git
 ./.gitignore
+./venv
