@@ -40,10 +40,7 @@ from distutils.core import Command, setup
 
 import intelhex, intelhex.__version__
 
-LONG_DESCRIPTION = """\
-
-"""
-
+LONG_DESCRIPTION = open('Readme.rst', 'r').read()
 
 METADATA = dict(
       name='intelhex',
@@ -56,8 +53,8 @@ METADATA = dict(
       author_email='alexander.belchenko@gmail.com',
       url='https://pypi.python.org/pypi/IntelHex',
 
-      description='Python Intel Hex library',
-      long_description='Python Intel Hex library',
+      description='Python library for Intel HEX files manipulations',
+      long_description=LONG_DESCRIPTION,
       keywords='Intel HEX hex2bin HEX8',
       license='BSD',
       classifiers = [

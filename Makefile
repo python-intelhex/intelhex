@@ -28,4 +28,4 @@ docs:
 	make -C docs/manual html
 
 wheel:
-	$(PYTHON) -m pip wheel .
+	$(PYTHON) -m pip wheel -w dist .

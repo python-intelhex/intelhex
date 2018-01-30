@@ -2,6 +2,10 @@
 IntelHex releases
 *****************
 
+2.2.1 (2018-01-30)
+------------------
+* Fixes for PyPI.
+
 2.2 (2018-01-28)
 ----------------
 * API changes: ``IntelHex.write_hex_file`` method: added support for new
