@@ -51,8 +51,7 @@ METADATA = dict(
 
       author='Alexander Belchenko',
       author_email='alexander.belchenko@gmail.com',
-      url='https://pypi.python.org/pypi/IntelHex',
-
+      url='https://github.com/bialix/intelhex',
       description='Python library for Intel HEX files manipulations',
       long_description=LONG_DESCRIPTION,
       keywords='Intel HEX hex2bin HEX8',
@@ -123,7 +122,7 @@ def main():
     metadata = METADATA.copy()
     metadata['cmdclass'] = {
         'test': test,
-        #'bench': bench,    # bench is out of date
+        'bench': bench,    # bench is out of date
         }
     return setup(**metadata)
 
