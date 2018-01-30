@@ -40,6 +40,10 @@ from distutils.core import Command, setup
 
 import intelhex, intelhex.__version__
 
+LONG_DESCRIPTION = """\
+
+"""
+
 
 METADATA = dict(
       name='intelhex',

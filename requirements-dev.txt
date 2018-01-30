@@ -1,0 +1,6 @@
+# requirements for development and release process
+twine
+docutils
+sphinx
+readme_renderer     # to check long description in setup.py: https://github.com/pypa/readme_renderer
+                    # python setup.py check -r -s

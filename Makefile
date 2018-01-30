@@ -4,7 +4,7 @@ all:
 	@echo Available targets:
 	@echo  clean   - clean build directory
 	@echo  test    - run unittest
-	@echo  epydoc  - run epydoc to create API documentation
+	@echo  epydoc  - run epydoc to create API documentation (python 2)
 	@echo  wininst - Windows installer for Python
 	@echo  docs    - build docs with ReST and Sphinx
 	@echo  wheel   - build python wheel binary archive

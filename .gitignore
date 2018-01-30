@@ -7,3 +7,5 @@ docs/manual/.build/html/*
 venv/
 dist/
 MANIFEST
+python.bat
+NEWS.html
