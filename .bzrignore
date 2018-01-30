@@ -15,4 +15,4 @@ wheelhouse
 ./.gitignore
 ./venv
 ./python.bat
-./NEWS.html
+./*.html

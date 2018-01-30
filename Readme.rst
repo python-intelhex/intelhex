@@ -7,7 +7,7 @@ The Intel HEX file format is widely used in microprocessors and microcontrollers
 area (embedded systems etc) as the de facto standard 
 for representation of code to be programmed into microelectronic devices.
 
-This work implements an **intelhex** Python library to read, write, 
+This work implements an ``intelhex`` Python library to read, write, 
 create from scratch and manipulate data from Intel HEX file format.
 
 The distribution package also includes several convenience Python scripts,
@@ -16,7 +16,8 @@ those based on the library itself. Check the docs to know more.
 
 License
 -------
-The code is distributed under BSD license, see LICENSE.rst.
+The code is distributed under BSD license,
+see `LICENSE.txt <https://github.com/bialix/intelhex/blob/master/LICENSE.txt>`_.
 
 In short: you can use IntelHex library in your project without *any*
 restrictions.
@@ -34,18 +35,22 @@ Install using ``pip`` (recommended, no separate download required)::
 
 Download
 --------
-* https://pypi.python.org/pypi/IntelHex
+* https://pypi.org/project/IntelHex/
 * https://github.com/bialix/intelhex/releases
 
 Source code, bug reports, patches
 ---------------------------------
 IntelHex on GitHub:
 
-    https://github.com/bialix/intelhex
+https://github.com/bialix/intelhex
 
 User manual
 -----------
-User manual for IntelHex is available in the sources docs/manual/ directory.
+User manual for IntelHex is available in the sources ``docs/manual/`` directory.
 You can browse User Manual online:
 
-    https://readthedocs.org/projects/python-intelhex/
+https://readthedocs.org/projects/python-intelhex/
+
+Changelog
+---------
+See `NEWS.rst <https://github.com/bialix/intelhex/blob/master/NEWS.rst>`_
