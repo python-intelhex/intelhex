@@ -964,6 +964,50 @@ class TestIntelHexGetPutString(TestIntelHexBase):
         self.ih.putsz(0x03, asbytes('hello'))
         self.assertEqual(asbytes('\x00\x01\x02hello\x00\x09'), self.ih.gets(0, 10))
 
+    def test_find(self):
+        self.assertEqual(0, self.ih.find(asbytes('\x00\x01\x02\x03\x04\x05\x06')))
+        self.assertEqual(0, self.ih.find(asbytes('\x00')))
+        self.assertEqual(3, self.ih.find(asbytes('\x03\x04\x05\x06')))
+        self.assertEqual(3, self.ih.find(asbytes('\x03')))
+        self.assertEqual(7, self.ih.find(asbytes('\x07\x08\x09')))
+        self.assertEqual(7, self.ih.find(asbytes('\x07')))
+        self.assertEqual(-1, self.ih.find(asbytes('\x0a')))
+        self.assertEqual(-1, self.ih.find(asbytes('\x02\x01')))
+        self.assertEqual(-1, self.ih.find(asbytes('\x08\x07')))
+
+    def test_find_start(self):
+        self.assertEqual(-1, self.ih.find(asbytes('\x00\x01\x02\x03\x04\x05\x06'), start=3))
+        self.assertEqual(-1, self.ih.find(asbytes('\x00'), start=3))
+        self.assertEqual(3, self.ih.find(asbytes('\x03\x04\x05\x06'), start=3))
+        self.assertEqual(3, self.ih.find(asbytes('\x03'), start=3))
+        self.assertEqual(7, self.ih.find(asbytes('\x07\x08\x09'), start=3))
+        self.assertEqual(7, self.ih.find(asbytes('\x07'), start=3))
+        self.assertEqual(-1, self.ih.find(asbytes('\x0a'), start=3))
+        self.assertEqual(-1, self.ih.find(asbytes('\x02\x01'), start=3))
+        self.assertEqual(-1, self.ih.find(asbytes('\x08\x07'), start=3))
+
+    def test_find_end(self):
+        self.assertEqual(-1, self.ih.find(asbytes('\x00\x01\x02\x03\x04\x05\x06'), end=4))
+        self.assertEqual(0, self.ih.find(asbytes('\x00'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x03\x04\x05\x06'), end=4))
+        self.assertEqual(3, self.ih.find(asbytes('\x03'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x07\x08\x09'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x07'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x0a'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x02\x01'), end=4))
+        self.assertEqual(-1, self.ih.find(asbytes('\x08\x07'), end=4))
+
+    def test_find_start_end(self):
+        self.assertEqual(-1, self.ih.find(asbytes('\x00\x01\x02\x03\x04\x05\x06'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x00'), start=3, end=7))
+        self.assertEqual(3, self.ih.find(asbytes('\x03\x04\x05\x06'), start=3, end=7))
+        self.assertEqual(3, self.ih.find(asbytes('\x03'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x07\x08\x09'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x07'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x0a'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x02\x01'), start=3, end=7))
+        self.assertEqual(-1, self.ih.find(asbytes('\x08\x07'), start=3, end=7))
+
 
 class TestIntelHexDump(TestIntelHexBase):
 
