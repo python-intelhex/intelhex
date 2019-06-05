@@ -1078,6 +1078,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
 def bin2hex(fin, fout, offset=0):
     """Simple bin-to-hex convertor.
     @return     0   if all OK
+
     @param  fin     input bin file (filename or file-like object)
     @param  fout    output hex file (filename or file-like object)
     @param  offset  starting address offset for loading bin
