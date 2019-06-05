@@ -69,10 +69,8 @@ class IntelHex(object):
     ''' Intel HEX file reader. '''
 
     def __init__(self, source=None):
-        print("Got intelhex from my modified file!")
         ''' Constructor. If source specified, object will be initialized
         with the contents of source. Otherwise the object will be empty.
-
         @param  source      source for initialization
                             (file name of HEX file, file object, addr dict or
                              other IntelHex object)
@@ -102,10 +100,8 @@ class IntelHex(object):
 
     def _decode_record(self, s, line=0):
         '''Decode one record of HEX file.
-
         @param  s       line with HEX record.
         @param  line    line number (for error messages).
-
         @raise  EndOfFile   if EOF record encountered.
         '''
         s = s.rstrip('\r\n')
@@ -194,7 +190,6 @@ class IntelHex(object):
         """Load hex file into internal buffer. This is not necessary
         if object was initialized with source set. This will overwrite
         addresses if object was already initialized.
-
         @param  fobj        file name or file-like object
         """
         if getattr(fobj, "read", None) is None:
@@ -222,7 +217,6 @@ class IntelHex(object):
         """Load bin file into internal buffer. Not needed if source set in
         constructor. This will overwrite addresses without warning
         if object was already initialized.
-
         @param  fobj        file name or file-like object
         @param  offset      starting address offset
         """
@@ -243,7 +237,6 @@ class IntelHex(object):
     def loadfile(self, fobj, format):
         """Load data file into internal buffer. Preferred wrapper over
         loadbin or loadhex.
-
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
         """
@@ -264,7 +257,6 @@ class IntelHex(object):
         those addresses in unsigned char form (i.e. not strings).
         The dictionary may contain the key, ``start_addr``
         to indicate the starting address of the data as described in README.
-
         The contents of the dict will be merged with this object and will
         overwrite any conflicts. This function is not necessary if the
         object was initialized with source specified.
@@ -379,7 +371,6 @@ class IntelHex(object):
 
     def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None):
         '''Convert to binary and write to file.
-
         @param  fobj    file name or file object for writing output bytes.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
@@ -410,7 +401,6 @@ class IntelHex(object):
 
     def todict(self):
         '''Convert to python dictionary.
-
         @return         dict suitable for initializing another IntelHex object.
         '''
         r = {}
@@ -448,7 +438,6 @@ class IntelHex(object):
             return max(aa)
 
     def __getitem__(self, addr):
-        print("Called other version of __getitem__")
         ''' Get requested byte from address.
         @param  addr    address of byte.
         @return         byte if address exists in HEX file, or self.padding
@@ -549,9 +538,7 @@ class IntelHex(object):
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
     def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16, endian_mode='little'):
-        print("Called modified version of write_hex_file!")
         """Write data to file f in HEX format.
-
         @param  f                   filename or file-like object for writing
         @param  write_start_addr    enable or disable writing start address
                                     record to file (enabled by default).
@@ -731,7 +718,6 @@ class IntelHex(object):
 
     def tofile(self, fobj, format):
         """Write data to hex or bin file. Preferred method over tobin or tohex.
-
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
         """
@@ -788,7 +774,6 @@ class IntelHex(object):
         """Dump object content to specified file object or to stdout if None.
         Format is a hexdump with some header information at the beginning,
         addresses on the left, and data on right.
-
         @param  tofile          file-like object to dump to
         @param  width           number of bytes per line (i.e. columns)
         @param  withpadding     print padding character instead of '--'
@@ -854,7 +839,6 @@ class IntelHex(object):
                                   in overlapping region;
                         - replace: replace data with other data
                                   in overlapping region.
-
         @raise  TypeError       if other is not instance of IntelHex
         @raise  ValueError      if other is the same object as self
                                 (it can't merge itself)
@@ -934,7 +918,6 @@ class IntelHex16bit(IntelHex):
         again because this class will alter it. This class leaves padding
         alone unless it was precisely 0xFF. In that instance it is sign
         extended to 0xFFFF.
-
         @param  source  file name of HEX file or file object
                         or instance of ordinary IntelHex class.
                         Will also accept dictionary from todict method.
@@ -956,11 +939,9 @@ class IntelHex16bit(IntelHex):
             self.padding = 0x0FFFF
 
     def __getitem__(self, addr16):
-        print("Calling modified version of __getitem__!")
         """Get 16-bit word from address.
         Raise error if only one byte from the pair is set.
         We assume a Little Endian interpretation of the hex file.
-
         @param  addr16  address of word (addr8 = 2 * addr16).
         @return         word if bytes exists in HEX file, or self.padding
                         if no data found.
@@ -971,7 +952,7 @@ class IntelHex16bit(IntelHex):
         byte2 = self._buf.get(addr2, None)
 
         if byte1 != None and byte2 != None:
-            return byte2 | (byte1 << 8)  # low endian
+            return byte1 | (byte2 << 8)  # low endian
 
         if byte1 == None and byte2 == None:
             return self.padding
@@ -979,7 +960,6 @@ class IntelHex16bit(IntelHex):
         raise BadAccess16bit(address=addr16)
 
     def __setitem__(self, addr16, word):
-        print("Calling modded version of __setitem__")
         """Sets the address at addr16 to word assuming Little Endian mode.
         """
         addr_byte = addr16 * 2
@@ -989,7 +969,6 @@ class IntelHex16bit(IntelHex):
 
     def minaddr(self):
         '''Get minimal address of HEX content in 16-bit mode.
-
         @return         minimal address used in this object
         '''
         aa = dict_keys(self._buf)
@@ -1000,7 +979,6 @@ class IntelHex16bit(IntelHex):
 
     def maxaddr(self):
         '''Get maximal address of HEX content in 16-bit mode.
-
         @return         maximal address used in this object
         '''
         aa = dict_keys(self._buf)
@@ -1040,7 +1018,6 @@ class IntelHex16bit(IntelHex):
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
-
     @param  fin     input hex file (filename or file-like object)
     @param  fout    output bin file (filename or file-like object)
     @param  start   start of address range (optional)
@@ -1088,7 +1065,6 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
 def bin2hex(fin, fout, offset=0):
     """Simple bin-to-hex convertor.
     @return     0   if all OK
-
     @param  fin     input bin file (filename or file-like object)
     @param  fout    output hex file (filename or file-like object)
     @param  offset  starting address offset for loading bin
@@ -1119,7 +1095,6 @@ def bin2hex(fin, fout, offset=0):
 def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
     """Diff 2 IntelHex objects and produce unified diff output for their
     hex dumps.
-
     @param ih1        first IntelHex object to compare
     @param ih2        second IntelHex object to compare
     @param tofile     file-like object to write output
@@ -1152,7 +1127,6 @@ class Record(object):
         """Takes a list of bytes, computes the checksum, and outputs the entire
         record as a string. bytes should be the hex record without the colon
         or final checksum.
-
         @param  bytes   list of byte values so far to pack into record.
         @return         String representation of one HEX record
         """
@@ -1168,10 +1142,8 @@ class Record(object):
         """Return Data record. This constructs the full record, including
         the length information, the record type (0x00), the
         checksum, and the offset.
-
         @param  offset  load offset of first byte.
         @param  bytes   list of byte values to pack into record.
-
         @return         String representation of one HEX record
         """
         assert 0 <= offset < 65536
@@ -1192,7 +1164,6 @@ class Record(object):
     def extended_segment_address(usba):
         """Return Extended Segment Address Record.
         @param  usba     Upper Segment Base Address.
-
         @return         String representation of Intel Hex USBA record.
         """
         b = [2, 0, 0, 0x02, (usba >> 8) & 0x0FF, usba & 0x0FF]
@@ -1204,7 +1175,6 @@ class Record(object):
         """Return Start Segment Address Record.
         @param  cs      16-bit value for CS register.
         @param  ip      16-bit value for IP register.
-
         @return         String representation of Intel Hex SSA record.
         """
         b = [4, 0, 0, 0x03, (cs >> 8) & 0x0FF, cs & 0x0FF,
@@ -1216,7 +1186,6 @@ class Record(object):
     def extended_linear_address(ulba):
         """Return Extended Linear Address Record.
         @param  ulba    Upper Linear Base Address.
-
         @return         String representation of Intel Hex ELA record.
         """
         b = [2, 0, 0, 0x04, (ulba >> 8) & 0x0FF, ulba & 0x0FF]
@@ -1227,7 +1196,6 @@ class Record(object):
     def start_linear_address(eip):
         """Return Start Linear Address Record.
         @param  eip     32-bit linear address for the EIP register.
-
         @return         String representation of Intel Hex SLA record.
         """
         b = [4, 0, 0, 0x05, (eip >> 24) & 0x0FF, (eip >> 16) & 0x0FF,
@@ -1245,7 +1213,6 @@ class _BadFileNotation(Exception):
 def _get_file_and_addr_range(s, _support_drive_letter=None):
     """Special method for hexmerge.py script to split file notation
     into 3 parts: (filename, start, end)
-
     @raise _BadFileNotation  when string cannot be safely split.
     """
     if _support_drive_letter is None:
