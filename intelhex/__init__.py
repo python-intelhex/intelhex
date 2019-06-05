@@ -57,7 +57,6 @@ from intelhex.compat import (
 
 from intelhex.getsizeof import total_size
 
-
 class _DeprecatedParam(object):
     pass
 
@@ -949,7 +948,7 @@ class IntelHex16bit(IntelHex):
         byte2 = self._buf.get(addr2, None)
 
         if byte1 != None and byte2 != None:
-            return byte1 | (byte2 << 8)     # low endian
+            return byte2 | (byte1 << 8)     # low endian
 
         if byte1 == None and byte2 == None:
             return self.padding
