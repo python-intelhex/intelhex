@@ -544,7 +544,8 @@ class IntelHex(object):
             raise ValueError("wrong eolstyle %s" % repr(eolstyle))
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
-    def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16, endian_mode='little'):
+    def write_hex_file(self, f, write_start_addr=True, eolstyle='native',
+                       byte_count=16, endian_mode='little', word_size_bytes=2):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -557,6 +558,8 @@ class IntelHex(object):
                                     Supported eol styles: 'native', 'CRLF'.
         @param byte_count           number of bytes in the data field
         @param endian_mode          supported endian modes: 'little', 'big'.
+        @param word_size_bytes      determines the size of each word in bytes
+                                    in order to format the endian mode correctly
         """
         if byte_count > 255 or byte_count < 1:
             raise ValueError("wrong byte_count value: %s" % byte_count)
@@ -630,7 +633,7 @@ class IntelHex(object):
                 rev_b[loc] = value
                 byte_num += 1
                 i = loc
-                if byte_num >= byte_count:
+                if byte_num >= word_size_bytes:
                     for loc2 in rev_b.keys():
                         self._buf[loc2] = rev_b[i]
                         i -= 1
