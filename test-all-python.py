@@ -74,7 +74,7 @@ if sys.platform == 'win32':
 
         ('3.5-32bit', r'C:\Python\3.5-32\python'),
         ('3.5-64bit', r'C:\Python\3.5-64\python'),
-        ('3.6-64bit', r'C:\Users\hipaa\Anaconda3\envs\cntk-py36\python.exe'),
+
         ('pypy',      r'C:\Python\pypy-2.5.1-win32\pypy'),
         )
 else:
