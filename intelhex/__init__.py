@@ -140,10 +140,15 @@ class IntelHex(object):
         if record_type == 0:
             # data record
             addr += self._offset
-            for i in range_g(4, 4+record_length):
-                if not self._buf.get(addr, None) is None:
+            if getattr(self, "word_length", None) is not None:
+                word_byte = self.word_byte
+            else:
+                word_byte = 1
+            for i in range_g(int(record_length/word_byte)): # FIXME:record_length should be multiples of word_byte
+                if not self._buf.get(addr*word_byte, None) is None: # FIXME: only check lowest byte
                     raise AddressOverlapError(address=addr, line=line)
-                self._buf[addr] = bin[i]
+                for j in range_g(word_byte): 
+                    self._buf[addr*word_byte+j] = bin[4+i*word_byte+j]
                 addr += 1   # FIXME: addr should be wrapped 
                             # BUT after 02 record (at 64K boundary)
                             # and after 04 record (at 4G boundary)
@@ -646,7 +651,10 @@ class IntelHex(object):
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
                     bin[3] = 4      # rectyp
-                    high_ofs = int(cur_addr>>16)
+                    if getattr(self, "word_length", None) is not None:
+                        high_ofs = int(cur_addr/self.word_byte)>>16
+                    else:
+                        high_ofs = int(cur_addr>>16)
                     b = divmod(high_ofs, 256)
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
@@ -676,7 +684,7 @@ class IntelHex(object):
                         chain_len = 1               # real chain_len
 
                     bin = array('B', asbytes('\0'*(5+chain_len)))
-                    if self.word_length is not None:
+                    if getattr(self, "word_length", None) is not None:
                         low_addr = int(low_addr/self.word_byte)
                     b = divmod(low_addr, 256)
                     bin[1] = b[0]   # msb of low_addr
@@ -702,7 +710,10 @@ class IntelHex(object):
                     else:
                         cur_addr = maxaddr + 1
                         break
-                    high_addr = int(cur_addr>>16)
+                    if getattr(self, "word_length", None) is not None:
+                        high_addr = int(cur_addr/self.word_byte)>>16
+                    else:
+                        high_addr = int(cur_addr>>16)
                     if high_addr > high_ofs:
                         break
 
@@ -1038,17 +1049,28 @@ class IntelHexWord(IntelHex):
             # private members
             self._buf = source._buf
             self._offset = source._offset
+            self.word_length = word_length
+            if word_length%8 ==0:
+                self.word_byte = int(word_length/8)
+            else:
+                self.word_byte = int(word_length/8) + 1
+
         elif isinstance(source, dict):
             raise IntelHexError("IntelHexWord does not support initialization from dictionary yet.\n"
                                 "Patches are welcome.")
+        elif isinstance(source, StrType) or getattr(source, "read", None):
+            # load hex file
+            IntelHex.__init__(self)
+            self.word_length = word_length
+            if word_length%8 ==0:
+                self.word_byte = int(word_length/8)
+            else:
+                self.word_byte = int(word_length/8) + 1
+            self.loadhex(source)
+
         else:
-            IntelHex.__init__(self, source)
-        self.word_length = word_length
-        if word_length%8 ==0:
-            self.word_byte = int(word_length/8)
-        else:
-            self.word_byte = int(word_length/8) + 1
-        
+            raise ValueError("source: bad initializer type")
+
         if self.padding == 0x0FF:
             for byte_count in range(self.word_byte-1):
                 self.padding = (self.padding<<8) + 0x0FF
