@@ -714,6 +714,7 @@ class IntelHex(object):
 
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
+        @param  byte_count  bytes per line
         """
         if format == 'hex':
             self.write_hex_file(fobj, byte_count=byte_count)
