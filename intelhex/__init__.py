@@ -709,14 +709,14 @@ class IntelHex(object):
         if fclose:
             fclose()
 
-    def tofile(self, fobj, format):
+    def tofile(self, fobj, format, byte_count=16):
         """Write data to hex or bin file. Preferred method over tobin or tohex.
 
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
         """
         if format == 'hex':
-            self.write_hex_file(fobj)
+            self.write_hex_file(fobj, byte_count=byte_count)
         elif format == 'bin':
             self.tobinfile(fobj)
         else:
