@@ -36,7 +36,11 @@
 """Setup script for IntelHex."""
 
 import sys, glob
-from distutils.core import Command, setup
+from distutils.core import Command
+try:
+    from setuptools import setup
+except ImportError:
+    from distutils.core import setup
 
 import intelhex, intelhex.__version__
 
