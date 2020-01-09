@@ -764,6 +764,22 @@ class IntelHex(object):
         self.puts(addr, s)
         self._buf[addr+len(s)] = 0
 
+    def find(self, sub, start=None, end=None):
+        """Return the lowest index in self[start:end] where subsection sub is found.
+        Optional arguments start and end are interpreted as in slice notation.
+        
+        @param  sub     bytes-like subsection to find
+        @param  start   start of section to search within (optional)
+        @param  end     end of section to search within (optional)
+        """
+        sub = bytes(sub)
+        for start, end in self[slice(start,end)].segments():
+            b = self.gets(start, end-start)
+            i = b.find(sub)
+            if i != -1:
+                return start+i
+        return -1
+
     def dump(self, tofile=None, width=16, withpadding=False):
         """Dump object content to specified file object or to stdout if None.
         Format is a hexdump with some header information at the beginning,
