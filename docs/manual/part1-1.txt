@@ -21,7 +21,7 @@ https://pypi.python.org/pypi/IntelHex
 
 on GitHub:
 
-https://github.com/bialix/intelhex
+https://github.com/python-intelhex/intelhex
 
 
 Motivation

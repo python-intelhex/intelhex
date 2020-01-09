@@ -39,11 +39,11 @@ https://pypi.python.org/pypi/IntelHex
 You can get the archive with the released code from corresponding section
 of GitHub project:
 
-https://github.com/bialix/intelhex/releases
+https://github.com/python-intelhex/intelhex/releases
 
 or even unreleased bleeding edge code from GitHub page:
 
-https://github.com/bialix/intelhex
+https://github.com/python-intelhex/intelhex
 
 Use the corresponding menu item in the right-hand side bar on that page 
 (e.g. "Download ZIP").
@@ -51,7 +51,7 @@ Use the corresponding menu item in the right-hand side bar on that page
 
 Get source code with git
 ~~~~~~~~~~~~~~~~~~~~~~~~
-	git clone https://github.com/bialix/intelhex.git
+	git clone https://github.com/python-intelhex/intelhex.git
 
 
 Install from sources

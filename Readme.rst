@@ -17,7 +17,7 @@ those based on the library itself. Check the docs to know more.
 License
 -------
 The code is distributed under BSD license,
-see `LICENSE.txt <https://github.com/bialix/intelhex/blob/master/LICENSE.txt>`_.
+see `LICENSE.txt <https://github.com/python-intelhex/intelhex/blob/master/LICENSE.txt>`_.
 
 In short: you can use IntelHex library in your project without *any*
 restrictions.
@@ -36,13 +36,13 @@ Install using ``pip`` (recommended, no separate download required)::
 Download
 --------
 * https://pypi.org/project/IntelHex/
-* https://github.com/bialix/intelhex/releases
+* https://github.com/python-intelhex/intelhex/releases
 
 Source code, bug reports, patches
 ---------------------------------
 IntelHex on GitHub:
 
-https://github.com/bialix/intelhex
+https://github.com/python-intelhex/intelhex
 
 User manual
 -----------
@@ -53,4 +53,4 @@ https://readthedocs.org/projects/python-intelhex/
 
 Changelog
 ---------
-See `NEWS.rst <https://github.com/bialix/intelhex/blob/master/NEWS.rst>`_
+See `NEWS.rst <https://github.com/python-intelhex/intelhex/blob/master/NEWS.rst>`_

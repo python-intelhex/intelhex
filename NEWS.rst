@@ -32,7 +32,7 @@ IntelHex releases
   in YAML format. (Andrew Fernandes)
 * Better Python 3 compatibility when ``hex2bin.py`` and ``bin2hex.py``
   scripts are trying to read/write binary data from stdin or to stdout.
-  (GitHub issue https://github.com/bialix/intelhex/issues/4)
+  (GitHub issue https://github.com/python-intelhex/intelhex/issues/4)
 * The main activity of the IntelHex project slowly drifting towards
   GitHub - the main social network for OSS developers.
   I'd really like to get some help from additional maintainer though.
