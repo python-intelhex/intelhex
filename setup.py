@@ -55,6 +55,8 @@ METADATA = dict(
 
       author='Alexander Belchenko',
       author_email='alexander.belchenko@gmail.com',
+      maintainer='Bert van Hall',
+      maintainer_email='bert.vanhall@gmx.de',
       url='https://github.com/bialix/intelhex',
       description='Python library for Intel HEX files manipulations',
       long_description=LONG_DESCRIPTION,

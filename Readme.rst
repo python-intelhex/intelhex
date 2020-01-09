@@ -1,9 +1,3 @@
-==========
-IMPORTANT!
-==========
-New maintainer is needed! I (bialix) don't have anymore time and motivation to move this project forward. I created a dedicated team `python-intelhex` to allow more real contributors to maintain it and ship new releases. Welcome on board!
-
-
 Python IntelHex library
 ***********************
 
