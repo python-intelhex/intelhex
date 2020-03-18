@@ -1171,7 +1171,7 @@ class TestIntelHexMerge(TestIntelHexBase):
             ih1.merge, ih1)
         ih2 = IntelHex()
         self.assertRaisesMsg(ValueError, "overlap argument should be either "
-            "'error', 'ignore' or 'replace'",
+            "'error', 'ignore', 'replace' or 'identical'",
             ih1.merge, ih2, overlap='spam')
 
     def test_merge_overlap(self):
@@ -1191,6 +1191,17 @@ class TestIntelHexMerge(TestIntelHexBase):
         ih2 = IntelHex({0:2})
         ih1.merge(ih2, overlap='replace')
         self.assertEqual({0:2}, ih1.todict())
+        # identical: same value: ok
+        ih1 = IntelHex({0:1})
+        ih2 = IntelHex({0:1})
+        ih1.merge(ih2, overlap='identical')
+        self.assertEqual({0:1}, ih1.todict())
+        # identical: different value: raise error
+        ih1 = IntelHex({0:1})
+        ih2 = IntelHex({0:2})
+        self.assertRaisesMsg(intelhex.AddressOverlapError,
+            'Data at address 0x0 is different: 0x1 vs. 0x2',
+            ih1.merge, ih2, overlap='identical')
 
     def test_merge_start_addr(self):
         # this, None
