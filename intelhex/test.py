@@ -62,6 +62,9 @@ from intelhex import (
     BadAccess16bit,
     hex2bin,
     Record,
+    LinearSpacingOverflowError,
+    SegmentSpacingOverflowError,
+    BasicSpacingOverflowError,
     )
 from intelhex import compat
 from intelhex.compat import (
@@ -333,6 +336,14 @@ hex64k = """:020000040000FA
 """
 data64k = {0: 1, 0x10000: 2}
 
+hex16M = """:020000040000FA
+:0100000001FE
+:020000040100F9
+:0100000002FD
+:00000001FF
+"""
+data_hex16M = {0: 1, 0x100000: 2}
+
 
 hex_rectype3 = """:0400000312345678E5
 :0100000001FE
@@ -364,7 +375,6 @@ hex_bug_lp_341051 = """\
 :040FF00022E122E1F7
 :00000001FF
 """
-
 
 ##
 # Test cases
@@ -1785,6 +1795,264 @@ class TestWriteHexFileByteCount(unittest.TestCase):
 
         self.assertEqual(ih.tobinstr(), ih2.tobinstr(),
                          "Written hex file does not equal with original")
+
+class TestWriteHexFileExtAddrMode(unittest.TestCase):
+
+    def test_write_hex_file_ext_addr_mode_param(self):
+        ih = intelhex.IntelHex()
+        sio = StringIO()
+
+        # invalid param
+        self.assertRaises(ValueError, ih.write_hex_file, sio, ext_addr_mode='bad')
+
+        # insesitive casing check
+        isValueError = False
+        try:
+            ih.write_hex_file(sio, ext_addr_mode='AUTO')
+        except ValueError:
+            isValueError = True
+        self.assertFalse(isValueError)
+
+        isValueError = False
+        try:
+            ih.write_hex_file(sio, ext_addr_mode='Linear')
+        except ValueError:
+            isValueError = True
+        self.assertFalse(isValueError)
+
+        isValueError = False
+        try:
+            ih.write_hex_file(sio, ext_addr_mode='segmenT')
+        except ValueError:
+            isValueError = True
+        self.assertFalse(isValueError)
+
+        isValueError = False
+        try:
+            ih.write_hex_file(sio, ext_addr_mode='NoNe')
+        except ValueError:
+            isValueError = True
+        self.assertFalse(isValueError)
+
+        sio.close()
+
+    def test_write_hex_file_no_starting_address_simple(self):
+        #prepare
+        ih = intelhex.IntelHex(StringIO(hex_simple))
+
+        #check 'auto' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='auto')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex_simple,
+            "Written hex file does not equal with original")
+        sio.close()
+
+        #check 'segment' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='segment')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex_simple,
+            "Written hex file does not equal with original")
+        sio.close()
+
+        #check 'linear' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='linear')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex_simple,
+            "Written hex file does not equal with original")
+        sio.close()
+
+        #check 'none' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='none')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex_simple,
+            "Written hex file does not equal with original")
+        sio.close()
+
+    def test_write_hex_file_segment_address_type(self):
+        #prepare
+        ih_records = [Record.start_segment_address(0x1234, 0x5678),
+            Record.extended_segment_address(0x3000),
+            Record.data(0x0, [0xAB, 0xCD]),
+            Record.eof()]
+        ih_records_str = '\n'.join(ih_records)+'\n'
+        ih = intelhex.IntelHex(StringIO(ih_records_str))
+
+        ih_records_segment_expected_str = ih_records_str
+        #ih_records won't be needed anymore, so it can be modified
+        ih_records[1] = Record.extended_linear_address(0x3)
+        ih_records_linear_expected_str = '\n'.join(ih_records)+'\n'
+
+        #check 'auto' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='auto')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, ih_records_segment_expected_str,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        #check 'segment' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='segment')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, ih_records_segment_expected_str,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        #check 'linear' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='linear')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, ih_records_linear_expected_str,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        # 'none' mode is causing exceptions
+        # this mode will be checked in different test suite
+
+    def test_write_hex_file_linear_address_type(self):
+        #prepare
+        ih_records = [Record.start_linear_address(0x12345678),
+            Record.extended_linear_address(0x3000),
+            Record.data(0x0, [0xAB, 0xCD]),
+            Record.eof()]
+        ih_records_str = '\n'.join(ih_records)+'\n'
+        ih = intelhex.IntelHex(StringIO(ih_records_str))
+
+        ih_records_linear_expected_str = ih_records_str
+
+        #check 'auto' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='auto')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, ih_records_linear_expected_str,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        #check 'linear' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='linear')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, ih_records_linear_expected_str,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        # 'none' and 'segment' mode are causing exceptions
+        # these modes will be checked in different test suite
+
+    def test_write_hex_file_no_starting_address_big1M(self):
+        #prepare
+        ih = intelhex.IntelHex(StringIO(hex16M))
+
+        #check 'auto' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='auto')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex16M,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        #check 'linear' mode
+        sio = StringIO()
+        ih.write_hex_file(sio, ext_addr_mode='linear')
+        sio.seek(0)
+        sioLines = sio.readlines()
+        s = ''.join(sioLines)
+        self.assertEqual(s, hex16M,
+            "Written hex file does not equal with expected")
+        sio.close()
+
+        # 'none' and 'segment' mode are causing exceptions
+        # these modes will be checked in different test suite
+
+# here only negative tests - positive are checked earlier
+class TestWriteHexFileAddrSpaceInvalidaiton(unittest.TestCase):
+
+    def setUp(self):
+        self.sio = StringIO()
+
+    def tearDown(self):
+        self.sio.close()
+
+    def test_write_hex_file_big32Mplus(self):
+        #prepare
+        ih = intelhex.IntelHex()
+        addr32Mplus = 0x100000000
+        linearBytesOverflowed = addr32Mplus - 0xFFFFFFFF # = 0x1
+        segmentBytesOverflowed = addr32Mplus - 0x0FFFFF # = 0xFFF00001, 4293918721 (DEC)
+        basicBytesOverflowed = addr32Mplus - 0xFFFF # = 0xFFFF0001, 4294901761 (DEC)
+        ih[addr32Mplus] = 0x01
+
+        with self.assertRaises(LinearSpacingOverflowError) as ctx:
+            ih.write_hex_file(self.sio, ext_addr_mode='auto')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, linearBytesOverflowed)
+
+        with self.assertRaises(LinearSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='linear')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, linearBytesOverflowed)
+
+        with self.assertRaises(SegmentSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='segment')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, segmentBytesOverflowed)
+        
+        with self.assertRaises(BasicSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='none')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, basicBytesOverflowed)
+
+    def test_write_hex_file_big1Mplus(self):
+        ih = intelhex.IntelHex()
+        addr1Mplus = 0x100000
+        segmentBytesOverflowed = addr1Mplus - 0x0FFFFF # = 0x1
+        basicBytesOverflowed = addr1Mplus - 0xFFFF # = 0xF0001, 983041 (DEC)
+        ih[addr1Mplus] = 0x01
+
+        with self.assertRaises(SegmentSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='segment')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, segmentBytesOverflowed)
+        
+        with self.assertRaises(BasicSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='none')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, basicBytesOverflowed)
+
+    def test_write_hex_file_big64kplus(self):
+        ih = intelhex.IntelHex()
+        addr64kplus = 0x10000
+        basicBytesOverflowed = addr64kplus - 0xFFFF # = 0x1
+        ih[addr64kplus] = 0x01
+
+        with self.assertRaises(BasicSpacingOverflowError) as ctx:
+                ih.write_hex_file(self.sio, ext_addr_mode='none')
+        # check also overflowed bytes length
+        self.assertEquals(ctx.exception.overflwd_len, basicBytesOverflowed)
 
 ##
 # MAIN

@@ -544,7 +544,7 @@ class IntelHex(object):
             raise ValueError("wrong eolstyle %s" % repr(eolstyle))
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
-    def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16):
+    def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16, ext_addr_mode='linear'):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -556,19 +556,54 @@ class IntelHex(object):
                                     for output file on different platforms.
                                     Supported eol styles: 'native', 'CRLF'.
         @param byte_count           number of bytes in the data field
+        @param  ext_addr_mode       used this to decide which record type to
+                                    to write for Extended Address records:
+                                    Linear (32-bit addressing) or Segment (20-bit addressing)
+                                    or without Extended Address records (16-bit addressing)
+                                    Supported modes: 'linear', 'segment', 'none', 'auto'.
         """
         if byte_count > 255 or byte_count < 1:
             raise ValueError("wrong byte_count value: %s" % byte_count)
-        fwrite = getattr(f, "write", None)
-        if fwrite:
-            fobj = f
-            fclose = None
-        else:
-            fobj = open(f, 'w')
-            fwrite = fobj.write
-            fclose = fobj.close
 
         eol = IntelHex._get_eol_textfile(eolstyle, sys.platform)
+
+        addresses = dict_keys(self._buf)
+        addresses.sort()
+        addr_len = len(addresses)
+        minaddr = addresses[0] if addr_len else 0
+        maxaddr = addresses[-1] if addr_len else 0
+
+        # make parameter case-insensitive
+        ext_addr_mode = ext_addr_mode.lower()
+        # resolve extended address type
+        if ext_addr_mode == 'linear':
+            # enforces Extended Linear Address record type (default)
+            extaddr_rectyp = 4
+        elif ext_addr_mode == 'segment':
+            # enforces Extended Segment Address record type
+            extaddr_rectyp = 2
+        elif ext_addr_mode == 'none':
+            # enforces no Extended Address records format
+            extaddr_rectyp = 0
+        elif ext_addr_mode == 'auto':
+            # Extended Address record type is resolved by Max Address
+            if maxaddr > 0x0FFFFF:
+                extaddr_rectyp = 4
+            else: # 1MB sapcing is max for Segement
+                extaddr_rectyp = 2
+        else:
+            raise ValueError('ext_addr_mode should be one of:'
+                ' "linear", "segment", "none", "auto";'
+                ' got %r instead' % ext_addr_mode)
+
+        # check max address with resolved format
+        if addr_len:
+            if extaddr_rectyp == 4 and maxaddr > 0xFFFFFFFF:
+                raise LinearSpacingOverflowError(overflwd_len=(maxaddr-0xFFFFFFFF))
+            elif extaddr_rectyp == 2 and maxaddr > 0x0FFFFF:
+                raise SegmentSpacingOverflowError(overflwd_len=(maxaddr-0x0FFFFF))
+            elif extaddr_rectyp == 0 and maxaddr > 0xFFFF:
+                raise BasicSpacingOverflowError(overflwd_len=(maxaddr-0xFFFF))
 
         # Translation table for uppercasing hex ascii string.
         # timeit shows that using hexstr.translate(table)
@@ -580,6 +615,15 @@ class IntelHex(object):
         else:
             # Python 2
             table = ''.join(chr(i).upper() for i in range_g(256))
+
+        fwrite = getattr(f, "write", None)
+        if fwrite:
+            fobj = f
+            fclose = None
+        else:
+            fobj = open(f, 'w')
+            fwrite = fobj.write
+            fclose = fobj.close
 
         # start address record if any
         if self.start_addr and write_start_addr:
@@ -623,19 +667,13 @@ class IntelHex(object):
                 raise InvalidStartAddressValueError(start_addr=self.start_addr)
 
         # data
-        addresses = dict_keys(self._buf)
-        addresses.sort()
-        addr_len = len(addresses)
         if addr_len:
-            minaddr = addresses[0]
-            maxaddr = addresses[-1]
-
             if maxaddr > 65535:
                 need_offset_record = True
             else:
                 need_offset_record = False
-            high_ofs = 0
 
+            high_ofs = 0
             cur_addr = minaddr
             cur_ix = 0
 
@@ -645,9 +683,15 @@ class IntelHex(object):
                     bin[0] = 2      # reclen
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
-                    bin[3] = 4      # rectyp
-                    high_ofs = int(cur_addr>>16)
+                    bin[3] = extaddr_rectyp # rectyp
+
+                    if extaddr_rectyp == 4:
+                        high_ofs = int(cur_addr>>16)
+                    else: # extaddr_rectyp == 2:
+                        # 0x00X0000 => 0xX000
+                        high_ofs = int((cur_addr & 0x00F0000) >> 4)
                     b = divmod(high_ofs, 256)
+
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
@@ -1094,7 +1138,7 @@ def bin2hex(fin, fout, offset=0):
         return 1
 
     try:
-        h.tofile(fout, format='hex')
+        h.write_hex_file(fout)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
@@ -1279,6 +1323,10 @@ def _get_file_and_addr_range(s, _support_drive_letter=None):
 #       BadAccess16bit - not enough data to read 16 bit value (deprecated, see NotEnoughDataError)
 #       NotEnoughDataError - not enough data to read N contiguous bytes
 #       EmptyIntelHexError - requested operation cannot be performed with empty object
+#       OverflowError - data overflow general error
+#           LinearSpacingOverflowError - 32-bit address spacing data overflow
+#           SegmentSpacingOverflowError - 20-bit address spacing data overflow
+#           BasicSpacingOverflowError - 16-bit address spacing data overflow
 
 class IntelHexError(Exception):
     '''Base Exception class for IntelHex module'''
@@ -1368,3 +1416,16 @@ class BadAccess16bit(NotEnoughDataError):
 
 class EmptyIntelHexError(IntelHexError):
     _fmt = "Requested operation cannot be executed with empty object"
+
+
+class OverflowError(IntelHexError):
+    _fmt = 'Base class for overflowed data'
+
+class LinearSpacingOverflowError(OverflowError):
+    _fmt = 'Data overflow Linear (32-bit) address spacing. Overflowed data: %(overflwd_len)d bytes'
+
+class SegmentSpacingOverflowError(OverflowError):
+    _fmt = 'Data overflow Segment (20-bit) address spacing. Overflowed data: %(overflwd_len)d bytes'
+
+class BasicSpacingOverflowError(OverflowError):
+    _fmt = 'Data overflow 16-bit address spacing. Overflowed data: %(overflwd_len)d bytes'
