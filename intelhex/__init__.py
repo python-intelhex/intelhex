@@ -889,24 +889,31 @@ class IntelHex(object):
                 elif overlap == 'replace':
                     self.start_addr = other.start_addr
 
-    def segments(self):
+    def segments(self, alignment=None):
         """Return a list of ordered tuple objects, representing contiguous occupied data addresses.
         Each tuple has a length of two and follows the semantics of the range and xrange objects.
-        The second entry of the tuple is always an integer greater than the first entry.
+        The second entry of the tuple is always an integer greater than the first entry. If
+        integer is passed as alignment, the contiguous segments are further split along
+        boundaries of integer multiples of the alignment.
+
+        @param alignment integer boundary on which to split segments
         """
+        # get normal segments
         addresses = self.addresses()
         if not addresses:
             return []
         elif len(addresses) == 1:
             return([(addresses[0], addresses[0]+1)])
+        if not alignment:
+            alignment = addresses[-1] + 1
         adjacent_differences = [(b - a) for (a, b) in zip(addresses[:-1], addresses[1:])]
         breaks = [i for (i, x) in enumerate(adjacent_differences) if x > 1]
         endings = [addresses[b] for b in breaks]
         endings.append(addresses[-1])
         beginings = [addresses[b+1] for b in breaks]
         beginings.insert(0, addresses[0])
-        return [(a, b+1) for (a, b) in zip(beginings, endings)]
-        
+        return [(a, b+1) for (x, y) in zip(beginings, endings) for (a, b) in _align_segment(x, y, alignment)]
+
     def get_memory_size(self):
         """Returns the approximate memory footprint for data."""
         n = sys.getsizeof(self)
@@ -1028,6 +1035,36 @@ class IntelHex16bit(IntelHex):
 
 
 #/class IntelHex16bit
+
+
+def _align_segment(start, end, alignment):
+    """Split segment into sub-segments on alignment boundaries. If the segment
+    spans an integer multiple of alignment it is split into two sub-segments,
+    each of which is further sub-divided if it spans additional bounadries.
+
+    @param start     start address of the segment
+    @param end       end address of the segment (inclusive)
+    @param alignment integer alignment boundary
+
+    @return          generator of ordered tuple sub-segments representing the
+                     start and end addresses (inclusive) of each sub-segment,
+                     in order of increasing start address; no sub-segment will
+                     span an integery multiple of `alignment`.
+    """
+    if not (float(start).is_integer() and float(end).is_integer() and float(alignment).is_integer()):
+        raise ValueError("_align_segment: all parameters must be int")
+    if alignment <= 0:
+        raise ValueError("_align_segment: alignment must be positive")
+    if end < start:
+        raise ValueError("_align_segment: segment must be monotonic")
+    while True:
+        stop = (start//alignment + 1) * alignment - 1
+        if stop >= end:
+            yield (start, end)
+            return
+        else:
+            yield (start, stop)
+            start = stop+1
 
 
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
