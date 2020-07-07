@@ -480,8 +480,22 @@ class IntelHex(object):
                 raise TypeError('Address should be >= 0.')
             self._buf[addr] = byte
         elif t == slice:
-            if not isinstance(byte, (list, tuple)):
-                raise ValueError('Slice operation expects sequence of bytes')
+            slice_error = ValueError('Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes') # avoid duplication code
+            if not isinstance(byte, (bytes, bytearray)):
+                if isinstance(byte, (list, tuple)):
+                    try:
+                        check = all(0 <= x < 255 for x in byte)
+                    except TypeError as exc:
+                        raise slice_error from exc
+                    if not check :
+                        raise slice_error
+                    if not all(isinstance(x, int) for x in byte) :
+                        raise slice_error
+                else :
+                    try:
+                        byte = bytes(byte) # check for int + 0<=x<=255 + convert to something getitem works with
+                    except TypeError as exc:
+                        raise slice_error from exc
             start = addr.start
             stop = addr.stop
             step = addr.step or 1

@@ -679,6 +679,8 @@ class TestIntelHex(TestIntelHexBase):
         # slice operations
         ih[0:4] = range_l(4)
         self.assertEqual({0:0, 1:1, 2:2, 3:3}, ih.todict())
+        ih[0:4] = range_g(1,5)
+        self.assertEqual({0:1, 1:2, 2:3, 3:4}, ih.todict())
         ih[0:] = range_l(5,9)
         self.assertEqual({0:5, 1:6, 2:7, 3:8}, ih.todict())
         ih[:4] = range_l(9,13)
@@ -687,11 +689,25 @@ class TestIntelHex(TestIntelHexBase):
         ih = IntelHex()
         ih[0:8:2] = range_l(4)
         self.assertEqual({0:0, 2:1, 4:2, 6:3}, ih.todict())
+        ih[0:8:2] = b'\xDE\xAD\xBE\xEF'
+        self.assertEqual({0:0xDE, 2:0xAD, 4:0xBE, 6:0xEF}, ih.todict())
         # errors in slice operations
         # ih[1:2] = 'a'
         self.assertRaisesMsg(ValueError,
-            'Slice operation expects sequence of bytes',
+            'Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes',
             setitem, slice(1,2,None), 'a')
+        self.assertRaisesMsg(ValueError,
+            'Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes',
+            setitem, slice(1,4,None), [1,1.5,2])
+        self.assertRaisesMsg(ValueError,
+            'Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes',
+            setitem, slice(1,4,None), [1,object(),2])
+        self.assertRaisesMsg(ValueError,
+            'Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes',
+            setitem, slice(1,2,None), (i/2 for i in range(1)))
+        self.assertRaisesMsg(ValueError,
+            'Slice operation expects either a bytes, a sequence of byte values (0 <= byte <= 255), or anything convertible to bytes',
+            setitem, slice(1,4,None), [1,2,256])
         # ih[0:1] = [1,2,3]
         self.assertRaisesMsg(ValueError,
             'Length of bytes sequence does not match address range',
