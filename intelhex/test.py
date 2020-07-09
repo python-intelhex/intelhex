@@ -809,6 +809,13 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual(max(sg[0]), 0x102)
         self.assertEqual(min(sg[1]), 0x200)
         self.assertEqual(max(sg[1]), 0x203)
+        ih[0x204] = 5
+        sg = ih.segments()
+        self.assertEqual(len(sg), 3)
+        sg = ih.segments(min_gap=2)
+        self.assertEqual(len(sg), 2)
+        self.assertEqual(min(sg[1]), 0x200)
+        self.assertEqual(max(sg[1]), 0x205)
         pass
 
 class TestIntelHexLoadBin(TestIntelHexBase):
