@@ -19,6 +19,7 @@ Contributors:
 * Nathan P. Stien
 * Stefan Schmitt
 * Zachary Clifford
+* Piotr Korowacki
 * "durexyl" @ GitHub
 * "erki1993" @ GitHub
 * "mentaal" @ GitHub

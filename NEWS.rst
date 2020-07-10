@@ -2,6 +2,13 @@
 IntelHex releases
 *****************
 
+2.X (2020-XX-XX)
+----------------
+* API changes: ``IntelHex.write_hex_file`` method: add support for new
+  parameter: ``ext_addr_mode = linear | segment | none | auto``.
+  Option dicedes how Extended Address records are resolved.
+  Default value is ``linear`` for backward comaptibility. (Piotr Korowacki)
+
 2.2.1 (2018-01-30)
 ------------------
 * Fixes for PyPI.
