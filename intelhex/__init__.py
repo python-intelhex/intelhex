@@ -140,10 +140,15 @@ class IntelHex(object):
         if record_type == 0:
             # data record
             addr += self._offset
-            for i in range_g(4, 4+record_length):
-                if not self._buf.get(addr, None) is None:
+            if getattr(self, "word_length", None) is not None:
+                word_byte = self.word_byte
+            else:
+                word_byte = 1
+            for i in range_g(int(record_length/word_byte)): # FIXME:record_length should be multiples of word_byte
+                if not self._buf.get(addr*word_byte, None) is None: # FIXME: only check lowest byte
                     raise AddressOverlapError(address=addr, line=line)
-                self._buf[addr] = bin[i]
+                for j in range_g(word_byte): 
+                    self._buf[addr*word_byte+j] = bin[4+i*word_byte+j]
                 addr += 1   # FIXME: addr should be wrapped 
                             # BUT after 02 record (at 64K boundary)
                             # and after 04 record (at 4G boundary)
@@ -646,7 +651,10 @@ class IntelHex(object):
                     bin[1] = 0      # offset msb
                     bin[2] = 0      # offset lsb
                     bin[3] = 4      # rectyp
-                    high_ofs = int(cur_addr>>16)
+                    if getattr(self, "word_length", None) is not None:
+                        high_ofs = int(cur_addr/self.word_byte)>>16
+                    else:
+                        high_ofs = int(cur_addr>>16)
                     b = divmod(high_ofs, 256)
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
@@ -676,6 +684,8 @@ class IntelHex(object):
                         chain_len = 1               # real chain_len
 
                     bin = array('B', asbytes('\0'*(5+chain_len)))
+                    if getattr(self, "word_length", None) is not None:
+                        low_addr = int(low_addr/self.word_byte)
                     b = divmod(low_addr, 256)
                     bin[1] = b[0]   # msb of low_addr
                     bin[2] = b[1]   # lsb of low_addr
@@ -700,7 +710,10 @@ class IntelHex(object):
                     else:
                         cur_addr = maxaddr + 1
                         break
-                    high_addr = int(cur_addr>>16)
+                    if getattr(self, "word_length", None) is not None:
+                        high_addr = int(cur_addr/self.word_byte)>>16
+                    else:
+                        high_addr = int(cur_addr>>16)
                     if high_addr > high_ofs:
                         break
 
@@ -1029,7 +1042,147 @@ class IntelHex16bit(IntelHex):
         return bin
 
 
-#/class IntelHex16bit
+#/class IntelHexWord
+
+class IntelHexWord(IntelHex):
+    """Access to data as words. Intended to use with Quartus II MEM initializing HEX files."""
+
+    def __init__(self, source=None, word_length=16):
+        """Construct class from HEX file
+        or from instance of ordinary IntelHex class. If IntelHex object
+        is passed as source, the original IntelHex object should not be used
+        again because this class will alter it. This class leaves padding
+        alone unless it was precisely 0xFF. In that instance it is sign
+        extended to 0xFFFF.
+
+        @param  source      file name of HEX file or file object
+                            or instance of ordinary IntelHex class.
+                            Will also accept dictionary from todict method.
+        @param  word_length word length of each record and address of memory
+        """
+        if isinstance(source, IntelHex):
+            # from ihex8
+            self.padding = source.padding
+            self.start_addr = source.start_addr
+            # private members
+            self._buf = source._buf
+            self._offset = source._offset
+            self.word_length = word_length
+            if word_length%8 ==0:
+                self.word_byte = int(word_length/8)
+            else:
+                self.word_byte = int(word_length/8) + 1
+
+        elif isinstance(source, dict):
+            raise IntelHexError("IntelHexWord does not support initialization from dictionary yet.\n"
+                                "Patches are welcome.")
+        elif isinstance(source, StrType) or getattr(source, "read", None):
+            # load hex file
+            IntelHex.__init__(self)
+            self.word_length = word_length
+            if word_length%8 ==0:
+                self.word_byte = int(word_length/8)
+            else:
+                self.word_byte = int(word_length/8) + 1
+            self.loadhex(source)
+
+        else:
+            raise ValueError("source: bad initializer type")
+
+        if self.padding == 0x0FF:
+            for byte_count in range(self.word_byte-1):
+                self.padding = (self.padding<<8) + 0x0FF
+
+    def __getitem__(self, addr):
+        """Get word from address.
+        Raise error if only one byte from the pair is set.
+        We assume a Little Endian interpretation of the hex file.
+
+        @param  addr  address of word (addr8 = word_byte * addr6).
+        @return         word if bytes exists in HEX file, or self.padding
+                        if no data found.
+        """
+        addr1 = addr * self.word_byte
+        out = 0
+        is_padding =True
+        for byte_count in range_g(self.word_byte):
+            addr2 = addr1 + byte_count
+            byte = self._buf.get(addr2, None)
+            if byte != None:
+                out = (out<<8)+byte
+                is_padding = False
+            elif byte_count>0 and  not is_padding:
+                raise BadAccessWord(address=addr)
+        if is_padding:
+            return self.padding
+        else:
+            return out
+
+
+    def __setitem__(self, addr, word):
+        """Sets the address at addr to word assuming Little Endian mode.
+        """
+        addr_byte = addr *  self.word_byte
+        for byte_count in range_g(self.word_byte):
+            addr2 = addr_byte + self.word_byte -1 - byte_count
+            self._buf[addr2]= word & 0x0ff
+            word = word >>8
+
+    def minaddr(self):
+        '''Get minimal address of HEX content in word mode.
+
+        @return         minimal address used in this object
+        '''
+        aa = dict_keys(self._buf)
+        if aa == []:
+            return 0
+        else:
+            return int(min(aa)/self.word_byte)
+
+    def maxaddr(self):
+        '''Get maximal address of HEX content in word mode.
+
+        @return         maximal address used in this object 
+        '''
+        aa = dict_keys(self._buf)
+        if aa == []:
+            return 0
+        else:
+            return int(max(aa)/self.word_byte)
+
+    def tobinarray(self, start=None, end=None, size=None):
+        '''Convert this object to binary form as array (of 2-bytes word data).
+        If start and end unspecified, they will be inferred from the data.
+        @param  start   start address of output data.
+        @param  end     end address of output data (inclusive).
+        @param  size    size of the block (number of words),
+                        used with start or end parameter.
+        @return         array of unsigned integer data according to word bytes.
+        '''
+        if self.word_byte<=1:
+            bin = array('B')
+        elif self.word_byte<=2:
+            bin = array('H')
+        elif self.word_byte<=4:
+            bin = array('L')
+        elif self.word_byte<=8:
+            bin = array('Q')
+
+        if self._buf == {} and None in (start, end):
+            return bin
+
+        if size is not None and size <= 0:
+            raise ValueError("tobinarray: wrong value for size")
+
+        start, end = self._get_start_end(start, end, size)
+
+        for addr in range_g(start, end+1):
+            bin.append(self[addr])
+
+        return bin
+
+
+#/class IntelHexWord
 
 
 def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
@@ -1367,6 +1520,9 @@ class NotEnoughDataError(IntelHexError):
 
 class BadAccess16bit(NotEnoughDataError):
     _fmt = 'Bad access at 0x%(address)X: not enough data to read 16 bit value'
+
+class BadAccessWord(NotEnoughDataError):
+    _fmt = 'Bad access at 0x%(address)X: not enough data to read word value'
 
 class EmptyIntelHexError(IntelHexError):
     _fmt = "Requested operation cannot be executed with empty object"

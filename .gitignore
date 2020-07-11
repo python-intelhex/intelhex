@@ -10,3 +10,4 @@ MANIFEST
 python.bat
 NEWS.html
 README.html
+*.egg-info
