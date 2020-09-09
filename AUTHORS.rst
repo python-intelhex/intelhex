@@ -22,3 +22,4 @@ Contributors:
 * "durexyl" @ GitHub
 * "erki1993" @ GitHub
 * "mentaal" @ GitHub
+* Léo Flaventin Hauchecorne

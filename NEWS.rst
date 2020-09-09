@@ -2,6 +2,11 @@
 IntelHex releases
 *****************
 
+2.3 (2020-09-09)
+------------------
+* API changes: ``IntelHex.__setitem__`` method: added support for slices
+  with any iterable values. (Léo Flaventin Hauchecorne)
+
 2.2.1 (2018-01-30)
 ------------------
 * Fixes for PyPI.
