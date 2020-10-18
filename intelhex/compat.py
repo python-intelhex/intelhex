@@ -57,7 +57,8 @@ if sys.version_info[0] >= 3:
             return s
         return s.decode('latin1')
 
-    array_tobytes = getattr(array.array, "tobytes", array.array.tostring)
+    # for python >= 3.2 use 'tobytes', otherwise 'tostring'
+    array_tobytes = array.array.tobytes if sys.version_info[1] >= 2 else array.array.tostring
 
     IntTypes = (int,)
     StrType = str
