@@ -1,3 +1,4 @@
+*.egg-info
 *.pyc
 .bzr/*
 *.~*
@@ -6,6 +7,7 @@ docs/manual/.build/doctrees/*
 docs/manual/.build/html/*
 venv/
 dist/
+.tox/
 MANIFEST
 python.bat
 NEWS.html
