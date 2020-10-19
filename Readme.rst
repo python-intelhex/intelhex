@@ -24,8 +24,8 @@ restrictions.
 
 Supported Python versions
 -------------------------
-IntelHex library v.2.2 supports Python 2 (2.4-2.7) and Python 3 (3.2-3.5 or later)
-without external libraries or 2to3 tool from the same codebase.
+IntelHex library supports Python 3 (3.5 or later) only. The 2.2.1 release was
+the last one which supported Python 2.7 and Python until 3.5.
 
 Install
 -------
