@@ -44,7 +44,7 @@ except ImportError:
 
 import intelhex, intelhex.__version__
 
-LONG_DESCRIPTION = open('Readme.rst', 'r').read()
+LONG_DESCRIPTION = open('README.rst', 'r').read()
 
 METADATA = dict(
       name='intelhex',
