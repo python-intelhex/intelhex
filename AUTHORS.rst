@@ -17,7 +17,12 @@ Contributors:
 * Masayuki Takeda
 * Morgan McClure
 * Nathan P. Stien
+* Piotr Korowacki
+* Reis Baltaoglu
+* Ryan Downing
+* Scott Armitage
 * Stefan Schmitt
+* Theo Sbrissa
 * Zachary Clifford
 * "durexyl" @ GitHub
 * "erki1993" @ GitHub
