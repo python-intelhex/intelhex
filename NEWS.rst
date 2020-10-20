@@ -2,7 +2,7 @@
 IntelHex releases
 *****************
 
-2.3.0 (unreleased)
+2.3.0 (2020-10-20)
 ------------------
 * Add ``IntelHex.find()`` method to find a given byte pattern. (Scott Armitage)
 * API changes: ``IntelHex.segments()`` method supports new optional parameter
