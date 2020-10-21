@@ -1,16 +1,21 @@
 PYTHON := python
 
+define HELP=
+Available targets:
+ clean   - clean build directory
+ test    - run unittest
+ epydoc  - run epydoc to create API documentation '(python 2)'
+ wininst - Windows installer for Python
+ docs    - build docs with ReST and Sphinx
+ wheel   - build python wheel binary archive
+
+endef
+
+export HELP
 all:
-	@echo Available targets:
-	@echo  clean   - clean build directory
-	@echo  test    - run unittest
-	@echo  epydoc  - run epydoc to create API documentation (python 2)
-	@echo  wininst - Windows installer for Python
-	@echo  docs    - build docs with ReST and Sphinx
-	@echo  wheel   - build python wheel binary archive
+	@echo "$$HELP"
 
 .PHONY: clean test epydoc wininst docs
-
 clean:
 	$(PYTHON) setup.py clean -a
 
