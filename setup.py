@@ -36,15 +36,15 @@
 """Setup script for IntelHex."""
 
 import sys, glob
-from distutils.core import Command
 try:
     from setuptools import setup
 except ImportError:
     from distutils.core import setup
+from distutils.core import Command
 
 import intelhex, intelhex.__version__
 
-LONG_DESCRIPTION = open('Readme.rst', 'r').read()
+LONG_DESCRIPTION = open('README.rst', 'r').read()
 
 METADATA = dict(
       name='intelhex',
@@ -69,6 +69,12 @@ METADATA = dict(
         'License :: OSI Approved :: BSD License',
         'Operating System :: OS Independent',
         'Programming Language :: Python',
+        'Programming Language :: Python :: 3',
+        'Programming Language :: Python :: 3.5',
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7',
+        'Programming Language :: Python :: 3.8',
+        'Programming Language :: Python :: 3.9',
       ],
 )
 

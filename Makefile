@@ -24,7 +24,7 @@ wininst:
 	$(PYTHON) setup.py bdist_wininst -d.
 
 docs:
-	rst2html docs/manual.txt docs/manual.html
+	rst2html5.py docs/manual.txt docs/manual.html
 	make -C docs/manual html
 
 wheel:

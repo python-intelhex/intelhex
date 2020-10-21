@@ -9,6 +9,19 @@ IntelHex releases
   Option dicedes how Extended Address records are resolved.
   Default value is ``linear`` for backward comaptibility. (Piotr Korowacki)
 
+2.3.0 (2020-10-20)
+------------------
+* Add ``IntelHex.find()`` method to find a given byte pattern. (Scott Armitage)
+* API changes: ``IntelHex.segments()`` method supports new optional parameter
+  ``min_gap`` to allow consolidation of segments with small but existing gaps
+  into a single segment. Default value is 1. (Ryan Downing)
+* API changes: ``IntelHex.tofile()`` now supports the optional ``byte_count``
+  parameter from ``IntelHex.write_hex_file()``. Only used if ``format = hex``.
+  (Reis Baltaoglu)
+* Fix Python 3.9 compatibility issue with 'array' module (Piotr Korowacki)
+* Fix installation for Python version taking setup rather from setuptools than
+  distutils (Theo Sbrissa)
+
 2.2.1 (2018-01-30)
 ------------------
 * Fixes for PyPI.

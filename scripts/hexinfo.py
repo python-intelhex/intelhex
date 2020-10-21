@@ -38,7 +38,7 @@
         data (if any), in YAML format.
 """
 
-VERSION = '2.2.1'
+VERSION = '2.3.0'
 
 USAGE = '''hexinfo: summarize a hex file's contents.
 Usage:
