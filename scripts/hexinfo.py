@@ -45,6 +45,7 @@ Usage:
     python hexinfo.py [options] FILE [ FILE ... ]
 
 Options:
+    -s, --strict            check for strictly incrementing addresses.
     -h, --help              this help message.
     -v, --version           version info.
 '''
@@ -54,10 +55,10 @@ import sys
 INDENT = '  '
 INLIST = '- '
 
-def summarize_yaml(fname):
+def summarize_yaml(fname, strict):
     print("{:s}file: '{:s}'".format(INLIST, fname))
     from intelhex import IntelHex
-    ih = IntelHex(fname)
+    ih = IntelHex(fname, strict_address_increment=strict)
     if ih.start_addr:
         keys = sorted(ih.start_addr.keys())
         if keys == ['CS','IP']:
@@ -77,10 +78,14 @@ def summarize_yaml(fname):
 def main(argv=None):
     import getopt
 
+    options = {
+        "strict": False,
+    }
+
     if argv is None:
         argv = sys.argv[1:]
     try:
-        opts, args = getopt.gnu_getopt(argv, 'hv', ['help', 'version'])
+        opts, args = getopt.gnu_getopt(argv, 'shv', ['help', 'version', 'strict'])
 
         for o,a in opts:
             if o in ('-h', '--help'):
@@ -89,6 +94,9 @@ def main(argv=None):
             elif o in ('-v', '--version'):
                 print(VERSION)
                 return 0
+            elif o in ('-s', '--strict'):
+                options["strict"] = True
+
 
     except getopt.GetoptError:
         e = sys.exc_info()[1]     # current exception
@@ -102,7 +110,7 @@ def main(argv=None):
         return 1
 
     for fname in args:
-        summarize_yaml(fname)
+        summarize_yaml(fname, options["strict"])
 
 if __name__ == '__main__':
     sys.exit(main())

@@ -67,18 +67,25 @@ _DEPRECATED = _DeprecatedParam()
 class IntelHex(object):
     ''' Intel HEX file reader. '''
 
-    def __init__(self, source=None):
+    def __init__(self, source=None, strict_address_increment=False):
         ''' Constructor. If source specified, object will be initialized
         with the contents of source. Otherwise the object will be empty.
 
         @param  source      source for initialization
                             (file name of HEX file, file object, addr dict or
                              other IntelHex object)
+        @param  strict_address_increment  require strictly monotonically
+                            increasing addresses when loading a hex file
         '''
         # public members
         self.padding = 0x0FF
         # Start Address
         self.start_addr = None
+
+        self.strict_address_increment = strict_address_increment
+        # Most previous address loaded from the hex file, used to check strict
+        # address incrementing
+        self.last_address_loaded = None
 
         # private members
         self._buf = {}
@@ -140,11 +147,18 @@ class IntelHex(object):
         if record_type == 0:
             # data record
             addr += self._offset
+            if (
+                self.strict_address_increment
+                and self.last_address_loaded is not None
+                and addr <= self.last_address_loaded
+            ):
+                raise AddressDecrementError(address=addr, line=line)
             for i in range_g(4, 4+record_length):
                 if not self._buf.get(addr, None) is None:
                     raise AddressOverlapError(address=addr, line=line)
                 self._buf[addr] = bin[i]
-                addr += 1   # FIXME: addr should be wrapped 
+                self.last_address_loaded = addr
+                addr += 1   # FIXME: addr should be wrapped
                             # BUT after 02 record (at 64K boundary)
                             # and after 04 record (at 4G boundary)
 
@@ -1314,6 +1328,9 @@ class HexReaderError(IntelHexError):
 
 class AddressOverlapError(HexReaderError):
     _fmt = 'Hex file has data overlap at address 0x%(address)X on line %(line)d'
+
+class AddressDecrementError(HexReaderError):
+    _fmt = 'Hex file has skipback address 0x%(address)X on line %(line)d'
 
 # class NotAHexFileError was removed in trunk.revno.54 because it's not used
 
