@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright (c) 2008-2018 Alexander Belchenko
 # All rights reserved.
@@ -37,7 +37,7 @@
 
 VERSION = '2.3.0'
 
-if __name__ == '__main__':
+def main():
     import getopt
     import os
     import sys
@@ -113,3 +113,6 @@ Options:
 
     from intelhex import bin2hex
     sys.exit(bin2hex(fin, fout, offset))
+
+if __name__ == '__main__':
+    main()

@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 # Copyright (c) 2008-2018, Alexander Belchenko
 # All rights reserved.
@@ -35,7 +35,7 @@
 
 """Setup script for IntelHex."""
 
-import sys, glob
+import os, sys, glob
 try:
     from setuptools import setup
 except ImportError:
@@ -46,12 +46,24 @@ import intelhex, intelhex.__version__
 
 LONG_DESCRIPTION = open('README.rst', 'r').read()
 
+SCRIPT_MODULES = [os.path.splitext(x)[0] for x in glob.glob('intelhex/scripts/*')]
+
+print(SCRIPT_MODULES)
+
 METADATA = dict(
       name='intelhex',
       version=intelhex.__version__.version_str,
 
-      scripts=glob.glob('scripts/*'),
-      packages=['intelhex'],
+      # Include the scripts as a subpackage
+      packages=['intelhex', 'intelhex.scripts'],
+
+      # For every script file, add an entrypoint
+      entry_points={
+          "console_scripts": [
+              "{name}.py = intelhex.scripts.{name}:main".format(name=os.path.basename(x))
+              for x in SCRIPT_MODULES
+          ]
+      },
 
       author='Alexander Belchenko',
       author_email='alexander.belchenko@gmail.com',
