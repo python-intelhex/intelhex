@@ -4,7 +4,7 @@ all:
 	@echo Available targets:
 	@echo  clean   - clean build directory
 	@echo  test    - run unittest
-	@echo  epydoc  - run epydoc to create API documentation (python 2)
+	@echo  apidoc  - run epdoc to create API documentation
 	@echo  wininst - Windows installer for Python
 	@echo  docs    - build docs with ReST and Sphinx
 	@echo  wheel   - build python wheel binary archive
@@ -17,15 +17,15 @@ clean:
 test:
 	$(PYTHON) setup.py test -q
 
-epydoc:
-	epydoc.py -o api -v intelhex
+apidoc:
+	pdoc -o docs/api --html -f intelhex
 
 wininst:
 	$(PYTHON) setup.py bdist_wininst -d.
 
 docs:
 	rst2html5.py docs/manual.txt docs/manual.html
-	make -C docs/manual html
+	$(MAKE) -C docs/manual html
 
 wheel:
 	$(PYTHON) -m pip wheel -w dist .
