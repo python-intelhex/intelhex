@@ -464,8 +464,8 @@ class IntelHex(object):
             ih = IntelHex()
             if addresses:
                 addresses.sort()
-                start = addr.start or addresses[0]
-                stop = addr.stop or (addresses[-1]+1)
+                start = addr.start if addr.start is not None else addresses[0]
+                stop = addr.stop if addr.stop is not None else addresses[-1] + 1
                 step = addr.step or 1
                 for i in range_g(start, stop, step):
                     x = self._buf.get(i)
