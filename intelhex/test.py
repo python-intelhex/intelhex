@@ -1718,19 +1718,19 @@ class TestInSubprocess(unittest.TestCase):
         self.versionChecker('%s setup.py --version')
 
     def test_sripts_bin2hex_version(self):
-        self.versionChecker('%s scripts/bin2hex.py --version')
+        self.versionChecker('%s intelhex/scripts/bin2hex.py --version')
 
     def test_sripts_hex2bin_version(self):
-        self.versionChecker('%s scripts/hex2bin.py --version')
+        self.versionChecker('%s intelhex/scripts/hex2bin.py --version')
 
     def test_sripts_hex2dump_version(self):
-        self.versionChecker('%s scripts/hex2dump.py --version')
+        self.versionChecker('%s intelhex/scripts/hex2dump.py --version')
 
     def test_sripts_hexdiff_version(self):
-        self.versionChecker('%s scripts/hexdiff.py --version')
+        self.versionChecker('%s intelhex/scripts/hexdiff.py --version')
 
     def test_sripts_hexmerge_version(self):
-        self.versionChecker('%s scripts/hexmerge.py --version')
+        self.versionChecker('%s intelhex/scripts/hexmerge.py --version')
 
 
 class TestWriteHexFileByteCount(unittest.TestCase):
