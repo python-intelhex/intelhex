@@ -48,8 +48,6 @@ LONG_DESCRIPTION = open('README.rst', 'r').read()
 
 SCRIPT_MODULES = [os.path.splitext(x)[0] for x in glob.glob('intelhex/scripts/*')]
 
-print(SCRIPT_MODULES)
-
 METADATA = dict(
       name='intelhex',
       version=intelhex.__version__.version_str,
