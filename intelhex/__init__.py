@@ -455,6 +455,9 @@ class IntelHex(object):
         if t in IntTypes:
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
+            addresses = dict_keys(self._buf)
+            if not addresses or addr > max(addresses):
+                raise IndexError
             return self._buf.get(addr, self.padding)
         elif t == slice:
             addresses = dict_keys(self._buf)
