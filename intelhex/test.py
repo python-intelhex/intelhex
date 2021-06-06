@@ -680,6 +680,9 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual({2:3, 10:4}, ih[2:].todict())
         self.assertEqual({0:1, 2:3, 10:4}, ih[::2].todict())
         self.assertEqual({10:4}, ih[3:11].todict())
+        # https://github.com/python-intelhex/intelhex/issues/52
+        self.assertEqual({}, ih[0:0].todict())
+        self.assertEqual({}, ih[1:1].todict())
 
     def test__setitem__(self):
         ih = IntelHex()
