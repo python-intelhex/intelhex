@@ -612,11 +612,17 @@ class TestIntelHex(TestIntelHexBase):
         self.assertNotEqual(id(ih), id(ih2))
 
     def test_dict_interface(self):
+        # https://github.com/python-intelhex/intelhex/issues/54
+        # uninitialized objects no longer return padding bytes for random
+        # addresses. Anything set defines an upper address, remaining bytes
+        # down to zero _will_ yield padding bytes then.
         ih = IntelHex()
+        ih[1] = 0
         self.assertEqual(0xFF, ih[0])  # padding byte substitution
         ih[0] = 1
         self.assertEqual(1, ih[0])
         del ih[0]
+        del ih[1]
         self.assertEqual({}, ih.todict())  # padding byte substitution
 
     def test_len(self):
@@ -627,14 +633,27 @@ class TestIntelHex(TestIntelHexBase):
         ih[1000] = 2
         self.assertEqual(2, len(ih))
 
+    def test_list(self):
+        # https://github.com/python-intelhex/intelhex/issues/54
+        ih = IntelHex()
+        self.assertEqual([], list(ih))
+        ih[2] = 1
+        self.assertEqual([0xFF, 0xFF, 1], list(ih))
+
     def test__getitem__(self):
         ih = IntelHex()
+        # https://github.com/python-intelhex/intelhex/issues/54
+        # uninitialized objects no longer return padding bytes for random
+        # addresses. Anything set defines an upper address, remaining bytes
+        # down to zero _will_ yield padding bytes then.
         # simple cases
+        ih[1] = 0xFF
         self.assertEqual(0xFF, ih[0])
         ih[0] = 1
         self.assertEqual(1, ih[0])
         # big address
-        self.assertEqual(0xFF, ih[2**32-1])
+        ih[2**32-1] = 1
+        self.assertEqual(0xFF, ih[2**32-2])
         # wrong addr type/value for indexing operations
         def getitem(index):
             return ih[index]
