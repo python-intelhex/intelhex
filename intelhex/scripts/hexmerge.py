@@ -57,6 +57,8 @@ Options:
                                         contains data at overlapped address
                             * replace -- use data from last file that
                                          contains data at overlapped address
+                            * identical -- if overlapped data verifies that values
+                                       are identical
 
 Arguments:
     FILES       list of hex files for merging
@@ -122,7 +124,7 @@ def main(args=None):
             elif o == '--no-start-addr':
                 write_start_addr = False
             elif o == '--overlap':
-                if a in ('error', 'ignore', 'replace'):
+                if a in ('error', 'ignore', 'replace', 'identical'):
                     overlap = a
                 else:
                     raise getopt.GetoptError('Bad overlap value')
