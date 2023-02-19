@@ -61,7 +61,7 @@ def summarize_yaml(fname):
     if ih.start_addr:
         keys = sorted(ih.start_addr.keys())
         if keys == ['CS','IP']:
-            entry = ih.start_addr['CS'] * 65536 + ih.start_addr['IP']
+            entry = ih.start_addr['CS'] * 16 + ih.start_addr['IP']
         elif keys == ['EIP']:
             entry = ih.start_addr['EIP']
         else:
