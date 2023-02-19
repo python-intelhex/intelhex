@@ -6,7 +6,7 @@ including HEX, bin, or python dictionaries.
 You can write out HEX data contained in object by method ``.write_hex_file(f)``. 
 Parameter ``f`` should be filename or file-like object. 
 Note that this can include builtins like sys.stdout. 
-Also you can use the universal tofile.
+Also you can use the universal ``tofile``.
 
 To convert data of IntelHex object to HEX8 file format without actually saving it 
 to disk you can use the builtin StringIO file-like object, e.g.::
@@ -25,10 +25,37 @@ Variable ``hexstr`` will contain a string with the content of a HEX8 file.
 You can customize hex file output with following optional arguments
 to ``write_hex_file`` call:
 
-  * ``write_start_addr`` - you can disable start address record in new hex file;
+  * ``write_start_addr`` - you can disable start address record in new hex file.
   * ``eolstyle`` - you can force ``CRLF`` line endings in new hex file.
   * ``byte_count`` - you can control how many bytes should be written to each
     data record.
+  * ``ext_addr_mode`` - you can decide how extended address records should be
+    resolved and written in new hex file (explained below).
+
+Extended Address records are describing an address in binary space from which
+a block of data is being written. Normally without those record we could write
+only 64KB of binary data into one single ``.hex`` file. This is because in
+one signle data record there are only 2 bytes for address. To have possibility
+to write more, Extended Records are needed to increase address resolution.
+Currently there are two types of records defined in IntelHex format:
+
+  * ``Extended Segment Address`` [02] - you can write up to 1MB of binary data
+  * ``Extended Linear Address`` [04] - you can write up to 4GB of binary data
+
+There are 4 modes given by ``ext_addr_mode`` parameter to support every type
+of memory address resolution:
+
+  * ``linear`` - forces to use Extended Linear Address records,
+    in most of cases this mode is commonly desired (default).
+  * ``segment`` - forces to use Extended Segment Address records.
+  * ``none`` - forces to not use any Extended Address records (legacy option).
+  * ``auto`` - automatically decides which mode to use using last known adress
+    where data need to be written.
+
+Whenever data overflow for different adres resoution is detected adequat
+exception will thrown. Mixing of ``linear`` and ``segment`` records isn't
+allowed. There won't be any Extened Address records will written in
+any mode if data to write need to be placed in address under 64KB.
 
 
 Data converters

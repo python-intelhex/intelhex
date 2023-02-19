@@ -24,6 +24,7 @@ Contributors:
 * Stefan Schmitt
 * Theo Sbrissa
 * Zachary Clifford
+* Piotr Korowacki
 * "durexyl" @ GitHub
 * "erki1993" @ GitHub
 * "mentaal" @ GitHub
