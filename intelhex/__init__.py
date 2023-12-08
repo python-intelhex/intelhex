@@ -315,7 +315,7 @@ class IntelHex(object):
                 start, end = end, start
         return start, end
 
-    def tobinarray(self, start=None, end=None, pad=_DEPRECATED, size=None):
+    def tobinarray(self, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
         ''' Convert this object to binary form as array. If start and end 
         unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
@@ -324,9 +324,10 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
+        @param  strip   whether to strip the padding from the end of the binary data
         @return         array of unsigned char data.
         '''
-        if not isinstance(pad, _DeprecatedParam):
+        if not (isinstance(pad, _DeprecatedParam) or pad is None):
             print ("IntelHex.tobinarray: 'pad' parameter is deprecated.")
             if pad is not None:
                 print ("Please, use IntelHex.padding attribute instead.")
@@ -335,9 +336,9 @@ class IntelHex(object):
                 print ("Use syntax like this: ih.tobinarray(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
-        return self._tobinarray_really(start, end, pad, size)
+        return self._tobinarray_really(start, end, pad, size, strip)
 
-    def _tobinarray_really(self, start, end, pad, size):
+    def _tobinarray_really(self, start, end, pad, size, strip):
         """Return binary array."""
         if pad is None:
             pad = self.padding
@@ -349,9 +350,12 @@ class IntelHex(object):
         start, end = self._get_start_end(start, end, size)
         for i in range_g(start, end+1):
             bin.append(self._buf.get(i, pad))
+        if strip:
+            while len(bin) != 0 and bin[-1] == pad:
+                bin.pop()
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None):
+    def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
         ''' Convert to binary form and return as binary string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
@@ -359,9 +363,10 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
+        @param  strip   whether to strip the padding from the end of the binary data
         @return         bytes string of binary data.
         '''
-        if not isinstance(pad, _DeprecatedParam):
+        if not (isinstance(pad, _DeprecatedParam) or pad is None):
             print ("IntelHex.tobinstr: 'pad' parameter is deprecated.")
             if pad is not None:
                 print ("Please, use IntelHex.padding attribute instead.")
@@ -370,12 +375,12 @@ class IntelHex(object):
                 print ("Use syntax like this: ih.tobinstr(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
-        return self._tobinstr_really(start, end, pad, size)
+        return self._tobinstr_really(start, end, pad, size, strip)
 
-    def _tobinstr_really(self, start, end, pad, size):
-        return array_tobytes(self._tobinarray_really(start, end, pad, size))
+    def _tobinstr_really(self, start, end, pad, size, strip):
+        return array_tobytes(self._tobinarray_really(start, end, pad, size, strip))
 
-    def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None):
+    def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
         '''Convert to binary and write to file.
 
         @param  fobj    file name or file object for writing output bytes.
@@ -385,8 +390,9 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
+        @param  strip   whether to strip the padding from the end of the binary data
         '''
-        if not isinstance(pad, _DeprecatedParam):
+        if not (isinstance(pad, _DeprecatedParam) or pad is None):
             print ("IntelHex.tobinfile: 'pad' parameter is deprecated.")
             if pad is not None:
                 print ("Please, use IntelHex.padding attribute instead.")
@@ -401,7 +407,7 @@ class IntelHex(object):
         else:
             close_fd = False
 
-        fobj.write(self._tobinstr_really(start, end, pad, size))
+        fobj.write(self._tobinstr_really(start, end, pad, size, strip))
 
         if close_fd:
             fobj.close()
@@ -1035,7 +1041,7 @@ class IntelHex16bit(IntelHex):
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, strip=False):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -1045,6 +1051,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
     @param  end     end of address range (inclusive; optional)
     @param  size    size of resulting file (in bytes) (optional)
     @param  pad     padding byte (optional)
+    @param  strip   whether to strip padding from the end of the binary data (optional)
     """
     try:
         h = IntelHex(fin)
@@ -1070,7 +1077,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
         if pad is not None:
             # using .padding attribute rather than pad argument to function call
             h.padding = pad
-        h.tobinfile(fout, start, end)
+        h.tobinfile(fout, start, end, strip=strip)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))

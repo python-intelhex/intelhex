@@ -60,17 +60,19 @@ Options:
                             Range can be in form 'START:' or ':END'.
     -l, --length=NNNN,
     -s, --size=NNNN         size of output (decimal value).
+        --strip             strip padding from the end of the binary data.
 '''
 
     pad = None
     start = None
     end = None
     size = None
+    strip = False
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hvp:r:l:s:",
                                   ["help", "version", "pad=", "range=",
-                                   "length=", "size="])
+                                   "length=", "size=", "strip"])
 
         for o, a in opts:
             if o in ("-h", "--help"):
@@ -98,6 +100,8 @@ Options:
                     size = int(a, 10)
                 except:
                     raise getopt.GetoptError('Bad size value')
+            elif o in ("--strip"):
+                strip = True
 
         if start != None and end != None and size != None:
             raise getopt.GetoptError('Cannot specify START:END and SIZE simultaneously')
@@ -129,7 +133,7 @@ Options:
         fout = compat.get_binary_stdout()
 
     from intelhex import hex2bin
-    sys.exit(hex2bin(fin, fout, start, end, size, pad))
+    sys.exit(hex2bin(fin, fout, start, end, size, pad, strip))
 
 if __name__ == '__main__':
     main()
