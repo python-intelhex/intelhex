@@ -144,7 +144,7 @@ class IntelHex(object):
                 if not self._buf.get(addr, None) is None:
                     raise AddressOverlapError(address=addr, line=line)
                 self._buf[addr] = bin[i]
-                addr += 1   # FIXME: addr should be wrapped 
+                addr += 1   # FIXME: addr should be wrapped
                             # BUT after 02 record (at 64K boundary)
                             # and after 04 record (at 4G boundary)
 
@@ -286,10 +286,10 @@ class IntelHex(object):
             self._buf[offset] = b
             offset += 1
 
-    def _get_start_end(self, start=None, end=None, size=None):
+    def _get_start_end(self, start=None, end=None, size=None, filter=False):
         """Return default values for start and end if they are None.
         If this IntelHex object is empty then it's error to
-        invoke this method with both start and end as None. 
+        invoke this method with both start and end as None.
         """
         if (start,end) == (None,None) and self._buf == {}:
             raise EmptyIntelHexError
@@ -311,12 +311,14 @@ class IntelHex(object):
                 start = self.minaddr()
             if end is None:
                 end = self.maxaddr()
+            elif filter:
+                end = self.maxaddr_in(start, end)
             if start > end:
                 start, end = end, start
         return start, end
 
-    def tobinarray(self, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
-        ''' Convert this object to binary form as array. If start and end 
+    def tobinarray(self, start=None, end=None, pad=_DEPRECATED, size=None, filter=False):
+        ''' Convert this object to binary form as array. If start and end
         unspecified, they will be inferred from the data.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
@@ -324,7 +326,7 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
-        @param  strip   whether to strip the padding from the end of the binary data
+        @param  filter  whether to filter the input range to avoid padding
         @return         array of unsigned char data.
         '''
         if not (isinstance(pad, _DeprecatedParam) or pad is None):
@@ -336,9 +338,9 @@ class IntelHex(object):
                 print ("Use syntax like this: ih.tobinarray(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
-        return self._tobinarray_really(start, end, pad, size, strip)
+        return self._tobinarray_really(start, end, pad, size, filter)
 
-    def _tobinarray_really(self, start, end, pad, size, strip):
+    def _tobinarray_really(self, start, end, pad, size, filter):
         """Return binary array."""
         if pad is None:
             pad = self.padding
@@ -347,15 +349,12 @@ class IntelHex(object):
             return bin
         if size is not None and size <= 0:
             raise ValueError("tobinarray: wrong value for size")
-        start, end = self._get_start_end(start, end, size)
+        start, end = self._get_start_end(start, end, size, filter)
         for i in range_g(start, end+1):
             bin.append(self._buf.get(i, pad))
-        if strip:
-            while len(bin) != 0 and bin[-1] == pad:
-                bin.pop()
         return bin
 
-    def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
+    def tobinstr(self, start=None, end=None, pad=_DEPRECATED, size=None, filter=False):
         ''' Convert to binary form and return as binary string.
         @param  start   start address of output bytes.
         @param  end     end address of output bytes (inclusive).
@@ -363,7 +362,7 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
-        @param  strip   whether to strip the padding from the end of the binary data
+        @param  filter  whether to filter the input range to avoid padding
         @return         bytes string of binary data.
         '''
         if not (isinstance(pad, _DeprecatedParam) or pad is None):
@@ -375,12 +374,12 @@ class IntelHex(object):
                 print ("Use syntax like this: ih.tobinstr(start=xxx, end=yyy, size=zzz)")
         else:
             pad = None
-        return self._tobinstr_really(start, end, pad, size, strip)
+        return self._tobinstr_really(start, end, pad, size, filter)
 
-    def _tobinstr_really(self, start, end, pad, size, strip):
-        return array_tobytes(self._tobinarray_really(start, end, pad, size, strip))
+    def _tobinstr_really(self, start, end, pad, size, filter):
+        return array_tobytes(self._tobinarray_really(start, end, pad, size, filter))
 
-    def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None, strip=False):
+    def tobinfile(self, fobj, start=None, end=None, pad=_DEPRECATED, size=None, filter=False):
         '''Convert to binary and write to file.
 
         @param  fobj    file name or file object for writing output bytes.
@@ -390,7 +389,7 @@ class IntelHex(object):
                         fill empty spaces with this value
                         (if pad is None then this method uses self.padding).
         @param  size    size of the block, used with start or end parameter.
-        @param  strip   whether to strip the padding from the end of the binary data
+        @param  filter  whether to filter the input range to avoid padding
         '''
         if not (isinstance(pad, _DeprecatedParam) or pad is None):
             print ("IntelHex.tobinfile: 'pad' parameter is deprecated.")
@@ -407,7 +406,7 @@ class IntelHex(object):
         else:
             close_fd = False
 
-        fobj.write(self._tobinstr_really(start, end, pad, size, strip))
+        fobj.write(self._tobinstr_really(start, end, pad, size, filter))
 
         if close_fd:
             fobj.close()
@@ -425,11 +424,20 @@ class IntelHex(object):
 
     def addresses(self):
         '''Returns all used addresses in sorted order.
-        @return         list of occupied data addresses in sorted order. 
+        @return         list of occupied data addresses in sorted order.
         '''
         aa = dict_keys(self._buf)
         aa.sort()
         return aa
+
+    def addresses_in(self, start, end):
+        '''Returns all used addresses in a given range in sorted order.
+        @param start    the start address of the range
+        @param end      the end address of the range
+        @return         list of occupied data addresses in sorted order.
+        '''
+        # TODO: end is inclusive, correct?
+        return [a for a in self.addresses() if a >= start and a <= end]
 
     def minaddr(self):
         '''Get minimal address of HEX content.
@@ -441,11 +449,35 @@ class IntelHex(object):
         else:
             return min(aa)
 
+    def minaddr_in(self, start, end):
+        '''Get minimal address of HEX content within the specified range.
+        @param start    the start address of the range
+        @param end      the end address of the range
+        @return         minimal address or None if no data
+        '''
+        aa = self.addresses_in(start, end)
+        if aa == []:
+            return None
+        else:
+            return min(aa)
+
     def maxaddr(self):
         '''Get maximal address of HEX content.
         @return         maximal address or None if no data
         '''
         aa = dict_keys(self._buf)
+        if aa == []:
+            return None
+        else:
+            return max(aa)
+
+    def maxaddr_in(self, start, end):
+        '''Get maximal address of HEX content within the specified range.
+        @param start    the start address of the range
+        @param end      the end address of the range
+        @return         maximal address or None if no data
+        '''
+        aa = self.addresses_in(start, end)
         if aa == []:
             return None
         else:
@@ -755,7 +787,7 @@ class IntelHex(object):
             self._buf[addr+i] = a[i]
 
     def getsz(self, addr):
-        """Get zero-terminated bytes string from given address. Will raise 
+        """Get zero-terminated bytes string from given address. Will raise
         NotEnoughDataError exception if a hole is encountered before a 0.
         """
         i = 0
@@ -777,7 +809,7 @@ class IntelHex(object):
     def find(self, sub, start=None, end=None):
         """Return the lowest index in self[start:end] where subsection sub is found.
         Optional arguments start and end are interpreted as in slice notation.
-        
+
         @param  sub     bytes-like subsection to find
         @param  start   start of section to search within (optional)
         @param  end     end of section to search within (optional)
@@ -807,7 +839,7 @@ class IntelHex(object):
         width = int(width)
         if tofile is None:
             tofile = sys.stdout
-            
+
         # start addr possibly
         if self.start_addr is not None:
             cs = self.start_addr.get('CS')
@@ -862,7 +894,7 @@ class IntelHex(object):
                                   in overlapping region.
 
         @raise  TypeError       if other is not instance of IntelHex
-        @raise  ValueError      if other is the same object as self 
+        @raise  ValueError      if other is the same object as self
                                 (it can't merge itself)
         @raise  ValueError      if overlap argument has incorrect value
         @raise  AddressOverlapError    on overlapped data
@@ -917,7 +949,7 @@ class IntelHex(object):
         beginnings = [addresses[b+1] for b in breaks]
         beginnings.insert(0, addresses[0])
         return [(a, b+1) for (a, b) in zip(beginnings, endings)]
-        
+
     def get_memory_size(self):
         """Returns the approximate memory footprint for data."""
         n = sys.getsizeof(self)
@@ -1005,7 +1037,7 @@ class IntelHex16bit(IntelHex):
     def maxaddr(self):
         '''Get maximal address of HEX content in 16-bit mode.
 
-        @return         maximal address used in this object 
+        @return         maximal address used in this object
         '''
         aa = dict_keys(self._buf)
         if aa == []:
@@ -1041,7 +1073,7 @@ class IntelHex16bit(IntelHex):
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, strip=False):
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, filter=False):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -1051,7 +1083,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, strip=False):
     @param  end     end of address range (inclusive; optional)
     @param  size    size of resulting file (in bytes) (optional)
     @param  pad     padding byte (optional)
-    @param  strip   whether to strip padding from the end of the binary data (optional)
+    @param  filter  whether to filter the input range to avoid padding (optional)
     """
     try:
         h = IntelHex(fin)
@@ -1077,7 +1109,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, strip=False):
         if pad is not None:
             # using .padding attribute rather than pad argument to function call
             h.padding = pad
-        h.tobinfile(fout, start, end, strip=strip)
+        h.tobinfile(fout, start, end, filter=filter)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
@@ -1180,7 +1212,7 @@ class Record(object):
 
     def eof():
         """Return End of File record as a string.
-        @return         String representation of Intel Hex EOF record 
+        @return         String representation of Intel Hex EOF record
         """
         return ':00000001FF'
     eof = staticmethod(eof)
