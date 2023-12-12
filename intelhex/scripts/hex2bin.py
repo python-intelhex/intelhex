@@ -37,6 +37,18 @@
 
 VERSION = '2.3.0'
 
+def split_range(a):
+    '''Split a range string "START:END" into integer parts
+    @param a           string in the form "START:END"
+    @return start,end  start and end values as integers
+    '''
+    l = a.split(":")
+    if l[0] != '':
+        start = int(l[0], 16)
+    if l[1] != '':
+        end = int(l[1], 16)
+    return start, end
+
 def main():
     import getopt
     import os
@@ -58,6 +70,9 @@ Options:
     -r, --range=START:END   specify address range for writing output
                             (ascii hex value).
                             Range can be in form 'START:' or ':END'.
+    -f, --filter=START:END  specify address range for filtering input
+                            (ascii hex value).
+                            Filter range can be in form 'START:' or ':END'.
     -l, --length=NNNN,
     -s, --size=NNNN         size of output (decimal value).
 '''
@@ -66,11 +81,12 @@ Options:
     start = None
     end = None
     size = None
+    filter = False
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hvp:r:l:s:",
+        opts, args = getopt.getopt(sys.argv[1:], "hvp:r:f:l:s:",
                                   ["help", "version", "pad=", "range=",
-                                   "length=", "size="])
+                                   "filter=", "length=", "size="])
 
         for o, a in opts:
             if o in ("-h", "--help"):
@@ -86,13 +102,15 @@ Options:
                     raise getopt.GetoptError('Bad pad value')
             elif o in ("-r", "--range"):
                 try:
-                    l = a.split(":")
-                    if l[0] != '':
-                        start = int(l[0], 16)
-                    if l[1] != '':
-                        end = int(l[1], 16)
+                    start, end = split_range(a)
                 except:
                     raise getopt.GetoptError('Bad range value(s)')
+            elif o in ("-f", "--filter"):
+                filter = True
+                try:
+                    start, end = split_range(a)
+                except:
+                    raise getopt.GetoptError('Bad filter range value(s)')
             elif o in ("-l", "--lenght", "-s", "--size"):
                 try:
                     size = int(a, 10)
@@ -129,7 +147,7 @@ Options:
         fout = compat.get_binary_stdout()
 
     from intelhex import hex2bin
-    sys.exit(hex2bin(fin, fout, start, end, size, pad))
+    sys.exit(hex2bin(fin, fout, start, end, size, pad, filter))
 
 if __name__ == '__main__':
     main()
