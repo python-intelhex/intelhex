@@ -93,7 +93,7 @@ Options:
                         end = int(l[1], 16)
                 except:
                     raise getopt.GetoptError('Bad range value(s)')
-            elif o in ("-l", "--lenght", "-s", "--size"):
+            elif o in ("-l", "--length", "-s", "--size"):
                 try:
                     size = int(a, 10)
                 except:
