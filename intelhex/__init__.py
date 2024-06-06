@@ -1081,13 +1081,14 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
 #/def hex2bin
 
 
-def bin2hex(fin, fout, offset=0):
+def bin2hex(fin, fout, offset=0, byte_count=16):
     """Simple bin-to-hex convertor.
     @return     0   if all OK
 
-    @param  fin     input bin file (filename or file-like object)
-    @param  fout    output hex file (filename or file-like object)
-    @param  offset  starting address offset for loading bin
+    @param  fin        input bin file (filename or file-like object)
+    @param  fout       output hex file (filename or file-like object)
+    @param  offset     starting address offset for loading bin
+    @param  byte_count bytes per line
     """
     h = IntelHex()
     try:
@@ -1099,7 +1100,7 @@ def bin2hex(fin, fout, offset=0):
         return 1
 
     try:
-        h.tofile(fout, format='hex')
+        h.tofile(fout, format='hex', byte_count=byte_count)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
