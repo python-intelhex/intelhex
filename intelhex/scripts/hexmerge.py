@@ -57,6 +57,7 @@ Options:
                                         contains data at overlapped address
                             * replace -- use data from last file that
                                          contains data at overlapped address
+     --byte-count=N         max bytes per line
 
 Arguments:
     FILES       list of hex files for merging
@@ -91,6 +92,7 @@ def main(args=None):
     end = None
     write_start_addr = True
     overlap = 'error'
+    byte_count = 32
 
     if args is None:
         args = sys.argv[1:]
@@ -99,6 +101,7 @@ def main(args=None):
                                        ['help', 'version',
                                         'output=', 'range=',
                                         'no-start-addr', 'overlap=',
+                                        'byte-count='
                                        ])
 
         for o,a in opts:
@@ -126,6 +129,8 @@ def main(args=None):
                     overlap = a
                 else:
                     raise getopt.GetoptError('Bad overlap value')
+            elif o == '--byte-count':
+                byte_count = int(a)
 
         if len(args) == 0:
             raise getopt.GetoptError('You should specify file list')
@@ -170,7 +175,7 @@ def main(args=None):
         res = res[start:end_addr_inclusive(end)]
     if output is None:
         output = sys.stdout
-    res.write_hex_file(output, write_start_addr)
+    res.write_hex_file(output, write_start_addr, byte_count=byte_count)
     return 0
 
 
