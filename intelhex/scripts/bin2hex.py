@@ -57,9 +57,11 @@ Options:
     -h, --help              this help message.
     -v, --version           version info.
     --offset=N              offset for loading bin file (default: 0).
+    --byte-count=N          max bytes per line
 '''
 
     offset = 0
+    byte_count = 32
 
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hv",
@@ -80,6 +82,8 @@ Options:
                     offset = int(a, base)
                 except:
                     raise getopt.GetoptError('Bad offset value')
+            elif o in ("--byte-count"):
+                byte_count = int(a)
 
         if not args:
             raise getopt.GetoptError('Input file is not specified')
@@ -112,7 +116,7 @@ Options:
         fout = sys.stdout   # compat.get_binary_stdout()
 
     from intelhex import bin2hex
-    sys.exit(bin2hex(fin, fout, offset))
+    sys.exit(bin2hex(fin, fout, offset, byte_count))
 
 if __name__ == '__main__':
     main()
