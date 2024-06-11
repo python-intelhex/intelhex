@@ -1110,7 +1110,7 @@ def bin2hex(fin, fout, offset=0):
 #/def bin2hex
 
 
-def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
+def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3, width=16):
     """Diff 2 IntelHex objects and produce unified diff output for their
     hex dumps.
 
@@ -1120,10 +1120,11 @@ def diff_dumps(ih1, ih2, tofile=None, name1="a", name2="b", n_context=3):
     @param name1      name of the first hex file to show in the diff header
     @param name2      name of the first hex file to show in the diff header
     @param n_context  number of context lines in the unidiff output
+    @param width      width of dump for which diff will be created
     """
     def prepare_lines(ih):
         sio = StringIO()
-        ih.dump(sio)
+        ih.dump(sio, width=width)
         dump = sio.getvalue()
         lines = dump.splitlines()
         return lines
