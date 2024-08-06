@@ -547,7 +547,7 @@ class IntelHex(object):
             raise ValueError("wrong eolstyle %s" % repr(eolstyle))
     _get_eol_textfile = staticmethod(_get_eol_textfile)
 
-    def write_hex_file(self, f, write_start_addr=True, eolstyle='native', byte_count=16):
+    def write_hex_file(self, f,start_address=None, write_start_addr=True, eolstyle='native', byte_count=16):
         """Write data to file f in HEX format.
 
         @param  f                   filename or file-like object for writing
@@ -650,7 +650,7 @@ class IntelHex(object):
                     bin[2] = 0      # offset lsb
                     bin[3] = 4      # rectyp
                     high_ofs = int(cur_addr>>16)
-                    b = divmod(high_ofs, 256)
+                    b = divmod(int((cur_addr + start_address)>>16), 256)
                     bin[4] = b[0]   # msb of high_ofs
                     bin[5] = b[1]   # lsb of high_ofs
                     bin[6] = (-sum(bin)) & 0x0FF    # chksum
@@ -679,7 +679,7 @@ class IntelHex(object):
                         chain_len = 1               # real chain_len
 
                     bin = array('B', asbytes('\0'*(5+chain_len)))
-                    b = divmod(low_addr, 256)
+                    b = divmod(((low_addr+start_address) & 0x0FFFF), 256)
                     bin[1] = b[0]   # msb of low_addr
                     bin[2] = b[1]   # lsb of low_addr
                     bin[3] = 0          # rectype
@@ -712,15 +712,16 @@ class IntelHex(object):
         if fclose:
             fclose()
 
-    def tofile(self, fobj, format, byte_count=16):
+    def tofile(self, fobj, format,start_address=None, byte_count=16):
         """Write data to hex or bin file. Preferred method over tobin or tohex.
 
         @param  fobj        file name or file-like object
         @param  format      file format ("hex" or "bin")
+        @param  start_address  user define starting address for the output hex data
         @param  byte_count  bytes per line
         """
         if format == 'hex':
-            self.write_hex_file(fobj, byte_count=byte_count)
+            self.write_hex_file(fobj,start_address, byte_count=byte_count)
         elif format == 'bin':
             self.tobinfile(fobj)
         else:
@@ -1081,13 +1082,14 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
 #/def hex2bin
 
 
-def bin2hex(fin, fout, offset=0):
+def bin2hex(fin, fout, offset=0,start_address=None):
     """Simple bin-to-hex convertor.
     @return     0   if all OK
 
     @param  fin     input bin file (filename or file-like object)
     @param  fout    output hex file (filename or file-like object)
     @param  offset  starting address offset for loading bin
+    @param  start_address  output hex file with user define start address
     """
     h = IntelHex()
     try:
@@ -1099,7 +1101,7 @@ def bin2hex(fin, fout, offset=0):
         return 1
 
     try:
-        h.tofile(fout, format='hex')
+        h.tofile(fout, format='hex',start_address=start_address)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
