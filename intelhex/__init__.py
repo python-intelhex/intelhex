@@ -158,7 +158,7 @@ class IntelHex(object):
             # Extended 8086 Segment Record
             if record_length != 2 or addr != 0:
                 raise ExtendedSegmentAddressRecordError(line=line)
-            self._offset = (bin[4]*256 + bin[5]) * 16
+            self._offset = (self._offset & 0xFFF00000 ) | ((bin[4]*256 + bin[5]) * 16)
 
         elif record_type == 4:
             # Extended Linear Address Record
