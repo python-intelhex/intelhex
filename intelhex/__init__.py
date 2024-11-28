@@ -445,6 +445,15 @@ class IntelHex(object):
         else:
             return max(aa)
 
+    def __contains__(self, addr):
+        ''' Returns a boolean if the address is present.
+        @param addr    address of byte.
+        @return        bool if address exists in HEX file.
+        '''
+        if addr < 0:
+            raise TypeError('Address should be >= 0.')
+        return addr in self._buf
+
     def __getitem__(self, addr):
         ''' Get requested byte from address.
         @param  addr    address of byte.

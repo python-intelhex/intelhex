@@ -22,6 +22,7 @@ Contributors:
 * Ryan Downing
 * Scott Armitage
 * Stefan Schmitt
+* Svein Seldal
 * Theo Sbrissa
 * Zachary Clifford
 * "durexyl" @ GitHub

@@ -640,6 +640,22 @@ class TestIntelHex(TestIntelHexBase):
         ih[2] = 1
         self.assertEqual([0xFF, 0xFF, 1], list(ih))
 
+    def test__contains__(self):
+        # https://github.com/python-intelhex/intelhex/issues/TBD
+        ih = IntelHex()
+        self.assertFalse(0 in ih)
+        ih[1] = 0xFF
+        self.assertTrue(1 in ih)
+        # big address
+        ih[2**32-1] = 1
+        self.assertTrue((2**32-1) in ih)
+        # Invalid address
+        def contains(index):
+            return index in ih
+        self.assertRaisesMsg(TypeError,
+            'Address should be >= 0.',
+            contains, -1)
+
     def test__getitem__(self):
         ih = IntelHex()
         # https://github.com/python-intelhex/intelhex/issues/54
