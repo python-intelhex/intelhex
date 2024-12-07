@@ -1,6 +1,6 @@
 #!/bin/sh
 
-TARGETS="3.5.10 3.6.12 3.7.9 3.8.1 3.9.0 pypy2.7-7.3.1 pypy3.5-7.0.0 pypy3.6-7.3.1"
+TARGETS="3.8 3.9 3.10 3.11 3.12 3.13"
 DIR=$(dirname "$(readlink -f "$0")")
 
 _pyenv=$(command -v pyenv)
