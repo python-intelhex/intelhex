@@ -1044,7 +1044,7 @@ class IntelHex16bit(IntelHex):
 #/class IntelHex16bit
 
 
-def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
+def hex2bin(fin, fout, start=None, end=None, size=None, pad=None, filter=False):
     """Hex-to-Bin convertor engine.
     @return     0   if all OK
 
@@ -1054,6 +1054,7 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
     @param  end     end of address range (inclusive; optional)
     @param  size    size of resulting file (in bytes) (optional)
     @param  pad     padding byte (optional)
+    @param  filter  whether to filter the input range (optional)
     """
     try:
         h = IntelHex(fin)
@@ -1079,7 +1080,10 @@ def hex2bin(fin, fout, start=None, end=None, size=None, pad=None):
         if pad is not None:
             # using .padding attribute rather than pad argument to function call
             h.padding = pad
-        h.tobinfile(fout, start, end)
+        if filter:
+            h[start:end+1].tobinfile(fout)
+        else:
+            h.tobinfile(fout, start, end)
     except IOError:
         e = sys.exc_info()[1]     # current exception
         txt = "ERROR: Could not write to file: %s: %s" % (fout, str(e))
