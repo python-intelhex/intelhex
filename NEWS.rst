@@ -2,6 +2,8 @@
 IntelHex releases
 *****************
 
+* Added support for ``in`` operator to check if address is in HEX file.
+
 2.3.0 (2020-10-20)
 ------------------
 * Add ``IntelHex.find()`` method to find a given byte pattern. (Scott Armitage)
