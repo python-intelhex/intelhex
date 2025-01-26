@@ -22,6 +22,8 @@ This is a script to merge two different hex files. It is a frontend for the
                                             contains data at overlapped address
                                 * replace -- use data from last file that
                                              contains data at overlapped address
+                                * identical -- raise error if data differ
+
 
     Arguments:
         FILES       list of hex files for merging
