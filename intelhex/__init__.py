@@ -67,13 +67,21 @@ _DEPRECATED = _DeprecatedParam()
 class IntelHex(object):
     ''' Intel HEX file reader. '''
 
-    def __init__(self, source=None):
+    def __init__(self, source=None, overlap='error'):
         ''' Constructor. If source specified, object will be initialized
         with the contents of source. Otherwise the object will be empty.
 
         @param  source      source for initialization
                             (file name of HEX file, file object, addr dict or
                              other IntelHex object)
+        @param  overlap     defines behavior for overlapping addresses
+                            during hex file loading:
+                            - 'error': raises AddressOverlapError (default)
+                            - 'ignore': keeps the original data, discards new data
+                            - 'replace': replaces the original data with new data
+
+                            Note: this parameter currently only affects loading
+                            from HEX files via loadhex or during initialization.
         '''
         # public members
         self.padding = 0x0FF
@@ -83,6 +91,11 @@ class IntelHex(object):
         # private members
         self._buf = {}
         self._offset = 0
+
+        # overlap setting for hex loading
+        if overlap not in ('error', 'ignore', 'replace'):
+            raise ValueError("overlap argument should be either 'error', 'ignore' or 'replace'")
+        self._overlap_check = overlap
 
         if source is not None:
             if isinstance(source, StrType) or getattr(source, "read", None):
@@ -140,11 +153,17 @@ class IntelHex(object):
         if record_type == 0:
             # data record
             addr += self._offset
-            for i in range_g(4, 4+record_length):
-                if not self._buf.get(addr, None) is None:
-                    raise AddressOverlapError(address=addr, line=line)
-                self._buf[addr] = bin[i]
-                addr += 1   # FIXME: addr should be wrapped 
+            base_addr = addr  # Start address for this record's data
+            for i in range_g(record_length):
+                current_addr = base_addr + i
+                # Check for overlap based on self._overlap_check setting
+                if current_addr in self._buf:
+                    if self._overlap_check == 'error':
+                        raise AddressOverlapError(address=current_addr, line=line)
+                    elif self._overlap_check == 'ignore':
+                        continue # Skip assignment for this byte
+                # Assign if address doesn't exist OR if overlap is 'replace'
+                self._buf[current_addr] = bin[4+i]
                             # BUT after 02 record (at 64K boundary)
                             # and after 04 record (at 4G boundary)
 
@@ -184,8 +203,8 @@ class IntelHex(object):
                 raise DuplicateStartAddressRecordError(line=line)
             self.start_addr = {'EIP': (bin[4]*16777216 +
                                        bin[5]*65536 +
-                                       bin[6]*256 +
-                                       bin[7]),
+                                        bin[6]*256 +
+                                        bin[7]),
                               }
 
     def loadhex(self, fobj):

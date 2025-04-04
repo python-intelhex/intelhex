@@ -1576,6 +1576,36 @@ class TestDecodeHexRecords(TestIntelHexBase):
         # EOF should raise special exception
         self.assertRaises(_EndOfFile, self.decode_record, ':00000001FF')
 
+    def test_overlap_options(self):
+        # Hex file with overlapping data
+        overlapping_hex = """\
+:020000001122CB
+:02000100334486
+:00000001FF
+"""
+        # Test 'error' (default)
+        ih_error = IntelHex()
+        ih_error._decode_record(':020000001122CB')  # First record ok
+        self.assertRaisesMsg(AddressOverlapError,
+                             'Hex file has data overlap at address 0x1 '
+                             'on line 1',
+                             ih_error._decode_record,
+                             ':02000100334486', 1)
+
+        # Test 'ignore'
+        ih_ignore = IntelHex(overlap='ignore')
+        ih_ignore.loadhex(StringIO(overlapping_hex))
+        self.assertEqual(ih_ignore[0], 0x11)
+        self.assertEqual(ih_ignore[1], 0x22) # Should keep the first value (0x22)
+        self.assertEqual(ih_ignore[2], 0x44)
+
+        # Test 'replace'
+        ih_replace = IntelHex(overlap='replace')
+        ih_replace.loadhex(StringIO(overlapping_hex))
+        self.assertEqual(ih_replace[0], 0x11)
+        self.assertEqual(ih_replace[1], 0x33) # Should be replaced with the second value (0x33)
+        self.assertEqual(ih_replace[2], 0x44)
+
 #/class TestDecodeHexRecords
 
 
