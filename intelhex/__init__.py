@@ -272,7 +272,7 @@ class IntelHex(object):
         if start_addr is not None:
             del s['start_addr']
         for k in dict_keys_g(s):
-            if type(k) not in IntTypes or k < 0:
+            if not isinstance(k, IntTypes) or k < 0:
                 raise ValueError('Source dictionary should have only int keys')
         self._buf.update(s)
         if start_addr is not None:
@@ -460,15 +460,14 @@ class IntelHex(object):
         @return         byte if address exists in HEX file, or self.padding
                         if no data found.
         '''
-        t = type(addr)
-        if t in IntTypes:
+        if isinstance(addr, IntTypes):
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             addresses = dict_keys(self._buf)
             if not addresses or addr > max(addresses):
                 raise IndexError
             return self._buf.get(addr, self.padding)
-        elif t == slice:
+        elif isinstance(addr, slice):
             addresses = dict_keys(self._buf)
             ih = IntelHex()
             if addresses:
@@ -482,16 +481,15 @@ class IntelHex(object):
                         ih[i] = x
             return ih
         else:
-            raise TypeError('Address has unsupported type: %s' % t)
+            raise TypeError('Address has unsupported type: %s' % type(addr))
 
     def __setitem__(self, addr, byte):
         """Set byte at address."""
-        t = type(addr)
-        if t in IntTypes:
+        if isinstance(addr, IntTypes):
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             self._buf[addr] = byte
-        elif t == slice:
+        elif isinstance(addr, slice):
             if not isinstance(byte, (list, tuple)):
                 raise ValueError('Slice operation expects sequence of bytes')
             start = addr.start
@@ -517,16 +515,15 @@ class IntelHex(object):
                 self._buf[i] = byte[j]
                 j += 1
         else:
-            raise TypeError('Address has unsupported type: %s' % t)
+            raise TypeError('Address has unsupported type: %s' % type(addr))
 
     def __delitem__(self, addr):
         """Delete byte at address."""
-        t = type(addr)
-        if t in IntTypes:
+        if isinstance(addr, IntTypes):
             if addr < 0:
                 raise TypeError('Address should be >= 0.')
             del self._buf[addr]
-        elif t == slice:
+        elif isinstance(addr, slice):
             addresses = dict_keys(self._buf)
             if addresses:
                 addresses.sort()
@@ -538,7 +535,7 @@ class IntelHex(object):
                     if x is not None:
                         del self._buf[i]
         else:
-            raise TypeError('Address has unsupported type: %s' % t)
+            raise TypeError('Address has unsupported type: %s' % type(addr))
 
     def __len__(self):
         """Return count of bytes with real values."""
