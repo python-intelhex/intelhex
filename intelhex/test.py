@@ -700,6 +700,16 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual({}, ih[0:0].todict())
         self.assertEqual({}, ih[1:1].todict())
 
+    def test__getitem__with_subclass_of_int(self):
+
+        class SubclassOfInt(int):
+            pass
+
+        ih = IntelHex()
+        ih[0] = 0xFF
+        scoi : SubclassOfInt = SubclassOfInt(0)
+        self.assertEqual(0xFF, ih[scoi])
+
     def test__setitem__(self):
         ih = IntelHex()
         # simple indexing operation
@@ -746,6 +756,16 @@ class TestIntelHex(TestIntelHexBase):
         self.assertRaisesMsg(TypeError,
             'stop address cannot be negative',
             setitem, slice(0,-3,-1), [1,2,3])
+
+    def test__setitem__with_subclass_of_int(self):
+
+        class SubclassOfInt(int):
+            pass
+
+        ih = IntelHex()
+        scoi : SubclassOfInt = SubclassOfInt(0)
+        # simple indexing operation
+        ih[scoi] = 1
 
     def test__delitem__(self):
         ih = IntelHex()
