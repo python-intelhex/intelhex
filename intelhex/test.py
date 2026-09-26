@@ -700,6 +700,19 @@ class TestIntelHex(TestIntelHexBase):
         self.assertEqual({}, ih[0:0].todict())
         self.assertEqual({}, ih[1:1].todict())
 
+    def test_slice_padding(self):
+        ih = IntelHex({0: 0x11, 2: 0x33})
+        ih.padding = 0
+        sliced = ih[:3]
+        self.assertEqual(asbytes('\x11\x00\x33'), sliced.tobinstr())
+        self.assertEqual(0, sliced.padding)
+        self.assertEqual(0, ih[1:2].padding)
+
+    def test_empty_slice_padding(self):
+        ih = IntelHex()
+        ih.padding = 0xAA
+        self.assertEqual(0xAA, ih[:].padding)
+
     def test__setitem__(self):
         ih = IntelHex()
         # simple indexing operation
