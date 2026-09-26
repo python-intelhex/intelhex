@@ -471,6 +471,7 @@ class IntelHex(object):
         elif t == slice:
             addresses = dict_keys(self._buf)
             ih = IntelHex()
+            ih.padding = self.padding
             if addresses:
                 addresses.sort()
                 start = addr.start if addr.start is not None else addresses[0]
